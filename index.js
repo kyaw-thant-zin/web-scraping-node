@@ -5,6 +5,7 @@
  */
 const express = require("express")
 const puppeteer = require('puppeteer')
+const {executablePath} = require('puppeteer')
 
 /**
  * App Variables
@@ -40,6 +41,7 @@ app.listen(port, () => {
     const browserSetting = {
         headless: false,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: executablePath(),
     }
 
    
@@ -56,6 +58,7 @@ app.listen(port, () => {
 
 
         await page.waitForTimeout(5000)
+        console.log("Close browser")
         await browser.close()
 
     });
