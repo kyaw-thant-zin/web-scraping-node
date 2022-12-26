@@ -48,8 +48,8 @@ app.listen(port, () => {
         devtools: false,
         // args: ['--no-sandbox'],
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        // executablePath: executablePath(),
-        executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        executablePath: executablePath(),
+        // executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
         // product: 'chrome'
     }
 
