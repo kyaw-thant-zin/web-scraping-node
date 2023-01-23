@@ -48,9 +48,10 @@ app.listen(port, () => {
     // Browser Setting
     const browserSetting = {
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1920,1080', '--use-gl=egl', '--disable-dev-shm-usage'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1000,1080', '--use-gl=egl', '--disable-dev-shm-usage'],
         ignoreDefaultArgs: ['--disable-extensions'],
         executablePath: executablePath(),
+
     }
 
     // launch browser
@@ -86,8 +87,8 @@ app.listen(port, () => {
 
         // go to profile
         console.log("Go to profile.....")
-        await page.goto('https://www.tiktok.com/@mizar449', {
-            waitUntil: 'networkidle0',
+        await page.goto('https://www.tiktok.com/@eichawpo6', {
+            waitUntil: 'domcontentloaded',
         })
 
         console.log("page scroll")
@@ -131,12 +132,14 @@ app.listen(port, () => {
                 if(element.request.url.includes("api/user/detail")) {
                     // profile URL
                     const profileURL = url.parse(element.request.url, true)
+                    console.log(profileURL.href);
                     profileURLQuery = profileURL.query
                     userInfo = element.response?.content
                     // userInfo = JSON.parse(element.response?.content?.text).userInfo
                 } else if(element.request.url.includes("api/post/item_list")) {
                     // video list URL
                     const videoListURL = url.parse(element.request.url, true)
+                    console.log(videoListURL.href);
                     videoListURLQuery = videoListURL.query
                     videoList = element.response?.content
                     // videoList = JSON.parse(element.response?.content?.text)
@@ -145,10 +148,10 @@ app.listen(port, () => {
             
         }
 
-        console.log(profileURLQuery)
+        // console.log(profileURLQuery)
         console.log(userInfo)
         console.log("----------------------------------------------------------------")
-        console.log(videoListURLQuery)
+        // console.log(videoListURLQuery)
         console.log(videoList)
 
         await page.close()
