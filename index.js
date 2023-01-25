@@ -1,19 +1,15 @@
-// index.js
-
-/**
- * Required External Modules
- */
-
+const fs = require("fs")
 const url = require("url")
 const path = require("path")
+const util = require('util')
+
+const crypto = require('crypto')
 const express = require("express")
 const puppeteer = require('puppeteer-extra')
 const {executablePath} = require('puppeteer')
 const PuppeteerHar = require('puppeteer-har')
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const { scrollPageToBottom } = require('puppeteer-autoscroll-down')
-
-const fs = require("fs")
 
 /**
  * App Variables
@@ -27,14 +23,12 @@ const port = process.env.PORT || "8000"
 puppeteer.use(StealthPlugin())
 puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
 
-
 /**
  * Routes Definitions
  */
 app.get("/", (req, res) => {
-
-    res.status(200).send("WHATABYTE: Food For Devs")
-});
+    res.status(200).send("Happy Scraping!")
+})
 
 /**
  * Server Activation
@@ -43,112 +37,117 @@ app.listen(port, () => {
 
     console.log(`Listening to requests on http://localhost:${port}`)
 
+    // TikTok SecretKey
+    const secretKey = "webapp1.0+202106";
+    // Defining Algorithm
+    const algorithm = 'aes-128-cbc';
+
+    // Browser Setting
     const browserSetting = {
-        headless: false,
-        devtools: false,
-        // args: ['--no-sandbox'],
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1000,1080', '--use-gl=egl', '--disable-dev-shm-usage'],
+        ignoreDefaultArgs: ['--disable-extensions'],
         executablePath: executablePath(),
-        // executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        // product: 'chrome'
     }
 
-    puppeteer.launch(browserSetting).then(async browser => {
+    puppeteer.launch( browserSetting ).then(async browser => {
 
-        console.log('Running tests....')
+        // Create a new page
         const page = await browser.newPage()
 
-        // await page.setDefaultNavigationTimeout(0)
+        // Disable Cache
+        await page.setCacheEnabled(true)
 
-        await page.setExtraHTTPHeaders({
-            // 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-            // 'accept-encoding': 'gzip, deflate, br',
-            // 'accept-language': 'en-US,en;q=0.9,en;q=0.8'
-        })
+        // Set Browser Width and Height
+        await page.setViewport({ width: 390, height: 844 })
 
-        const har = new PuppeteerHar(page)
-        const harSetting = { 
-            path: 'results.har', 
-            saveResponse: true, 
-            captureMimeTypes: ['application/json']
-        }
-        await har.start(harSetting)
-        console.log("Go TikTok......")
-        await page.goto('https://www.tiktok.com/', {
-            waitUntil: 'networkidle0',
-        })
+        // Prevent Timeout Error
         await page.setDefaultNavigationTimeout(0)
-        console.log("Go to profile.....")
-        await page.goto('https://www.tiktok.com/@mizar449', {
+
+        await page.setRequestInterception(true)
+        let apiUserURL = '';
+        let apiUserHeaders = {};
+        let apiListURL = '';
+        let apiListHeaders = {};
+        const removeResourceTypes = ['image', 'font', 'other', 'media']
+
+        page.on('request', request => {
+            if (request.resourceType() === 'fetch') {
+                if(request.url().includes("api/post/item_list")) {
+                    apiListURL = request.url()
+                    apiListHeaders = request.headers()
+                }
+                if(request.url().includes("api/user/detail")) {
+                    apiUserURL = request.url()
+                    apiUserHeaders = request.headers()
+                }
+                request.continue()
+            } else if(removeResourceTypes.includes(request.resourceType())) {
+                request.abort()
+            } else if(request.resourceType() === 'script') {
+                request.continue()
+            } else {
+                console.log(request.resourceType())
+                request.continue()
+            }
+        })
+
+        await page.goto('https://www.tiktok.com/@chojudai', {
             waitUntil: 'networkidle0',
         })
-        console.log("Load profile.....")
-        await page.waitForTimeout(5000)
+
         const lastPosition = await scrollPageToBottom(page, {
-            size: 2500,
+            size: 500,
             delay: 250
         })
-        console.log("page scroll")
-        // await page.reload()
-        await page.waitForTimeout(5000)
-        // await page.screenshot({       
-        //     path: "screenshot.png",      
-        //     fullPage: true        
-        // })
-        await page.waitForTimeout(3000)
-        // console.log("Page take screenshot")
-        console.log("Wait to take har.....")
-        await har.stop()
-        console.log("stop har.....")
-        await page.waitForTimeout(5000)
 
-
-        console.log("Read har.....")
-        const fileContents = fs.readFileSync("results.har")
-        const jsonContents = JSON.parse(fileContents)
-
-        console.log("filter har.....")
-        console.log(jsonContents.log.entries.length)
-        const filtered = jsonContents.log.entries.filter((element) => {
-            return element.request.url.includes("api/user/detail") || element.request.url.includes("api/post/item_list")
-            // return element.request.url.includes("api/user/detail") || element.request.url.includes("api/post/item_list")
-            // return element.request.url.includes("api/user/detail") || element.request.url.includes("node/share/discover")
+        await page.screenshot({
+            path: 'screenshot.jpg'
         })
-        
-        let profileURLQuery = {}
-        let userInfo = {}
 
-        if(filtered.length > 0) {
-            // last URL
-            // const lastData = filtered[filtered.length - 1]
-            filtered.forEach((element) => {
-                console.log(element.request.url)
-                console.log(element.response.content)
-                console.log("---------------------------------------------------------------------------------------")
+        await page.setExtraHTTPHeaders(apiUserHeaders)
+        await page.goto(apiUserURL, {
+            waitUntil: 'domcontentloaded',
+        })
+
+        await page.waitForSelector('pre')
+        const element = await page.$('pre')
+        const profileInfo = await page.evaluate(el => el.textContent, element)
+        console.log(JSON.parse(profileInfo))
+
+        console.log("----------------------------------------------------------------")
+
+        if(apiListURL != '') {
+            const decipher = crypto.createDecipheriv(algorithm, secretKey, secretKey)
+            const decrpyted = Buffer.concat([decipher.update(apiListHeaders['x-tt-params'], 'base64'), decipher.final()])
+            const decrpytedVideoListParams = decrpyted.toString("utf-8")
+            const decrpytedVideoListQuery = new URLSearchParams(decrpytedVideoListParams)
+            decrpytedVideoListQuery.set('cursor', 0)
+
+            const str = new URLSearchParams(decrpytedVideoListQuery).toString()
+            const cipher = crypto.createCipheriv(algorithm, secretKey, secretKey)
+            const crpyted = Buffer.concat([cipher.update(str), cipher.final()])
+            const xttParams = crpyted.toString("base64")
+            apiListHeaders['x-tt-params'] = xttParams
+
+            await page.setExtraHTTPHeaders(apiListHeaders)
+            await page.goto(apiListURL, {
+                waitUntil: 'domcontentloaded',
             })
-            // const profileURL = url.parse(lastData.request.url, true)
-            // profileURLQuery = profileURL.query
-            // userInfo = JSON.parse(lastData.response?.content?.text).userInfo
+
+            await page.waitForSelector('pre')
+            const element2 = await page.$('pre')
+            const videoListData = await page.evaluate(el => el.textContent, element2)
+            const videoList = JSON.parse(videoListData)
+            console.log(videoList)
+            console.log(videoList.itemList.length)
         }
-
-        // console.log(profileURLQuery)
-        // console.log(userInfo)
-
-        // filtered.forEach((element) => {
-        //     console.log(element.request.url)
-        // })
-        // console.log(jsonContents.log.entries)
-
-        // console.log("Fetch Cookie.....")
-        // const cookies = await page.cookies()
-        // console.log("Print Cookie.....")
-        // console.log(cookies)
 
         await page.close()
         console.log("Page closed!")
         await browser.close()
         console.log("Browser closed!")
 
-    })
+    });
 
-});
+})
