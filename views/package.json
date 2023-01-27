@@ -1,25 +1,32 @@
 {
   "name": "views",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "watch": "vite build --watch",
+    "serve": "vite preview",
     "build": "vite build",
-    "preview": "vite preview"
+    "dev": "vite",
+    "preview": "vite preview",
+    "watch": "vite build --watch"
   },
   "dependencies": {
+    "@mdi/font": "5.9.55",
     "axios": "^1.2.5",
     "pinia": "^2.0.29",
+    "roboto-fontface": "*",
     "vue": "^3.2.45",
-    "vue-meta": "^3.0.0-alpha.10"
+    "vue-meta": "^3.0.0-alpha.10",
+    "vuetify": "^3.0.0-beta.0",
+    "webfontloader": "^1.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
     "sass": "^1.57.1",
     "vite": "^4.0.0",
     "vite-plugin-browser-sync": "^1.0.2",
+    "vite-plugin-vuetify": "^1.0.0-alpha.12",
+    "vue-cli-plugin-vuetify": "~2.5.8",
     "vue-router": "^4.1.6"
-  }
+  },
+  "type": "module"
 }

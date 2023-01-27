@@ -1,17 +1,18 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-import { createMetaManager } from 'vue-meta';
+import App from './App.vue'
+import router from './router'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import vuetify from './plugins/vuetify'
+import { createMetaManager } from 'vue-meta'
+import { loadFonts } from './plugins/webfontloader'
 
-import App from './App.vue';
-import router from './router';
 
-import './assets/scss/common.scss';
 
-const app = createApp(App);
-const metaManager = createMetaManager();
+loadFonts()
 
-app.use(createPinia());
-app.use(router);
-app.use(metaManager);
-
-app.mount('#app');
+createApp(App)
+  .use(createPinia())
+  .use(router)
+  .use(createMetaManager())
+  .use(vuetify)
+  .mount('#app')
