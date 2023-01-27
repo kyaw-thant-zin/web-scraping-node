@@ -1,4 +1,17 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import { createMetaManager } from 'vue-meta';
 
-createApp(App).mount('#app')
+import App from './App.vue';
+import router from './router';
+
+import './assets/scss/common.scss';
+
+const app = createApp(App);
+const metaManager = createMetaManager();
+
+app.use(createPinia());
+app.use(router);
+app.use(metaManager);
+
+app.mount('#app');
