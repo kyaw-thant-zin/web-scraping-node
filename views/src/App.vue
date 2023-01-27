@@ -2,32 +2,34 @@
 import { RouterView } from 'vue-router';
 
 /* header and footer for common  */
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
+import Header from '@/views/layout/Header.vue';
+import Footer from '@/views/layout/Footer.vue';
 </script>
 
 <template>
-  <Header></Header>
-  <v-app>
-    <v-main>
+  <q-layout view="lHh LpR lff">
+    <Header></Header>
+    <q-page-container>
       <RouterView v-slot="{ Component }">
-        <template v-if="Component">
-          <Transition name="fade">
-            <KeepAlive>
-              <Suspense>
-                <!-- main content -->
-                <component :is="Component"></component>
+          <template v-if="Component">
+            <Transition name="fade">
+              <div>
+                <KeepAlive>
+                <Suspense>
+                  <!-- main content -->
+                  <component :is="Component"></component>
 
-                <!-- loading state -->
-                <template #fallback>
-                  Loading...
-                </template>
-              </Suspense>
-            </KeepAlive>
-          </Transition>
-        </template>
+                  <!-- loading state -->
+                  <template #fallback>
+                    Loading...
+                  </template>
+                </Suspense>
+              </KeepAlive>
+              </div>
+            </Transition>
+          </template>
       </RouterView>
-    </v-main>
-  </v-app>
-  <Footer></Footer>
+    </q-page-container>
+    <Footer></Footer>
+  </q-layout>
 </template>

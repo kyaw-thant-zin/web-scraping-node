@@ -11,21 +11,20 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "@quasar/extras": "^1.15.10",
     "axios": "^1.2.5",
     "pinia": "^2.0.29",
+    "quasar": "^2.11.5",
     "roboto-fontface": "*",
     "vue": "^3.2.45",
-    "vue-meta": "^3.0.0-alpha.10",
-    "vuetify": "^3.0.0-beta.0",
-    "webfontloader": "^1.0.0"
+    "vue-meta": "^3.0.0-alpha.10"
   },
   "devDependencies": {
+    "@quasar/vite-plugin": "^1.3.0",
     "@vitejs/plugin-vue": "^4.0.0",
-    "sass": "^1.57.1",
+    "sass": "^1.32.12",
     "vite": "^4.0.0",
     "vite-plugin-browser-sync": "^1.0.2",
-    "vite-plugin-vuetify": "^1.0.0-alpha.12",
-    "vue-cli-plugin-vuetify": "~2.5.8",
     "vue-router": "^4.1.6"
   },
   "type": "module"
