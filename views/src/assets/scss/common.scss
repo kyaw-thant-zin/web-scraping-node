@@ -2,3 +2,40 @@ a {
     color: #000;
     text-decoration: unset !important;
 }
+
+body {
+    color: #172B4D !important;
+}
+
+.page-ttl.q-toolbar__title {
+    font-size: 25px !important;
+    font-weight: bold !important;
+  }
+
+  .index-table {
+
+    .q-table__title {
+      color: #172B4D;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    thead {
+      font-size: 11px;
+      color: #8898AA;
+      background-color: #F1F3F9;
+    }
+
+    tbody {
+      color: #172B4D;
+      tr {
+        td:first-child {
+          font-weight: bold;
+        }
+      }
+
+      tr:nth-child(even) {
+        background-color: #F7FAFC;
+      }
+    }
+  }
