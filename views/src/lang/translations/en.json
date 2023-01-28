@@ -1,0 +1,11 @@
+{
+    "nav" : {
+        "home": "Home",
+        "campaign": "Campaign",
+        "campaignOutput": "Campaign Output",
+        "report": "Report",
+        "linkSetting": "Link Setting",
+        "inputCode": "InputCode",
+        "generalSetting": "Setting"
+    }
+}

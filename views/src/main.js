@@ -1,8 +1,10 @@
 import App from './App.vue'
 import router from './router'
+import messages from './lang'
 import { createApp } from 'vue'
 import { Quasar } from 'quasar'
 import { createPinia } from 'pinia'
+import { createI18n } from 'vue-i18n'
 import { createMetaManager } from 'vue-meta'
 
 // Import icon libraries
@@ -22,7 +24,21 @@ import 'quasar/dist/quasar.css'
 // Common CSS
 import '@/assets/scss/common.scss'
 
+const i18n = createI18n({
+  locale: 'JP', // default language
+  messages
+})
+
+const localStorageLocale = localStorage.getItem('locale') || ''
+
+if(localStorageLocale) {
+  i18n.global.locale = localStorageLocale
+}
+
+export default i18n
+
 createApp(App)
+  .use(i18n)
   .use(createPinia())
   .use(router)
   .use(createMetaManager())

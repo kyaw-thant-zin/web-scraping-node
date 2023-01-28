@@ -1,0 +1,11 @@
+{
+    "nav" : {
+        "home": "ホーム",
+        "campaign": "キャンペーン",
+        "campaignOutput": "表示設定",
+        "report": "レポート",
+        "linkSetting": "リンク設定",
+        "inputCode": "埋め込みコード",
+        "generalSetting": "全般設定"
+    }
+}

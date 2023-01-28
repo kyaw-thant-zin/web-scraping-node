@@ -1,46 +1,59 @@
 <script setup>
-import { ref } from 'vue'
-
-  const model = ref(null)
+  import { ref } from 'vue'
   const options = [
     'EN', 'JP'
   ]
 
+  const showChannel = (val) => {
+    saveToLocalStorage('locale', val)
+  }
+
+  function saveToLocalStorage(key, val) {
+    localStorage.setItem( key, val)
+  }
+
   const menuList = [
     {
       icon: 'mdi-home-variant-outline',
-      label: 'ホーム',
-      styleColor: '#7764E4'
+      label: 'home',
+      styleColor: '#7764E4',
+      path: '/'
     },
     {
       icon: 'mdi-email-outline',
-      label: 'キャンペーン',
-      styleColor: '#F53C56'
+      label: 'campaign',
+      styleColor: '#F53C56',
+      path: '/campaign'
     },
     {
       icon: 'mdi-package-variant-closed',
-      label: '表示設定',
-      styleColor: '#11CDEF'
+      label: 'campaignOutput',
+      styleColor: '#11CDEF',
+      path: '/'
     },
     {
       icon: 'mdi-file-document-outline',
-      label: 'レポート',
-      styleColor: '#FB6340'
+      label: 'report',
+      styleColor: '#FB6340',
+      path: '/'
     },
     {
       icon: 'mdi-message-outline',
-      label: 'リンク設定',
-      styleColor: '#FEB969'
+      label: 'linkSetting',
+      styleColor: '#FEB969',
+      path: '/'
     },
     {
       icon: 'mdi-cog-outline',
-      label: '埋め込みコード',
-      styleColor: '#FB6340'
+      label: 'inputCode',
+      styleColor: '#FB6340',
+      path: '/'
     },
     {
       icon: 'mdi-application-cog-outline',
-      label: '全般設定',
-      styleColor: '#7764E4'
+      label: 'generalSetting',
+      styleColor: '#7764E4',
+      path: '/'
     }
   ]
   const leftDrawerOpen = ref(false)
@@ -55,7 +68,7 @@ import { ref } from 'vue'
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-space />
-        <q-select standout="bg-primary text-white" v-model="model" :options="options">
+        <q-select standout="bg-primary text-white" v-model="$i18n.locale" :options="options" @update:model-value="val => showChannel(val)" >
           <template v-slot:prepend>
             <q-icon name="mdi-translate"  color="white" />
           </template>
@@ -75,13 +88,13 @@ import { ref } from 'vue'
             </q-item>
             <q-separator />
             <template v-for="(menuItem, index) in menuList" :key="index">
-              <router-link to="/">
+              <router-link :to="menuItem.path">
                 <q-item clickable :active="menuItem.label === 'Outbox'" v-ripple>
                     <q-item-section avatar>
                       <q-icon :name="menuItem.icon" :style="{ color: menuItem.styleColor }" />
                     </q-item-section>
                     <q-item-section>
-                      {{ menuItem.label }}
+                      {{ $t(`nav.${menuItem.label}`) }}
                     </q-item-section>
                 </q-item>
             </router-link>
