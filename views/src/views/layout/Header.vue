@@ -68,13 +68,14 @@
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-space />
-        <q-select standout="bg-primary text-white" v-model="$i18n.locale" :options="options" @update:model-value="val => showChannel(val)" >
+        <q-select class="white-select" borderless v-model="$i18n.locale" :options="options" @update:model-value="val => showChannel(val)" >
           <template v-slot:prepend>
-            <q-icon name="mdi-translate"  color="white" />
+            <q-icon name="mdi-translate" color="white" />
           </template>
         </q-select>
-        <q-btn flat round dense icon="apps" class="q-mr-xs" />
-        <q-btn flat round dense icon="more_vert" />
+        <q-btn round outline color="primary" class="q-ml-md" to="/">
+          <q-avatar text-color="white">J</q-avatar>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -105,4 +106,20 @@
     </q-drawer>
 
 </template>
+
+<style lang="scss">
+
+
+.white-select {
+
+  div.q-field__control-container.col.relative-position.row.no-wrap.q-anchor--skip > div > span {
+    color: white !important;
+  }
+  
+  .q-icon.notranslate.material-icons.q-select__dropdown-icon {
+    color: white !important;
+  }
+}
+
+</style>
   
