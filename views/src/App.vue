@@ -7,7 +7,7 @@ import Footer from '@/views/layout/Footer.vue';
 </script>
 
 <template>
-  <q-layout view="lHh LpR lff">
+  <q-layout class="l" view="lHh LpR lff">
     <Header></Header>
     <q-page-container>
       <RouterView v-slot="{ Component }">

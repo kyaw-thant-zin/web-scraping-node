@@ -15,7 +15,7 @@ useMeta({
   </metainfo>
   <div class="q-pa-sm row items-start q-gutter-md">
     <q-breadcrumbs>
-        <q-breadcrumbs-el label="Home" icon="home" />
+        <q-breadcrumbs-el label="Home" icon="mdi-home-variant-outline" />
     </q-breadcrumbs>
   </div>
   <div class="q-pa-md row items-start q-gutter-md">

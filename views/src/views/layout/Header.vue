@@ -1,9 +1,30 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onMounted, watchEffect } from 'vue'
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute()
+  const activeLink = ref()
+
+  watchEffect( async () => {
+
+    // set active class to sidebar nav when navigate with breadcrumbs or page refresh
+    let routeName = route.name
+    if(routeName !== undefined) {
+      if(routeName.includes('.')) {
+        const routeNameIndex = routeName.indexOf(".")
+        routeName = routeName.substring(0, routeNameIndex)
+      }
+
+      activeLink.value = routeName
+    }
+
+  }, [route])
+
   const options = [
     'EN', 'JP'
   ]
 
+  // save locale into browser localstorage
   const showChannel = (val) => {
     saveToLocalStorage('locale', val)
   }
@@ -12,6 +33,7 @@
     localStorage.setItem( key, val)
   }
 
+  // sidebar nav menu list
   const menuList = [
     {
       icon: 'mdi-home-variant-outline',
@@ -23,7 +45,7 @@
       icon: 'mdi-email-outline',
       label: 'campaign',
       styleColor: '#F53C56',
-      path: '/campaign'
+      path: '/campaigns'
     },
     {
       icon: 'mdi-package-variant-closed',
@@ -56,14 +78,19 @@
       path: '/'
     }
   ]
+  // trigger sidebar open and close
   const leftDrawerOpen = ref(false)
   const drawer = leftDrawerOpen
   const toggleLeftDrawer = () => {
     leftDrawerOpen.value = !leftDrawerOpen.value
   }
+
+
+
+  
 </script>
 <template>
-    <q-header bordered class="bg-primary text-white">
+    <q-header bordered class="l-hd text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
@@ -73,24 +100,23 @@
             <q-icon name="mdi-translate" color="white" />
           </template>
         </q-select>
-        <q-btn round outline color="primary" class="q-ml-md" to="/">
-          <q-avatar text-color="white">J</q-avatar>
+        <q-btn size="sm" round outline class="q-ml-md" to="/">
+          <q-avatar size="sm" text-color="white">J</q-avatar>
         </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="drawer" side="left" bordered>
+    <q-drawer class="l-sb" show-if-above v-model="drawer" side="left" bordered :width="245">
         <q-scroll-area class="fit">
           <q-list>
             <q-item >
               <q-item-section>
-                <router-link to="/">HASHVANK</router-link>
+                <router-link class="l-sb-logo" to="/">HASHVANK</router-link>
               </q-item-section>
             </q-item>
-            <q-separator />
             <template v-for="(menuItem, index) in menuList" :key="index">
               <router-link :to="menuItem.path">
-                <q-item clickable :active="menuItem.label === 'Outbox'" v-ripple>
+                <q-item  class="q-mt-md" clickable :active="activeLink === menuItem.label" @click="activeLink = menuItem.label" active-class="active-sb" v-ripple>
                     <q-item-section avatar>
                       <q-icon :name="menuItem.icon" :style="{ color: menuItem.styleColor }" />
                     </q-item-section>
@@ -109,17 +135,6 @@
 
 <style lang="scss">
 
-
-.white-select {
-
-  div.q-field__control-container.col.relative-position.row.no-wrap.q-anchor--skip > div > span {
-    color: white !important;
-  }
-  
-  .q-icon.notranslate.material-icons.q-select__dropdown-icon {
-    color: white !important;
-  }
-}
 
 </style>
   

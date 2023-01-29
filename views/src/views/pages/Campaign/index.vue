@@ -68,7 +68,7 @@
   </metainfo>
   <div class="q-pa-sm row items-start q-gutter-md">
     <q-breadcrumbs>
-        <q-breadcrumbs-el :label="$t('nav.home')" icon="home" />
+        <q-breadcrumbs-el :label="$t('nav.home')" icon="mdi-home-variant-outline" to="/" />
         <q-breadcrumbs-el :label="$t('nav.campaign')" />
     </q-breadcrumbs>
   </div>
@@ -85,7 +85,7 @@
         <q-table
           class="index-table"
           separator="none"
-          title="キャンペーン一覧"
+          :title="$t('table.title.campaign')"
           :rows="rows"
           :columns="columns"
           color="primary"
@@ -94,12 +94,7 @@
           hide-pagination
         >
           <template v-slot:top-right>
-            <q-btn
-              color="primary"
-              icon-right="archive"
-              label="Export to csv"
-              no-caps
-            />
+            <q-btn class="btn-common" outline :label="$t('table.btn.createNew')" to="/campaigns/create" no-caps />
           </template>
           <template v-slot:body-cell-isActive="props">
             <q-td :props="props">

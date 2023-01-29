@@ -7,5 +7,16 @@
         "linkSetting": "Link Setting",
         "inputCode": "InputCode",
         "generalSetting": "Setting"
+    },
+    "table" : {
+        "title" : {
+            "campaign": "Campaign List"
+        },
+        "btn": {
+            "createNew": "New Campaign"
+        }
+    },
+    "export": {
+        "csv": "Export to csv"
     }
 }

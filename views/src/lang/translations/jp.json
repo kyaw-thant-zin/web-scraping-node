@@ -7,5 +7,16 @@
         "linkSetting": "リンク設定",
         "inputCode": "埋め込みコード",
         "generalSetting": "全般設定"
+    },
+    "table" : {
+        "title" : {
+            "campaign": "キャンペーン一覧"
+        },
+        "btn": {
+            "createNew": "新規作成"
+        }
+    },
+    "export": {
+        "csv": "CSV にエクスポート"
     }
 }

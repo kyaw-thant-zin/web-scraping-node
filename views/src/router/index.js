@@ -1,20 +1,31 @@
-import i18n from '@/main.js'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/pages/HomePage.vue'
-import CampaignPage from '@/views/pages/CampaignPage.vue'
+import CampaignIndex from '@/views/pages/Campaign/index.vue'
+import CampaignCreate from '@/views/pages/Campaign/create.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-        path: '/:locale?',
+        path: '/',
         name: 'home',
         component: HomePage,
     },
     {
-      path: '/:locale?/campaign',
-      name: 'campaign',
-      component: CampaignPage,
+      path: '/campaigns',
+      name: 'campaigns',
+      children: [
+        {
+          path: '',
+          name: 'campaign.index',
+          component: CampaignIndex,
+        },
+        {
+          path: 'create',
+          name: 'campaign.create',
+          component: CampaignCreate,
+        }
+      ]
     },
   ],
 });
