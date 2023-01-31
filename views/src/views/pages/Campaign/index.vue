@@ -32,6 +32,7 @@
     { name: 'tags', label: 'Tags', field: 'tags', align: 'center', sortable: true },
     { name: 'linkType', label: 'Link Type', field: 'linkType', align: 'center', sortable: true },
     { name: 'publicPrivate', label: 'Public Private', field: 'publicPrivate', align: 'center', sortable: true },
+    { name: 'action', label: '', field: 'action', align: 'center', sortable: true },
   ]
 
   const rows = [
@@ -43,6 +44,7 @@
       tags: '#超しまむら学園',
       linkType: 'TikTok',
       publicPrivate: true,
+      action: true
     },
     {
       campaignName: '超しまむら学園2',
@@ -52,6 +54,7 @@
       tags: '#超しまむら学園',
       linkType: 'TikTok',
       publicPrivate: true,
+      action: true
     },
     {
       campaignName: '超しまむら学園3',
@@ -61,6 +64,7 @@
       tags: '#超しまむら学園',
       linkType: 'TikTok',
       publicPrivate: true,
+      action: true
     },
     {
       campaignName: '超しまむら学園4',
@@ -70,6 +74,7 @@
       tags: '#超しまむら学園',
       linkType: 'TikTok',
       publicPrivate: true,
+      action: true
     },
     {
       campaignName: '超しまむら学園5',
@@ -79,6 +84,7 @@
       tags: '#超しまむら学園',
       linkType: 'TikTok',
       publicPrivate: true,
+      action: true
     },
     {
       campaignName: '超しまむら学園6',
@@ -88,6 +94,7 @@
       tags: '#超しまむら学園',
       linkType: 'TikTok',
       publicPrivate: true,
+      action: true
     },
   ]
 
@@ -130,73 +137,61 @@
     </div>
     <div class="full-width row q-px-md q-mt-md">
       <div class="col-12">
-        <q-table
-          class="index-table"
-          separator="none"
-          :title="$t('table.title.campaign')"
-          :rows="rows"
-          :columns="columns"
-          color="primary"
-          row-key="campaignName"
-          v-model:pagination="pagination"
-          hide-pagination
-        >
-          <template v-slot:top-right>
-            <q-btn class="btn-common" outline :label="$t('table.btn.createNew')" to="/campaigns/create" no-caps />
-          </template>
-          <template v-slot:body-cell-publicPrivate="props">
-            <q-td :props="props">
-              <q-toggle 
-                v-model="props.row.publicPrivate" 
-                checked-icon="mdi-lock"
-                color="negative"
-                unchecked-icon="mdi-earth"  
-                @update:model-value="val => togglePublicPrivate(props, val)"
+        <q-card class="common-card">
+          <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
+            <div class="common-card-ttl">New Campaign</div>
+            <q-btn class="btn-common shadow-3" outline :label="$t('table.btn.createNew')" to="/campaigns/create" no-caps />
+          </q-card-section>
+          <q-card-section class="q-px-none">
+            <q-table
+              class="index-table no-shadow"
+              separator="none"
+              :rows="rows"
+              :columns="columns"
+              color="primary"
+              row-key="campaignName"
+              v-model:pagination="pagination"
+              hide-pagination
+            >
+              <template v-slot:body-cell-publicPrivate="props">
+                <q-td :props="props">
+                  <q-toggle 
+                    v-model="props.row.publicPrivate" 
+                    checked-icon="mdi-lock"
+                    color="negative"
+                    unchecked-icon="mdi-earth"  
+                    @update:model-value="val => togglePublicPrivate(props, val)"
+                  />
+                </q-td>
+              </template>
+              <template v-slot:body-cell-action="props">
+                <q-td>
+                  <q-btn color="grey-7" round flat icon="more_vert">
+                    <q-menu auto-close :offset="[-5, 5]">
+                      <q-list>
+                        <q-item clickable to="/">
+                          <q-item-section>Edit</q-item-section>
+                        </q-item>
+                        <q-item clickable>
+                          <q-item-section>Delete</q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                </q-td>
+              </template>
+            </q-table>
+            <div class="row justify-end q-mt-md">
+              <q-pagination
+                v-model="pagination.page"
+                color="primary"
+                :max="pagesNumber"
+                size="md"
+                direction-links
               />
-            </q-td>
-          </template>
-          <!-- <template v-slot:body-cell-publicPrivate="props">
-            <q-td key="calories" :props="props">
-              {{ props.row.calories }}
-              <q-popup-edit 
-                v-model="props.row.calories" 
-                v-slot="scope"
-              >
-                <q-input 
-                  v-model="scope.value" 
-                  :model-value="scope.value" 
-                  dense 
-                  autofocus 
-                  @keyup.enter="scope.set"
-                >
-                <template v-slot:after>
-                  <div>
-                    <q-btn
-                    flat dense color="negative" icon="cancel"
-                    @click.stop.prevent="scope.cancel"
-                  />
-
-                  <q-btn
-                    flat dense color="positive" icon="check_circle"
-                    @click.stop.prevent="scope.set"
-                    :disable="scope.validate(scope.value) === false || scope.initialValue === scope.value"
-                  />
-                  </div>
-                </template>
-                </q-input>
-              </q-popup-edit>
-            </q-td>
-          </template> -->
-        </q-table>
-        <div class="row justify-end q-mt-md">
-          <q-pagination
-            v-model="pagination.page"
-            color="primary"
-            :max="pagesNumber"
-            size="md"
-            direction-links
-          />
-        </div>
+            </div>
+          </q-card-section>
+        </q-card>
       </div>
     </div>
   </div>
