@@ -3,6 +3,9 @@ import HomePage from '@/views/pages/HomePage.vue'
 import CampaignIndex from '@/views/pages/Campaign/index.vue'
 import CampaignCreate from '@/views/pages/Campaign/create.vue'
 
+// USER
+import UserIndex from '@/views/pages/User/index.vue'
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -25,6 +28,17 @@ const router = createRouter({
           name: 'campaign.create',
           component: CampaignCreate,
         }
+      ]
+    },
+    {
+      path: '/user',
+      name: 'user',
+      children: [
+        {
+          path: '',
+          name: 'user.index',
+          component: UserIndex,
+        },
       ]
     },
   ],

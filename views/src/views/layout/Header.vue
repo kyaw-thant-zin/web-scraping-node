@@ -70,13 +70,19 @@
       label: 'inputCode',
       styleColor: '#FB6340',
       path: '/'
+    },{
+      icon: 'mdi-account-edit',
+      label: 'user',
+      styleColor: '#7764E4',
+      path: '/user'
     },
     {
       icon: 'mdi-application-cog-outline',
       label: 'generalSetting',
       styleColor: '#7764E4',
       path: '/'
-    }
+    },
+
   ]
   // trigger sidebar open and close
   const leftDrawerOpen = ref(false)
