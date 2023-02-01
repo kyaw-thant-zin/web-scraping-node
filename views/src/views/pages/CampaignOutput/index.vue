@@ -7,7 +7,7 @@
 
   /* app config */
   useMeta({
-    title: 'CAMPAIGN',
+    title: 'CAMPAIGN OUTPUT',
   })
 
   function togglePublicPrivate(props, val) {
@@ -124,14 +124,14 @@
   <div class="q-pa-sm row items-start q-gutter-md">
     <q-breadcrumbs>
         <q-breadcrumbs-el :label="$t('nav.home')" icon="mdi-home-variant-outline" to="/" />
-        <q-breadcrumbs-el :label="$t('nav.campaign')" />
+        <q-breadcrumbs-el :label="$t('nav.campaignOutput')" />
     </q-breadcrumbs>
   </div>
   <div class="full-width row wrap justify-start items-start content-start">
     <div class="q-px-md row">
       <q-toolbar>
         <q-toolbar-title class="page-ttl">
-          {{ $t('nav.campaign') }}
+          {{ $t('nav.campaignOutput') }}
         </q-toolbar-title>
       </q-toolbar>
     </div>
@@ -139,7 +139,7 @@
       <div class="col-12">
         <q-card class="common-card">
           <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
-            <div class="common-card-ttl">Campaign List</div>
+            <div class="common-card-ttl">Campaign Output</div>
             <q-btn class="btn-common shadow-3" outline :label="$t('table.btn.createNew')" to="/campaigns/create" no-caps />
           </q-card-section>
           <q-card-section class="q-px-none">

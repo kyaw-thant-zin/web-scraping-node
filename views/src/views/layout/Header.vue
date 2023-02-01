@@ -51,7 +51,7 @@
       icon: 'mdi-package-variant-closed',
       label: 'campaignOutput',
       styleColor: '#11CDEF',
-      path: '/'
+      path: '/campaign-outputs'
     },
     {
       icon: 'mdi-file-document-outline',
