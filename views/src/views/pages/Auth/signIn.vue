@@ -10,7 +10,9 @@
     title: 'USER',
   })
 
-  const pagesNumber = computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
+  const pagesNumber = computed(() => {
+    
+  })
 
   onMounted(() => {
     // init function

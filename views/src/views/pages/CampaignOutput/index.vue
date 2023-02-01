@@ -10,6 +10,22 @@
     title: 'CAMPAIGN OUTPUT',
   })
 
+  const campaign = ref('All Campaign')
+  const campaigns = [
+    {
+      label: 'All Campaign',
+      value: '1'
+    },
+    {
+      label: 'Account',
+      value: '2'
+    },
+  ]
+
+  function filterByCampaign(val) {
+
+  }
+
   function togglePublicPrivate(props, val) {
 
     console.log(props)
@@ -17,6 +33,8 @@
   }
 
   const columns = [
+
+    { name: 'publicPrivate', label: 'Public Private', field: 'publicPrivate', align: 'center', sortable: true },
     {
       name: 'campaignName',
       required: true,
@@ -26,75 +44,88 @@
       format: val => `${val}`,
       sortable: true,
     },
-    { name: 'createdAt', label: 'Created', field: 'createdAt', align: 'center', sortable: true },
-    { name: 'collectionType', label: 'Collection Type', field: 'collectionType', align: 'center', sortable: true },
+    { name: 'tiktok', label: 'TikTok', field: 'tiktok', align: 'center', sortable: true },
+    { name: 'postDate', label: 'Post Date', field: 'postDate', align: 'center', sortable: true },
     { name: 'account', label: 'Account', field: 'account', align: 'center', sortable: true },
-    { name: 'tags', label: 'Tags', field: 'tags', align: 'center', sortable: true },
-    { name: 'linkType', label: 'Link Type', field: 'linkType', align: 'center', sortable: true },
-    { name: 'publicPrivate', label: 'Public Private', field: 'publicPrivate', align: 'center', sortable: true },
-    { name: 'action', label: '', field: 'action', align: 'center', sortable: true },
+    { name: 'hashtag', label: 'Hashtag', field: 'hashtag', align: 'center', sortable: true },
+    { name: 'views', label: 'View', field: 'views', align: 'center', sortable: true },
+    { name: 'link', label: 'Link', field: 'link', align: 'center', sortable: true },
+    { name: 'priority', label: 'Priority', field: 'priority', align: 'center', sortable: true },
+    { name: 'url', label: '', field: 'url', align: 'center', sortable: true },
   ]
 
   const rows = [
     {
+      publicPrivate: true,
       campaignName: '超しまむら学園1',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
+      tiktok: '',
+      postDate: '28/09/2022',
+      account: '@Hashtag',
+      hashtag: '#超しまむら学園',
+      views: '1.2M',
+      link: 'TikTok',
+      priority: false,
+      url: true
     },
     {
+      publicPrivate: true,
       campaignName: '超しまむら学園2',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
+      tiktok: '',
+      postDate: '28/09/2022',
+      account: '@Hashtag',
+      hashtag: '#超しまむら学園',
+      views: '1.2M',
+      link: 'TikTok',
+      priority: false,
+      url: true
     },
     {
+      publicPrivate: true,
       campaignName: '超しまむら学園3',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
+      tiktok: '',
+      postDate: '28/09/2022',
+      account: '@Hashtag',
+      hashtag: '#超しまむら学園',
+      views: '1.2M',
+      link: 'TikTok',
+      priority: false,
+      url: true
     },
     {
+      publicPrivate: true,
       campaignName: '超しまむら学園4',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
+      tiktok: '',
+      postDate: '28/09/2022',
+      account: '@Hashtag',
+      hashtag: '#超しまむら学園',
+      views: '1.2M',
+      link: 'TikTok',
+      priority: false,
+      url: true
     },
     {
+      publicPrivate: true,
       campaignName: '超しまむら学園5',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
+      tiktok: '',
+      postDate: '28/09/2022',
+      account: '@Hashtag',
+      hashtag: '#超しまむら学園',
+      views: '1.2M',
+      link: 'TikTok',
+      priority: false,
+      url: true
     },
     {
-      campaignName: '超しまむら学園6',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
       publicPrivate: true,
-      action: true
+      campaignName: '超しまむら学園6',
+      tiktok: '',
+      postDate: '28/09/2022',
+      account: '@Hashtag',
+      hashtag: '#超しまむら学園',
+      views: '1.2M',
+      link: 'TikTok',
+      priority: false,
+      url: true
     },
   ]
 
@@ -140,7 +171,9 @@
         <q-card class="common-card">
           <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
             <div class="common-card-ttl">Campaign Output</div>
-            <q-btn class="btn-common shadow-3" outline :label="$t('table.btn.createNew')" to="/campaigns/create" no-caps />
+            <div class="col-4">
+              <q-select @update:model-value="val => filterByCampaign(val)"  name="campaign" borderless v-model="campaign" :options="campaigns" class="common-select p-sm" />
+            </div>
           </q-card-section>
           <q-card-section class="q-px-none">
             <q-table
@@ -164,20 +197,14 @@
                   />
                 </q-td>
               </template>
-              <template v-slot:body-cell-action="props">
+              <template v-slot:body-cell-priority="props">
                 <q-td>
-                  <q-btn color="grey-7" round flat icon="more_vert">
-                    <q-menu auto-close :offset="[-5, 5]">
-                      <q-list>
-                        <q-item clickable to="/">
-                          <q-item-section>Edit</q-item-section>
-                        </q-item>
-                        <q-item clickable>
-                          <q-item-section>Delete</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
+                  <q-checkbox v-model="props.row.priority" class="common-checkbox" />
+                </q-td>
+              </template>
+              <template v-slot:body-cell-url="props">
+                <q-td>
+                  <q-btn to="/" class="common-anchor" round flat icon="mdi-open-in-new"></q-btn>
                 </q-td>
               </template>
             </q-table>

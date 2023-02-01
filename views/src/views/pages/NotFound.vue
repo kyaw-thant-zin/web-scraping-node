@@ -10,7 +10,9 @@
     title: 'USER',
   })
 
-  const pagesNumber = computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
+  const pagesNumber = computed(() => {
+    
+  })
 
   onMounted(() => {
     // init function
@@ -35,7 +37,7 @@
     <div class="q-px-md row">
       <q-toolbar>
         <q-toolbar-title class="page-ttl">
-          {{ $t('nav.user') }}
+          404
         </q-toolbar-title>
       </q-toolbar>
     </div>

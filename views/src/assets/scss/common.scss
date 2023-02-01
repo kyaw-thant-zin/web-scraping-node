@@ -7,6 +7,14 @@ body {
     color: #172B4D !important;
 }
 
+.min-height-fit {
+  min-height: inherit;
+}
+
+.auth-bg {
+  background-color: #263642;
+}
+
 .l {
     background-color: #F1F3F9;
     &-hd {
@@ -29,6 +37,73 @@ body {
         .active-sb {
             color: #7764E4;
         }
+    }
+    &-signup {
+      background-color: #F7FAFC;
+      &-wr {
+        &-ttl {
+          margin: 0px;
+          line-height: 1.167;
+          color: #172B4D;
+          font-size: 25px;
+          font-weight: 700;
+          text-align: center;
+        }
+        &-desc {
+          color: #172B4D;
+          font-family: GothamBook, sans-serif;
+          font-weight: 350;
+          font-size: 15px;
+          text-align: center;
+          margin-top: 10px;
+        }
+        &-form {
+          margin-top: 40px;
+          .auth-input {
+            margin-bottom: 20px;
+            input {
+              font-size: 16px;
+              padding: 15px 20px;
+            }
+            .q-field__label {
+              font-size: 16px;
+              left: 20px;
+            }
+
+            .q-field--float {
+              .q-field__label {
+                left: 20px;
+                top: 12px;
+              }
+            }
+            
+            .q-field__after, 
+            .q-field__append {
+              padding-right: 10px;
+            }
+
+            .q-field__control {
+              &::before {
+                background-color: #fff;
+                box-shadow: 0 1px 8px #0003,0 3px 4px #00000024,0 3px 3px -2px #0000001f;
+                border-radius: 5px;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                -ms-border-radius: 5px;
+                -o-border-radius: 5px;
+              }
+            }
+          }
+
+          .auth-submit {
+            margin-top: 20px;
+            button {
+              color: #fff;
+              background-color: #11CDEF;
+            }
+          }
+        }
+      }
     }
 }
 
@@ -111,6 +186,43 @@ body {
         color: #8898AA;
       }
     }
+
+    &.p-sm {
+      margin-top: 0px;
+
+      .q-field__control {
+        height: 39px;
+        min-height: unset;
+      }
+
+      .q-field__native {
+        font-size: 15px;
+        padding: 0px 20px;
+        min-height: unset;
+      }
+
+      .q-field__marginal {
+        height: 39px;
+      }
+    }
+  }
+
+  &-checkbox {
+    .q-checkbox__bg {
+      border: 2px solid #7764E4;
+    }
+
+    .q-checkbox__inner--truthy {
+      color: #fff !important;
+    }
+
+    .q-checkbox__svg {
+      color: #7764E4;
+    }
+  }
+
+  &-anchor {
+    color: #7764E4;
   }
 }
 
