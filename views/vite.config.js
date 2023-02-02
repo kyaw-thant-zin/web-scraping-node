@@ -7,6 +7,8 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  assetsDir: ['public'],
+  outDir: './',
   base: './',
   plugins: [
     vue({
@@ -38,7 +40,7 @@ export default defineConfig({
       output: {
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`,
+        assetFileNames: `assets/[name].[ext]`,
       },
     },
   },

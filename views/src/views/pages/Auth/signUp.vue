@@ -1,18 +1,18 @@
 <script setup>
 
-  import { useMeta } from 'vue-meta'
-  import { ref, computed, onMounted } from 'vue'
-  import { WebsiteName } from '@/api/constants.js'
 
+import { useMeta } from 'vue-meta'
+import { ref, computed, onMounted } from 'vue'
+import { WebsiteName } from '@/api/constants.js'
+import { API } from '@/api/index.js'
 
-  /* app config */
-  useMeta({
-    title: 'USER',
-  })
+/* app config */
+useMeta({
+title: 'SIGN UP',
+})
 
-  const isPwd = ref(true)
-  const acceptAgreementError = ref(false)
-  const formData = {
+const isPwd = ref(true)
+const formData = {
     firstName: ref(''),
     lastName: ref(''),
     tel: ref(''),
@@ -20,12 +20,23 @@
     userName: ref(''),
     password: ref(''),
     confirmPassword: ref(''),
-    acceptAgreement: ref(false)
-  }
+}
 
-  async function submitForm() {
-    console.log(formData)
-  }
+const acceptAgreementError = ref(false)
+const acceptAgreement = ref(false)
+
+async function submitForm() {
+    const signUpData = {
+        firstName: formData.firstName.value,
+        lastName: formData.lastName.value,
+        tel: formData.tel.value,
+        email: formData.email.value,
+        userName: formData.userName.value,
+        password: formData.password.value
+    }
+    const response = await API.user.signUp(signUpData)
+    console.log(response)
+}
 
 
 </script>
@@ -141,7 +152,7 @@
                         <div class="row items-center">
                             <q-checkbox
                                 name="accept_agreement"
-                                v-model="formData.acceptAgreement.value"
+                                v-model="acceptAgreement"
                             />
                             <p class="q-mb-none">Agree with <a class="auth-link" href="https://www.google.com" target="_blank" rel="noreferrer noopener">
                                     Terms & Conditions</a></p>
