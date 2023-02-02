@@ -152,73 +152,75 @@
       content ? `${content} | ${WebsiteName}` : WebsiteName
     }}</template>
   </metainfo>
-  <div class="q-pa-sm row items-start q-gutter-md">
-    <q-breadcrumbs>
-        <q-breadcrumbs-el :label="$t('nav.home')" icon="mdi-home-variant-outline" to="/" />
-        <q-breadcrumbs-el :label="$t('nav.campaignOutput')" />
-    </q-breadcrumbs>
-  </div>
-  <div class="full-width row wrap justify-start items-start content-start">
-    <div class="q-px-md row">
-      <q-toolbar>
-        <q-toolbar-title class="page-ttl">
-          {{ $t('nav.campaignOutput') }}
-        </q-toolbar-title>
-      </q-toolbar>
+  <div class="full-width">
+    <div class="q-pa-sm row items-start q-gutter-md">
+      <q-breadcrumbs>
+          <q-breadcrumbs-el :label="$t('nav.home')" icon="mdi-home-variant-outline" to="/" />
+          <q-breadcrumbs-el :label="$t('nav.campaignOutput')" />
+      </q-breadcrumbs>
     </div>
-    <div class="full-width row q-px-md q-mt-md">
-      <div class="col-12">
-        <q-card class="common-card">
-          <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
-            <div class="common-card-ttl">Campaign Output</div>
-            <div class="col-4">
-              <q-select @update:model-value="val => filterByCampaign(val)"  name="campaign" borderless v-model="campaign" :options="campaigns" class="common-select p-sm" />
-            </div>
-          </q-card-section>
-          <q-card-section class="q-px-none">
-            <q-table
-              class="index-table no-shadow"
-              separator="none"
-              :rows="rows"
-              :columns="columns"
-              color="primary"
-              row-key="campaignName"
-              v-model:pagination="pagination"
-              hide-pagination
-            >
-              <template v-slot:body-cell-publicPrivate="props">
-                <q-td :props="props">
-                  <q-toggle 
-                    v-model="props.row.publicPrivate" 
-                    checked-icon="mdi-lock"
-                    color="negative"
-                    unchecked-icon="mdi-earth"  
-                    @update:model-value="val => togglePublicPrivate(props, val)"
-                  />
-                </q-td>
-              </template>
-              <template v-slot:body-cell-priority="props">
-                <q-td>
-                  <q-checkbox v-model="props.row.priority" class="common-checkbox" />
-                </q-td>
-              </template>
-              <template v-slot:body-cell-url="props">
-                <q-td>
-                  <q-btn to="/" class="common-anchor" round flat icon="mdi-open-in-new"></q-btn>
-                </q-td>
-              </template>
-            </q-table>
-            <div class="row justify-end q-mt-md">
-              <q-pagination
-                v-model="pagination.page"
+    <div class="full-width row wrap justify-start items-start content-start">
+      <div class="q-px-md row">
+        <q-toolbar>
+          <q-toolbar-title class="page-ttl">
+            {{ $t('nav.campaignOutput') }}
+          </q-toolbar-title>
+        </q-toolbar>
+      </div>
+      <div class="full-width row q-px-md q-mt-md">
+        <div class="col-12">
+          <q-card class="common-card">
+            <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
+              <div class="common-card-ttl">Campaign Output</div>
+              <div class="col-4">
+                <q-select @update:model-value="val => filterByCampaign(val)"  name="campaign" borderless v-model="campaign" :options="campaigns" class="common-select p-sm" />
+              </div>
+            </q-card-section>
+            <q-card-section class="q-px-none">
+              <q-table
+                class="index-table no-shadow"
+                separator="none"
+                :rows="rows"
+                :columns="columns"
                 color="primary"
-                :max="pagesNumber"
-                size="md"
-                direction-links
-              />
-            </div>
-          </q-card-section>
-        </q-card>
+                row-key="campaignName"
+                v-model:pagination="pagination"
+                hide-pagination
+              >
+                <template v-slot:body-cell-publicPrivate="props">
+                  <q-td :props="props">
+                    <q-toggle 
+                      v-model="props.row.publicPrivate" 
+                      checked-icon="mdi-lock"
+                      color="negative"
+                      unchecked-icon="mdi-earth"  
+                      @update:model-value="val => togglePublicPrivate(props, val)"
+                    />
+                  </q-td>
+                </template>
+                <template v-slot:body-cell-priority="props">
+                  <q-td>
+                    <q-checkbox v-model="props.row.priority" class="common-checkbox" />
+                  </q-td>
+                </template>
+                <template v-slot:body-cell-url="props">
+                  <q-td>
+                    <q-btn to="/" class="common-anchor" round flat icon="mdi-open-in-new"></q-btn>
+                  </q-td>
+                </template>
+              </q-table>
+              <div class="row justify-end q-mt-md">
+                <q-pagination
+                  v-model="pagination.page"
+                  color="primary"
+                  :max="pagesNumber"
+                  size="md"
+                  direction-links
+                />
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
     </div>
   </div>
