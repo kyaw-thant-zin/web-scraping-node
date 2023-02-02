@@ -38,6 +38,15 @@ body {
   }
 }
 
+.icon {
+  &-input {
+    .q-field__prepend {
+      padding-left: 20px;
+      padding-right: 0px;
+    }
+  }
+}
+
 .l {
     background-color: #F1F3F9;
     &-hd {

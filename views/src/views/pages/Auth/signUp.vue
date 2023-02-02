@@ -152,12 +152,12 @@
                         </div>
                     </div>
                     <div class="col-12 text-center auth-submit">
-                        <q-btn type="submit" size="md" label="Sign Up" />
+                        <q-btn type="submit" size="md"  class="q-px-lg q-py-sm" label="Sign Up" />
                     </div>
                 </form>
             </q-card-section> 
         </q-card>
-        <p class="auth-desc">Already member? <router-link to="/sing-in">Sign In</router-link></p>
+        <p class="auth-desc">Already member? <router-link to="/sign-in">Sign In</router-link></p>
     </div>
   </div>
 </template>

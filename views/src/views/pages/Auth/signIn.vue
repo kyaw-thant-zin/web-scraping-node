@@ -10,14 +10,18 @@
     title: 'USER',
   })
 
-  const pagesNumber = computed(() => {
-    
-  })
+  const isPwd = ref(true)
+  const formData = {
+    userName: ref(''),
+    password: ref(''),
+  }
 
-  onMounted(() => {
-    // init function
-    console.log('mounted')
-  })
+  const rememberMe = ref(false)
+
+  async function submitForm() {
+    console.log(formData)
+  }
+
 
 </script>
 
@@ -27,32 +31,62 @@
       content ? `${content} | ${WebsiteName}` : WebsiteName
     }}</template>
   </metainfo>
-  <div class="q-pa-sm row items-start q-gutter-md">
-    <q-breadcrumbs>
-        <q-breadcrumbs-el :label="$t('nav.home')" icon="mdi-home-variant-outline" to="/" />
-        <q-breadcrumbs-el :label="$t('nav.user')" />
-    </q-breadcrumbs>
-  </div>
-  <div class="full-width row wrap justify-start items-start content-start">
-    <div class="q-px-md row">
-      <q-toolbar>
-        <q-toolbar-title class="page-ttl">
-          {{ $t('nav.user') }}
-        </q-toolbar-title>
-      </q-toolbar>
-    </div>
-    <div class="full-width row q-px-md q-mt-md">
-      <div class="col-12">
-        <q-card class="common-card">
-          <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
-            <div class="common-card-ttl">Account Information</div>
-            <q-btn class="btn-common shadow-3" outline :label="`Save Changes`" to="/campaigns/create" no-caps />
-          </q-card-section>
-          <q-card-section class="q-px-none">
-            
-          </q-card-section>
+  <div class="fit row wrap justify-center items-center min-height-fit auth-bg">
+    <div class="col-xs-10 col-sm-8 col-md-5 justify-center q-my-xl">
+        <q-card class="q-px-xl q-py-lg l-signup">
+            <q-card-section class="l-signup-wr">
+                <h1 class="l-signup-wr-ttl">HASHVANK</h1>
+                <p class="l-signup-wr-desc">Welcome back! Please login to continue.</p>
+                <form @submit.prevent="submitForm"  class="fit row l-signup-wr-form">
+                    <div class="col-12 auth-input icon-input">
+                        <q-input 
+                            borderless 
+                            label="Username or email"
+                            name="userName" 
+                            v-model="formData.userName.value" 
+                            :rules="[val => !!val || 'Field is required']"
+                        >
+                          <template v-slot:prepend>
+                            <q-icon name="mdi-email-outline" />
+                          </template>
+                        </q-input>
+                    </div>
+                    <div class="col-12 auth-input icon-input">
+                        <q-input 
+                            borderless 
+                            name="password"
+                            v-model="formData.password.value" 
+                            :type="isPwd ? 'password' : 'text'" 
+                            label="Password"
+                            :rules="[
+                                val => !!val || 'Field is required',
+                            ]"
+                        >
+                          <template v-slot:prepend>
+                            <q-icon name="mdi-lock-outline" />
+                          </template> 
+                            <template v-slot:append>
+                            <q-icon
+                                :name="isPwd ? 'visibility_off' : 'visibility'"
+                                class="cursor-pointer"
+                                @click="isPwd = !isPwd"
+                            />
+                            </template>
+                        </q-input>
+                    </div>
+                    <div class="col-12">
+                        <div class="row justify-between items-center">
+                            <q-checkbox v-model="rememberMe" label="Remember Me" color="primary" />
+                            <router-link to="/">Forgot Password?</router-link>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center auth-submit">
+                        <q-btn type="submit" size="md" class="q-px-lg q-py-sm" label="Sign In" />
+                    </div>
+                </form>
+            </q-card-section> 
         </q-card>
-      </div>
+        <p class="auth-desc">New to Product? <router-link to="/sign-up">Sign Up</router-link></p>
     </div>
   </div>
 </template>
