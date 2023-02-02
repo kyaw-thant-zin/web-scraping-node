@@ -11,6 +11,21 @@
   })
 
   const isPwd = ref(true)
+  const acceptAgreementError = ref(false)
+  const formData = {
+    firstName: ref(''),
+    lastName: ref(''),
+    tel: ref(''),
+    email: ref(''),
+    userName: ref(''),
+    password: ref(''),
+    confirmPassword: ref(''),
+    acceptAgreement: ref(false)
+  }
+
+  async function submitForm() {
+    console.log(formData)
+  }
 
 
 </script>
@@ -27,12 +42,13 @@
             <q-card-section class="l-signup-wr">
                 <h1 class="l-signup-wr-ttl">HASHVANK</h1>
                 <p class="l-signup-wr-desc">Welcome! Thank you for joining us.</p>
-                <form action=""  class="fit row l-signup-wr-form">
+                <form @submit.prevent="submitForm"  class="fit row l-signup-wr-form">
                     <div class="col-12 auth-input">
                         <q-input 
                             borderless 
                             type="text" 
-                            v-model="text" 
+                            name="firstName"
+                            v-model="formData.firstName.value" 
                             label="First Name" 
                             :rules="[val => !!val || 'Field is required']"
                         />
@@ -41,7 +57,8 @@
                         <q-input 
                             borderless 
                             type="text" 
-                            v-model="text" 
+                            name="lastName" 
+                            v-model="formData.lastName.value" 
                             label="Last Name" 
                             :rules="[val => !!val || 'Field is required']"
                         />
@@ -50,7 +67,8 @@
                         <q-input 
                             borderless 
                             type="tel" 
-                            v-model="text" 
+                            name="tel" 
+                            v-model="formData.tel.value" 
                             label="Tel:" 
                             :rules="[val => !!val || 'Field is required']"
                         />
@@ -59,15 +77,20 @@
                         <q-input 
                             borderless 
                             type="email" 
-                            v-model="text" 
+                            name="email" 
+                            v-model="formData.email.value" 
                             label="Email" 
-                            :rules="[val => !!val || 'Field is required']"
+                            :rules="[
+                                val => !!val || 'Field is required', 
+                                (val, rules) => rules.email(val) || 'Please enter a valid email address'
+                            ]"
                         />
                     </div>
                     <div class="col-12 auth-input">
                         <q-input 
                             borderless 
-                            v-model="text" 
+                            name="userName" 
+                            v-model="formData.userName.value" 
                             label="Username" 
                             :rules="[val => !!val || 'Field is required']"
                         />
@@ -75,10 +98,14 @@
                     <div class="col-12 auth-input">
                         <q-input 
                             borderless 
-                            v-model="password" 
+                            name="password"
+                            v-model="formData.password.value" 
                             :type="isPwd ? 'password' : 'text'" 
                             label="Password"
-                            :rules="[val => !!val || 'Field is required']"
+                            :rules="[
+                                val => !!val || 'Field is required',
+                                val => val.length >= 8 || 'Please use minumn 8 character',
+                            ]"
                         >
                             <template v-slot:append>
                             <q-icon
@@ -92,10 +119,14 @@
                     <div class="col-12 auth-input">
                         <q-input 
                             borderless 
-                            v-model="password" 
+                            name="confirmPassword"
+                            v-model="formData.confirmPassword.value" 
                             :type="isPwd ? 'password' : 'text'" 
                             label="Confirm Password"
-                            :rules="[val => !!val || 'Field is required']"
+                            :rules="[
+                                val => !!val || 'Field is required',
+                                val => val.length >= 8 || 'Please use minumn 8 character',
+                            ]"
                         >
                             <template v-slot:append>
                             <q-icon
@@ -107,19 +138,26 @@
                         </q-input>
                     </div>
                     <div class="col-12">
-                        <q-checkbox
-                            name="accept_agreement"
-                            v-model="acceptAgreement"
-                            label="Agree with Terms & Conditions"
-                        />
+                        <div class="row items-center">
+                            <q-checkbox
+                                name="accept_agreement"
+                                v-model="formData.acceptAgreement.value"
+                            />
+                            <p class="q-mb-none">Agree with <a class="auth-link" href="https://www.google.com" target="_blank" rel="noreferrer noopener">
+                                    Terms & Conditions</a></p>
+                            <div
+                                v-if="acceptAgreementError"
+                                class="auth-alret"
+                            >You must agree to the terms and conditions to continue.</div>
+                        </div>
                     </div>
                     <div class="col-12 text-center auth-submit">
                         <q-btn type="submit" size="md" label="Sign Up" />
                     </div>
                 </form>
-            </q-card-section>
+            </q-card-section> 
         </q-card>
-        <p>Already member? <router-link to="/sing-in">Sign In</router-link></p>
+        <p class="auth-desc">Already member? <router-link to="/sing-in">Sign In</router-link></p>
     </div>
   </div>
 </template>

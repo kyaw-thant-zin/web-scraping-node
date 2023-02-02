@@ -11,8 +11,31 @@ body {
   min-height: inherit;
 }
 
-.auth-bg {
-  background-color: #263642;
+.auth {
+
+  &-alret {
+    color: #C10015;
+    font-size: 12px;
+  }
+
+  &-link {
+    color: #11CDEF;
+  }
+
+  &-bg {
+    background-color: #263642;
+  }
+
+  &-desc {
+    margin-top: 23px;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 13px;
+
+    a {
+      color: #11CDEF;
+    }
+  }
 }
 
 .l {
@@ -39,8 +62,14 @@ body {
         }
     }
     &-signup {
+      border-radius: 10px;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      -ms-border-radius: 10px;
+      -o-border-radius: 10px;
       background-color: #F7FAFC;
       &-wr {
+
         &-ttl {
           margin: 0px;
           line-height: 1.167;
