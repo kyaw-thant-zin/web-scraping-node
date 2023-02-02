@@ -8,7 +8,8 @@ import Footer from '@/views/layout/Footer.vue';
 
 const authRoute = [
   'signUp',
-  'signIn'
+  'signIn',
+  'forgotPassword'
 ]
 
 const routeName = computed(() => { 

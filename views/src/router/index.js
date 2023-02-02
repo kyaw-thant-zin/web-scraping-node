@@ -4,6 +4,8 @@ import HomePage from '@/views/pages/HomePage.vue'
 // AUTH
 import signIn from '@/views/pages/Auth/signIn.vue'
 import signUp from '@/views/pages/Auth/signUp.vue'
+import forgotPassword from '@/views/pages/Auth/forgotPassword.vue'
+
 
 // CAMPAIGN
 import CampaignIndex from '@/views/pages/Campaign/index.vue'
@@ -17,6 +19,10 @@ import UserIndex from '@/views/pages/User/index.vue'
 
 // 404 NOT FOUND
 import notFound from '@/views/pages/NotFound.vue'
+
+const isLoggedIn = () => {
+  return true
+}
 
 const router = createRouter({
   history: createWebHistory(),
@@ -37,40 +43,52 @@ const router = createRouter({
       component: signUp,
     },
     {
+      path: '/forgot-password',
+      name: 'forgotPassword',
+      component: forgotPassword,
+    },
+    {
       path: '/campaigns',
       name: 'campaigns',
+      meta: { requiresAuth: true },
       children: [
         {
           path: '',
           name: 'campaign.index',
           component: CampaignIndex,
+          meta: { requiresAuth: true },
         },
         {
           path: 'create',
           name: 'campaign.create',
           component: CampaignCreate,
+          meta: { requiresAuth: true },
         }
       ]
     },
     {
       path: '/campaign-outputs',
       name: 'campaignOutput',
+      meta: { requiresAuth: true },
       children: [
         {
           path: '',
           name: 'campaignOutput.index',
           component: CampaignOutputIndex,
+          meta: { requiresAuth: true },
         },
       ]
     },
     {
       path: '/user',
       name: 'user',
+      meta: { requiresAuth: true },
       children: [
         {
           path: '',
           name: 'user.index',
           component: UserIndex,
+          meta: { requiresAuth: true },
         },
       ]
     },
@@ -81,5 +99,13 @@ const router = createRouter({
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isLoggedIn()) {
+    next({ path: '/sign-in' })
+  } else {
+    next()
+  }
+})
 
 export default router;

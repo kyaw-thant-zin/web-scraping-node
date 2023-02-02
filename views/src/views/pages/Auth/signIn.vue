@@ -77,7 +77,7 @@
                     <div class="col-12">
                         <div class="row justify-between items-center">
                             <q-checkbox v-model="rememberMe" label="Remember Me" color="primary" />
-                            <router-link to="/">Forgot Password?</router-link>
+                            <router-link to="/forgot-password">Forgot Password?</router-link>
                         </div>
                     </div>
                     <div class="col-12 text-center auth-submit">
