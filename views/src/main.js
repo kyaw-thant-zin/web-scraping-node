@@ -1,8 +1,8 @@
 import App from './App.vue'
 import router from './router'
 import messages from './lang'
-import { createApp } from 'vue'
-import { Quasar } from 'quasar'
+import { createApp, markRaw } from 'vue'
+import { Quasar, Loading } from 'quasar'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { createMetaManager } from 'vue-meta'
@@ -37,12 +37,19 @@ if(localStorageLocale) {
 
 export default i18n
 
+const pinia = createPinia()
+pinia.use(({ store }) => {
+  store.router = markRaw(router)
+})
+
 createApp(App)
   .use(i18n)
-  .use(createPinia())
+  .use(pinia)
   .use(router)
   .use(createMetaManager())
   .use(Quasar, {
-    plugins: {}, // import Quasar plugins and add here
+    plugins: {
+      Loading
+    }, // import Quasar plugins and add here
   })
   .mount('#app')

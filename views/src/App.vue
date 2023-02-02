@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRoute } from 'vue-router';
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 
 /* header and footer for common  */
 import Header from '@/views/layout/Header.vue';
