@@ -62,7 +62,20 @@ module.exports = (sequelize, DataTypes) => {
                 deferrable: Deferrable.INITIALLY_IMMEDIATE
             }
         },
+        userTypeId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'userTypes',
+                key: 'id',
+                deferrable: Deferrable.INITIALLY_IMMEDIATE
+            }
+        },
         rememberToken: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
+        resetToken: {
             type: DataTypes.TEXT,
             allowNull: true
         },

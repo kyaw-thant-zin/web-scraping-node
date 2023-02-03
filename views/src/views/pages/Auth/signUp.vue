@@ -1,18 +1,20 @@
 <script setup>
 import { useMeta } from 'vue-meta'
 import { useQuasar } from 'quasar'
-import { ref, watchEffect, computed } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { WebsiteName } from '@/api/constants.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 
 /* app config */
 useMeta({
-title: 'SIGN UP',
+    title: 'SIGN UP',
 })
 
 const $q = useQuasar()
 const authStore = useAuthStore()
+
+const authForm = ref(null)
 
 const isPwd = ref(true)
 const formData = ref({
@@ -49,9 +51,65 @@ const formIsValid = () => {
 
 async function submitForm(formData) {
     if(formIsValid()) {
-        authStore.handleRegister(formData)
+        const resposne = authStore.handleRegister(formData)
+        if(resposne) {
+            $q.notify({
+                caption: 'Congratulations, your account has been successfully created.',
+                message: 'SUCCESS',
+                icon: 'mdi-check-circle-outline',
+                color: 'positive',
+                timeout: 1000
+            })
+            resetForm()
+            authStore.router.push({ name: 'signIn' })
+        } else {
+            $q.notify({
+                caption: 'Oops, something went wrong. Please try again later.',
+                message: 'ERROR',
+                icon: 'mdi-close-box-outline',
+                color: 'negative',
+                timeout: 1000
+            })
+        }
     }
     
+}
+
+const emailLoadingState = ref(false)
+const usernameLoadingState = ref(false)
+async function validateUnique(val, rules, field) {
+    
+    if(field === 'email') {
+        if(rules.email(val)) {
+            emailLoadingState.value = true
+            const resposne = await authStore.handleUniqueFields(field, val)
+            emailLoadingState.value = false
+            return resposne || 'Email already exists.'
+        } 
+        return rules.email(val) || 'Please enter a valid email address'
+    }else if(field === 'userName') {
+
+        const validate = /^[a-zA-Z0-9_.]+$/.test(val)
+        if(validate) {
+            usernameLoadingState.value = true
+            const resposne = await authStore.handleUniqueFields(field, val)
+            usernameLoadingState.value = false
+            return resposne || 'Username already exists.'
+        } 
+        return validate || 'Username can only contain letters, numbers, underscores, and periods'
+    }
+}
+
+function resetForm() {
+    formData.value.firstName = ''
+    formData.value.lastName = ''
+    formData.value.tel = ''
+    formData.value.email = ''
+    formData.value.userName = ''
+    formData.value.password = ''
+    formData.value.confirmPassword = ''
+    acceptAgreement.value = false
+    authForm.value.resetValidation()
 }
 
 
@@ -69,7 +127,7 @@ async function submitForm(formData) {
             <q-card-section class="l-signup-wr">
                 <h1 class="l-signup-wr-ttl">HASHVANK</h1>
                 <p class="l-signup-wr-desc">Welcome! Thank you for joining us.</p>
-                <q-form @submit.prevent="submitForm(formData)"  class="fit row l-signup-wr-form">
+                <q-form ref="authForm" @submit.prevent="submitForm(formData)"  class="fit row l-signup-wr-form">
                     <div class="col-12 auth-input">
                         <q-input 
                             borderless 
@@ -108,12 +166,13 @@ async function submitForm(formData) {
                             borderless 
                             type="email" 
                             name="email" 
+                            :loading="emailLoadingState"
                             v-model="formData.email" 
                             label="Email" 
                             lazy-rules
                             :rules="[
                                 val => !!val.replace(/\s/g, '') || 'Field is required', 
-                                (val, rules) => rules.email(val) || 'Please enter a valid email address'
+                                (val, rules) => validateUnique(val, rules, 'email'),
                             ]"
                         />
                     </div>
@@ -121,13 +180,14 @@ async function submitForm(formData) {
                         <q-input 
                             borderless 
                             name="userName" 
+                            :loading="usernameLoadingState"
                             v-model="formData.userName" 
                             label="Username" 
                             lazy-rules
                             :rules="[
                                 val => !!val.replace(/\s/g, '') || 'Field is required',
                                 val => val.length >= 4 || 'Please use minumn 4 character',
-                                val => /^[a-zA-Z0-9_.]+$/.test(val) || 'Username can only contain letters, numbers, underscores, and periods'
+                                (val, rules) => validateUnique(val, rules, 'userName')
                             ]"
                         />
                     </div>
@@ -199,9 +259,3 @@ async function submitForm(formData) {
     </div>
   </div>
 </template>
-
-<style lang="scss">
-
-  
-
-</style>

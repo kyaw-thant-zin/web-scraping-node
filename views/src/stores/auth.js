@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import { API } from '@/api/index.js'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -12,10 +12,13 @@ export const useAuthStore = defineStore('auth', {
     },
     actions: {
         async handleRegister(data) {
-            
-            console.log(data.firstName)
-            console.log(this.loadingState)
-            console.log(this.router)
+            // make a request to server
+            const response = await API.user.signUp(data)
+            return response
+        },
+        async handleUniqueFields(field, val) {
+            const response = await API.user.checkUniqueFields(field, val)
+            return response
         }
     }
 })

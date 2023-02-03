@@ -39,12 +39,12 @@ app.use('/api/v2/user', require('./routes/auth.routes')) // auth
 /**
  * Server Activation
  */
-const root = require('path').join(__dirname, './views', 'dist')
-console.log(root)
-app.use(express.static(root))
-app.get('*', (req, res) => {
-    res.sendFile('index.html', { root })
-})
+// const root = require('path').join(__dirname, './views', 'dist')
+// console.log(root)
+// app.use(express.static(root))
+// app.get('*', (req, res) => {
+//     res.sendFile('index.html', { root })
+// })
 
 
 app.listen(port, () => {

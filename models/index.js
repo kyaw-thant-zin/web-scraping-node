@@ -41,8 +41,10 @@ db.sequelize = sequelize
 /**
  *  Set Tables
  */
-db.users = require('./user.model')(sequelize, DataTypes)
+
 db.roles = require('./role.model')(sequelize, DataTypes)
+db.userTypes = require('./userType.model')(sequelize, DataTypes)
+db.users = require('./user.model')(sequelize, DataTypes)
 
 db.sequelize.sync({ force: false })
 .then(() => console.log('re-sync done!') )
@@ -56,3 +58,5 @@ db.roles.hasOne(db.users, {
     onUpdate: 'CASCADE'
 }) // roles => user
 db.users.belongsTo(db.roles) // user => roles
+
+module.exports = db
