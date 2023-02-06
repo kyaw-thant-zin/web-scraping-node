@@ -1,9 +1,12 @@
 <script setup>
   import { ref, onMounted, watchEffect } from 'vue'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useRoute } from 'vue-router'
 
   const route = useRoute()
   const activeLink = ref()
+  const userName = ref('')
+  const authStore = useAuthStore()
 
   watchEffect( async () => {
 
@@ -18,7 +21,12 @@
       activeLink.value = routeName
     }
 
-  }, [route])
+    // change the username
+    if(authStore.user) {
+      userName.value = authStore.user.userName.charAt(0)
+    }
+
+  }, [route, authStore])
 
   const options = [
     'EN', 'JP'
@@ -82,6 +90,12 @@
       styleColor: '#7764E4',
       path: '/'
     },
+    {
+      icon: 'mdi-logout-variant',
+      label: 'signOut',
+      styleColor: '#FB6340',
+      path: '/sign-out'
+    },
 
   ]
   // trigger sidebar open and close
@@ -107,7 +121,7 @@
           </template>
         </q-select>
         <q-btn size="sm" round outline class="q-ml-md" to="/">
-          <q-avatar size="sm" text-color="white">J</q-avatar>
+          <q-avatar size="sm" text-color="white">{{ userName }}</q-avatar>
         </q-btn>
       </q-toolbar>
     </q-header>

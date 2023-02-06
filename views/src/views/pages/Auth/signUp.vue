@@ -34,6 +34,8 @@ watchEffect( async () => {
 
     if(authStore.loadingState) {
         $q.loading.show()
+    } else {
+        $q.loading.hide()
     }
 
 }, [authStore.loadingState])
@@ -51,7 +53,9 @@ const formIsValid = () => {
 
 async function submitForm(formData) {
     if(formIsValid()) {
-        const resposne = authStore.handleRegister(formData)
+        authStore.loadingState = true
+        const resposne = authStore.handleSignUp(formData)
+        authStore.loadingState = false
         if(resposne) {
             $q.notify({
                 caption: 'Congratulations, your account has been successfully created.',

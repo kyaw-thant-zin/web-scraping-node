@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/pages/HomePage.vue'
 
+// API
+import { API } from '@/api/index.js'
+
 // AUTH
 import signIn from '@/views/pages/Auth/signIn.vue'
 import signUp from '@/views/pages/Auth/signUp.vue'
@@ -20,8 +23,10 @@ import UserIndex from '@/views/pages/User/index.vue'
 // 404 NOT FOUND
 import notFound from '@/views/pages/NotFound.vue'
 
-const isLoggedIn = () => {
-  return true
+const isLoggedIn = async () => {
+  // CHECK AUTH AND REDIRECT
+  const response = await API.checkAuth()
+  return response
 }
 
 const router = createRouter({
@@ -43,6 +48,16 @@ const router = createRouter({
       component: signUp,
     },
     {
+      path: '/sign-out',
+      name: 'signOut',
+      async beforeEnter (to, from, next) {
+        // Perform sign out logic here (e.g. clear authentication token)
+        const response = await API.user.signOut()
+        console.log(response)
+        next('/sign-in')
+      }
+    },
+    {
       path: '/forgot-password',
       name: 'forgotPassword',
       component: forgotPassword,
@@ -50,7 +65,9 @@ const router = createRouter({
     {
       path: '/campaigns',
       name: 'campaigns',
-      meta: { requiresAuth: true },
+      meta: { 
+        requiresAuth: true 
+      },
       children: [
         {
           path: '',
@@ -100,8 +117,8 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !isLoggedIn()) {
+router.beforeEach( async (to, from, next) => {
+  if (to.meta.requiresAuth && !await isLoggedIn()) {
     next({ path: '/sign-in' })
   } else {
     next()

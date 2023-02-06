@@ -1,9 +1,8 @@
 <script setup>
 
   import { useMeta } from 'vue-meta'
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted,  reactive} from 'vue'
   import { WebsiteName } from '@/api/constants.js'
-
 
   /* app config */
   useMeta({

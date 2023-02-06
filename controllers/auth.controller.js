@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const asyncHnadler = require('express-async-handler')
 const db = require('../models/index')
 const { Op } = require('sequelize')
+const passport = require('passport')
 
 
 // Create user Model
@@ -28,35 +29,39 @@ const signUp = asyncHnadler( async (req, res) => {
         throw new Error('Please add all fields')
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
+    try {
+        // Hash password
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
-    // Generate remember token
-    const rememberToken = await bcrypt.hash(userName, salt)
-    const resetToken = await bcrypt.hash(email, salt)
+        // Generate remember token
+        const rememberToken = await bcrypt.hash(userName, salt)
+        const resetToken = await bcrypt.hash(email, salt)
 
-    const userData = {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        tel: tel,
-        userName: userName,
-        password: hashedPassword,
-        status: 1,
-        roleId: 3,
-        userTypeId: 1,
-        rememberToken: rememberToken,
-        resetToken: resetToken
-    }
+        const userData = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            tel: tel,
+            userName: userName,
+            password: hashedPassword,
+            status: 1,
+            roleId: 3,
+            userTypeId: 1,
+            rememberToken: rememberToken,
+            resetToken: resetToken
+        }
 
-    // Create user
-    const user = await User.create(userData).catch(error => {console.log(error)}) 
+        // Create user
+        const user = await User.create(userData).catch(error => {console.log(error)}) 
 
-    if(user) {
-        res.status(201).json(true)
-    } else {
-        res.status(201).json(false)
+        if(user) {
+            res.status(201).json(true)
+        } else {
+            res.status(201).json(false)
+        }
+    } catch (error) {
+        res.send(error)
     }
 })
 
@@ -96,18 +101,48 @@ const validateUnique = asyncHnadler( async (req, res) => {
     res.json(foundUser)
 })
 
+// @desc GET checkAuth
+// @route GET /api/v2/check-auth
+// @access Public
+const checkAuth = asyncHnadler( async (req, res) => {
+    const user = req.user
+    if(!user) {
+        res.json(false)
+    } else {
+        res.json(true)
+    }
+})
+
 // @desc POST signIn
 // @route POST /api/v2/user/sign-in
 // @access Public
 const signIn = asyncHnadler( async (req, res) => {
+    passport.authenticate('local', (err, user) => {
+        if(user === 'USER_NOT_FOUND' || user === 'WRONG_PASSWORD') {
+            res.json(user)
+        } else {
+            req.logIn(user, function(err) {
+                if(err) {
+                    res.json(false)
+                } else {
+                    res.json(req.session.passport.user)
+                }
+            })
+        }
+    })(req, res)
     
-    const cookies = req.cookies;
-    const { id, password } = req.body
+})
 
-    console.log(cookies)
-    console.log(id)
-    console.log(password)
-    
+// @desc POST signOut
+// @route POST /api/v2/user/sign-out
+// @access Public
+const signOut = asyncHnadler( async (req, res) => {
+    req.logout((err) => {
+        if(err) {
+            res.send(err)
+        }
+    })
+    res.send(true)
 })
 
 
@@ -115,5 +150,7 @@ module.exports = {
     show,
     signUp,
     validateUnique,
+    checkAuth,
     signIn,
+    signOut
 }

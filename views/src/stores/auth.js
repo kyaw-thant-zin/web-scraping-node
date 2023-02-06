@@ -11,14 +11,24 @@ export const useAuthStore = defineStore('auth', {
         loading: (state) => state.loadingState
     },
     actions: {
-        async handleRegister(data) {
-            // make a request to server
+        async handleCheckAuth() {
+            const response = await API.checkAuth()
+            return response
+        },
+        async handleSignUp(data) {
             const response = await API.user.signUp(data)
             return response
         },
         async handleUniqueFields(field, val) {
             const response = await API.user.checkUniqueFields(field, val)
             return response
+        },
+        async handleSignIn(data) {
+            const response = await API.user.signIn(data)
+            return response
+        },
+        setAuthUser (state, user) {
+            state.authUser = user
         }
     }
 })

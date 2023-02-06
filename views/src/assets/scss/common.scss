@@ -3,12 +3,33 @@ a {
     text-decoration: unset !important;
 }
 
+/* Change Autocomplete styles in Chrome*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus
+input:-webkit-autofill, 
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 body {
     color: #172B4D !important;
 }
 
 .min-height-fit {
   min-height: inherit;
+}
+
+.btn-white {
+  i {
+    color: #fff;
+  }
 }
 
 .auth {

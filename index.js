@@ -1,10 +1,14 @@
-const cors = require('cors')
-const express = require("express")
-const cookieParser = require('cookie-parser')
-
 const dotenv = require('dotenv').config({
     path: __dirname + '/.env'
 })
+const cors = require('cors')
+const express = require("express")
+const bodyParser = require("body-parser")
+const session = require("express-session")
+const cookieParser = require('cookie-parser')
+const passport = require('passport')
+const { passportConfig } = require("./config/passportConfig")
+
 
 /**
  * App Variables
@@ -24,7 +28,18 @@ app.use(express.json())
 app.use(express.urlencoded({
     extended: true
 }))
-app.use(cookieParser())
+
+app.use(cookieParser("secretcode"))
+app.use(
+    session({
+      secret: "secretcode",
+      resave: false,
+      saveUninitialized: false,
+    })
+)
+app.use(passport.initialize())
+app.use(passport.session())
+passportConfig()
 
 /**
  * Routes Definitions
@@ -39,12 +54,12 @@ app.use('/api/v2/user', require('./routes/auth.routes')) // auth
 /**
  * Server Activation
  */
-// const root = require('path').join(__dirname, './views', 'dist')
-// console.log(root)
-// app.use(express.static(root))
-// app.get('*', (req, res) => {
-//     res.sendFile('index.html', { root })
-// })
+const root = require('path').join(__dirname, './views', 'dist')
+console.log(root)
+app.use(express.static(root))
+app.get('*', (req, res) => {
+    res.sendFile('index.html', { root })
+})
 
 
 app.listen(port, () => {

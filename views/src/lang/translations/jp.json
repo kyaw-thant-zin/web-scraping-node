@@ -7,7 +7,8 @@
         "linkSetting": "リンク設定",
         "inputCode": "埋め込みコード",
         "user": "ユーザー",
-        "generalSetting": "全般設定"
+        "generalSetting": "全般設定",
+        "signOut": "ログアウト"
     },
     "table" : {
         "title" : {
