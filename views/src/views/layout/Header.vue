@@ -150,7 +150,7 @@
 
           </q-list>
         </q-scroll-area>
-    </q-drawer>
+    </q-drawer>  
 
 </template>
 

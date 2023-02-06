@@ -9,7 +9,7 @@ import signUp from '@/views/pages/Auth/signUp.vue'
 import forgotPassword from '@/views/pages/Auth/forgotPassword.vue'
 
 // DASHBOARD
-import DashboardIndex from '@/views/pages/Dashboard/index.vue'
+import Dashboard from '@/views/pages/Dashboard/index.vue'
 
 // CAMPAIGN
 import CampaignIndex from '@/views/pages/Campaign/index.vue'
@@ -70,29 +70,18 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: DashboardIndex,
-      meta: { requiresAuth: true },
+      component: Dashboard,
     },
     {
       path: '/campaigns',
       name: 'campaigns',
-      meta: { 
-        requiresAuth: true 
-      },
-      children: [
-        {
-          path: '',
-          name: 'campaign.index',
-          component: CampaignIndex,
-          meta: { requiresAuth: true },
-        },
-        {
-          path: 'create',
-          name: 'campaign.create',
-          component: CampaignCreate,
-          meta: { requiresAuth: true },
-        }
-      ]
+      component: CampaignIndex,
+      // meta: { requiresAuth: true },
+    },
+    {
+      path: '/campaigns/create',
+      name: 'campaignCreate',
+      component: CampaignCreate,
     },
     {
       path: '/campaign-outputs',
@@ -129,11 +118,12 @@ const router = createRouter({
 });
 
 router.beforeEach( async (to, from, next) => {
-  if (to.meta.requiresAuth && !await isLoggedIn()) {
-    next({ path: '/sign-in' })
-  } else {
-    next()
-  }
+  // if (to.meta.requiresAuth && !await isLoggedIn()) {
+  //   next({ path: '/sign-in' })
+  // } else {
+  //   next()
+  // }
+  next()
 })
 
 export default router;

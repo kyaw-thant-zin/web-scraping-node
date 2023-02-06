@@ -31,8 +31,7 @@ const routeName = computed(() => {
         <template v-if="Component">
             <Transition name="fade">
               <div class="fit row min-height-fit">
-                <KeepAlive>
-                  <Suspense>
+                <Suspense>
                     <!-- main content -->
                     <component :is="Component"></component>
 
@@ -41,7 +40,6 @@ const routeName = computed(() => {
                       Loading...
                     </template>
                   </Suspense>
-                </KeepAlive>
               </div>
             </Transition>
         </template>

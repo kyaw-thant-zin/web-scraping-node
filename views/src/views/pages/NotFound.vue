@@ -29,7 +29,7 @@
   </metainfo>
   <div class="q-pa-sm row items-start q-gutter-md">
     <q-breadcrumbs>
-        <q-breadcrumbs-el :label="$t('nav.home')" icon="mdi-home-variant-outline" to="/" />
+        <q-breadcrumbs-el :label="$t('nav.dashboard')" icon="mdi-home-variant-outline" to="/" />
         <q-breadcrumbs-el :label="$t('nav.user')" />
     </q-breadcrumbs>
   </div>

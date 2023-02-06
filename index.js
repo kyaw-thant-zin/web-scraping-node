@@ -58,6 +58,7 @@ const root = require('path').join(__dirname, './views', 'dist')
 console.log(root)
 app.use(express.static(root))
 app.get('*', (req, res) => {
+    console.log(req.originalUrl)
     res.sendFile('index.html', { root })
 })
 
@@ -65,7 +66,5 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
 
     console.log(`Listening to requests on http://localhost:${port}`)
-
-    
 
 })
