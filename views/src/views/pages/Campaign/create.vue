@@ -31,28 +31,53 @@
     },
   ]
 
-  const collectionType = ref('Hashtag')
+  const campaignCreateForm = ref(null)
+  const formData = ref({
+    campaignName: '',
+    collectionType: {
+      label: 'Hashtag',
+      value: '1'
+    },
+    account: '',
+    hashtag: '',
+    linkType: {
+      label: 'TikTok',
+      value: '1'
+    }
+  })
   const collectionTypeInput = ref(false)
 
-  
-  const linkType = ref()
-
   function selectCollectionType(val) {
-    
+    if(val.label === 'Account') {
+      collectionTypeInput.value = true
+    } else {
+      collectionTypeInput.value = false
+    }
+  }
+
+  function submitForm() {
+    campaignCreateForm.value.submit()
   }
 
   function onSubmit() {
+    console.log(formData.value)
+  }
+
+  function validateUnique(val) {
 
   }
 
-  function onReset() {
-    
+  function requireOnce(val, field) {
+    if(field === 'account') {
+      if(collectionTypeInput.value === true) {
+        return !!val.replace(/\s/g, '') || 'Field is required'
+      }
+    } else {
+      if(collectionTypeInput.value === false) {
+        return !!val.replace(/\s/g, '') || 'Field is required'
+      }
+    }
   }
-
-  onMounted(() => {
-    // init function
-    console.log('mounted')
-  })
 
 </script>
 
@@ -82,36 +107,79 @@
         <q-card class="common-card">
           <q-card-section class="row justify-between items-center q-py-md q-px-lg">
             <div class="common-card-ttl">New Campaign</div>
-            <q-btn class="btn-common q-px-xl shadow-3" outline :label="`Create`" to="/campaigns/create" no-caps />
+            <q-btn class="btn-common q-px-xl shadow-3" outline :label="`Create`" @click="submitForm()" no-caps />
           </q-card-section>
           <q-separator />
           <q-card-section class="q-px-none">
             <q-form
+              ref="campaignCreateForm"
               @submit="onSubmit"
-              @reset="onReset"
               class="q-gutter-md"
             >
               <div class="row q-px-lg q-mt-none">
                 <div class="col-4">
                   <div class="common-input">
                     <label class="text-subtitle1 common-input-label">Campaign Name</label>
-                    <q-input name="campaignName" borderless class="common-input-text" />
+                    <q-input 
+                      name="campaignName" 
+                      borderless 
+                      class="common-input-text" 
+                      v-model="formData.campaignName"
+                      lazy-rules
+                      :rules="[
+                        val => !!val.replace(/\s/g, '') || 'Field is required', 
+                        (val, rules) => validateUnique(val),
+                      ]"
+                    />
                   </div>
                   <div class="common-input">
                     <label class="text-subtitle1 common-input-label">Collection Type</label>
-                    <q-select @update:model-value="val => selectCollectionType(val)"  name="collectionType" borderless v-model="collectionType" :options="collectionTypes" class="common-select" />
+                    <q-select 
+                      name="collectionType" 
+                      borderless 
+                      @update:model-value="val => selectCollectionType(val)"  
+                      v-model="formData.collectionType" 
+                      :options="collectionTypes" 
+                      class="common-select" 
+                    />
                   </div>
                   <div class="common-input">
                     <label class="text-subtitle1 common-input-label">Account</label>
-                    <q-input name="account" :disable="!collectionTypeInput" placeholder="#fashion,#music" borderless class="common-input-text" />
+                    <q-input 
+                      name="account" 
+                      placeholder="#fashion,#music" 
+                      borderless 
+                      class="common-input-text" 
+                      :disable="!collectionTypeInput" 
+                      v-model="formData.account"
+                      :rules="[
+                        (val, rules) => requireOnce(val, 'account'),
+                      ]"
+                    />
                   </div>
                   <div class="common-input">
                     <label class="text-subtitle1 common-input-label">Hashtag</label>
-                    <q-input name="hashtag" :disable="collectionTypeInput" placeholder="Ex:@TikTok" borderless class="common-input-text" />
+                    <q-input 
+                      name="hashtag" 
+                      placeholder="Ex:@TikTok" 
+                      borderless 
+                      class="common-input-text"
+                      :disable="collectionTypeInput" 
+                      v-model="formData.hashtag"
+                      :rules="[
+                        (val, rules) => requireOnce(val, 'hashtag'),
+                      ]"
+                    />
                   </div>
                   <div class="common-input">
                     <label class="text-subtitle1 common-input-label">Link Type</label>
-                    <q-select name="linkType" borderless v-model="linkType" :options="linkTypes" class="common-select" />
+                    <q-select 
+                      name="linkType" 
+                      borderless 
+                      class="common-select" 
+                      v-model="formData.linkType" 
+                      :options="linkTypes" 
+                    />
                   </div>
                 </div>
               </div>

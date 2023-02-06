@@ -201,10 +201,9 @@ body {
       -o-border-radius: 5px;
 
       &.q-field--disabled {
-        background-color: #B5BFCA;
-
         input {
           color: #696E7B;
+          background-color: #B5BFCA;
         }
       }
 
