@@ -1,4 +1,5 @@
-const bcrypt = require("bcryptjs")
+const CryptoJS = require("crypto-js")
+const bcrypt = require('bcryptjs')
 const { Op } = require('sequelize')
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
@@ -6,6 +7,7 @@ const db = require('../models/index')
 
 // Create user Model
 const User = db.users
+const screctKey = 'webapp0.2'
 
 module.exports.passportConfig = () => {
     passport.use(
@@ -30,7 +32,11 @@ module.exports.passportConfig = () => {
             const filteredUser = {}
             for(const key in user.dataValues) {
                 if(key === 'uuid' || key === 'userName' || key === 'roleId' || key === 'firstName' || key === 'lastName' ) {
-                    filteredUser[key] = user.dataValues[key]
+                    if(key === 'uuid') {
+                        filteredUser[key] = CryptoJS.AES.encrypt(user.dataValues[key], screctKey).toString()
+                    } else {
+                        filteredUser[key] = user.dataValues[key]
+                    }
                 }
             }
 
@@ -44,13 +50,14 @@ module.exports.passportConfig = () => {
     })
   
     passport.deserializeUser(async (user, done) => {
+        const decryptedUUID = CryptoJS.AES.decrypt(user.uuid, screctKey).toString(CryptoJS.enc.Utf8)
         const users = await User.findOne({
             where: {
-                uuid: user.uuid
+                uuid: decryptedUUID
             }
         })
         if (!users) {
-            done(error, false)
+            done(null, false)
         }
         done(null, user)
     })

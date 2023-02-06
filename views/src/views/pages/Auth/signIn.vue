@@ -21,27 +21,32 @@ const formData = ref({
   password: '',
   rememberMe: false
 })
+const formError = ref({
+  userName: false,
+  password: false
+})
 
 watchEffect( async () => {
 
-if(authStore._loading) {
-    $q.loading.show()
-} else {
-    $q.loading.hide()
-}
+  if(authStore._loading) {
+      $q.loading.show()
+  } else {
+      $q.loading.hide()
+  }
 
-}, [authStore._loading])
+  formError.value.userName = authStore._error
+  formError.value.password = authStore._error
+
+}, [authStore])
 
 async function submitForm(formData) {
   await authStore.handleSignIn(formData)
   
-  if(authStore._user === 'WRONG_PASSWORD') {
-  
-  } else if(authStore._user === 'USER_NOT_FOUND') {
-
+  if(authStore._user === 'WRONG_PASSWORD' || authStore._user === 'USER_NOT_FOUND') {
+    
   } else if(authStore._user) {
     resetForm()
-    authStore.router.replace({ path: '/campaigns' })
+    authStore.router.replace({ path: '/dashboard' })
   }
 }
 
@@ -73,6 +78,7 @@ function resetForm() {
                             label="Username or email"
                             name="userName" 
                             v-model="formData.userName" 
+                            :error="formError.userName"
                             lazy-rules
                             :rules="[val => !!val.replace(/\s/g, '') || 'Field is required']"
                         >
@@ -85,6 +91,7 @@ function resetForm() {
                         <q-input 
                             borderless 
                             name="password"
+                            :error="formError.password"
                             v-model="formData.password" 
                             :type="isPwd ? 'password' : 'text'" 
                             label="Password"
@@ -113,6 +120,14 @@ function resetForm() {
                     </div>
                     <div class="col-12 text-center auth-submit">
                         <q-btn type="submit" size="md" class="q-px-lg q-py-sm" label="Sign In" />
+                    </div>
+                    <div class="col-12 q-mt-lg" v-if="formError.userName">
+                      <q-banner class="text-negative bg-none">
+                        <template v-slot:avatar>
+                          <q-icon name="mdi-alert-circle-outline" color="negative" />
+                        </template>
+                        You have entered incorrect Username or Email or Passowrd.
+                      </q-banner>
                     </div>
                 </q-form>
             </q-card-section> 

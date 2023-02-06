@@ -1,6 +1,6 @@
 {
     "nav" : {
-        "home": "ホーム",
+        "dashboard": "ホーム",
         "campaign": "キャンペーン",
         "campaignOutput": "表示設定",
         "report": "レポート",

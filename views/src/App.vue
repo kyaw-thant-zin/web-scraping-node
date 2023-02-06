@@ -7,6 +7,8 @@ import Header from '@/views/layout/Header.vue';
 import Footer from '@/views/layout/Footer.vue';
 
 const authRoute = [
+  'notFound',
+  'home',
   'signUp',
   'signIn',
   'forgotPassword'

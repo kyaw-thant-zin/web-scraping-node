@@ -26,6 +26,10 @@ body {
   min-height: inherit;
 }
 
+.bg-none {
+  background-color: unset !important;
+}
+
 .btn-white {
   i {
     color: #fff;

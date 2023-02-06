@@ -24,7 +24,7 @@
 
     const user = authStore._user
     if(user) {
-      userName.value = user.userName
+      userName.value = user.userName.charAt(0)
     }
 
   }, [route, authStore])
@@ -46,9 +46,9 @@
   const menuList = [
     {
       icon: 'mdi-home-variant-outline',
-      label: 'home',
+      label: 'dashboard',
       styleColor: '#7764E4',
-      path: '/'
+      path: '/dashboard'
     },
     {
       icon: 'mdi-email-outline',

@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const _loading = ref(false)
     const _user = ref(null)
+    const _error = ref(false)
     const _uuid = ref(useLocalStorage('_uuid', null))
     const _isLoggedIn = ref(useLocalStorage('_isLoggedIn', false))
     const _rememberMe = ref(useLocalStorage('_rememberMe', false))
@@ -17,6 +18,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     const storeUUID = (uuid) => {
         _uuid.value = uuid
+    }
+    const storeError = (error) => {
+        _error.value = error
     }
 
     const storeRememberMe = (rememberMe) => {
@@ -34,11 +38,16 @@ export const useAuthStore = defineStore('auth', () => {
     const handleCheckAuth = async (uuid) => {
         const response = await API.checkAuth(uuid)
         if(response !== false) {
+            storeError(false)
             storeUser(response)
             storeUUID(response.uuid)
             storeIsLoggedIn(true)
             return true
         } else {
+            storeError(true)
+            storeUser(null)
+            storeUUID(null)
+            storeIsLoggedIn(false)
             return false
         }
     }
@@ -57,9 +66,17 @@ export const useAuthStore = defineStore('auth', () => {
         storeRememberMe(data.rememberMe)
         storeLoading(true)
         const response = await API.user.signIn(data)
-        storeUser(response)
-        storeUUID(response.uuid)
-        storeIsLoggedIn(true)
+        if(response === 'USER_NOT_FOUND' || response === 'WRONG_PASSWORD') {
+            storeError(true)
+            storeUser(null)
+            storeUUID(null)
+            storeIsLoggedIn(false)
+        } else {
+            storeError(false)
+            storeUser(response)
+            storeUUID(response.uuid)
+            storeIsLoggedIn(true)
+        }
         storeLoading(false)
     }
 
@@ -71,6 +88,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     return {
         _uuid,
+        _error,
         _isLoggedIn,
         _rememberMe,
         _loading,

@@ -1,6 +1,6 @@
 {
     "nav" : {
-        "home": "Home",
+        "dashboard": "Home",
         "campaign": "Campaign",
         "campaignOutput": "Campaign Output",
         "report": "Report",

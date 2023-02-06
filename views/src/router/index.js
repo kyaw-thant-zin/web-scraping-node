@@ -8,6 +8,8 @@ import signIn from '@/views/pages/Auth/signIn.vue'
 import signUp from '@/views/pages/Auth/signUp.vue'
 import forgotPassword from '@/views/pages/Auth/forgotPassword.vue'
 
+// DASHBOARD
+import DashboardIndex from '@/views/pages/Dashboard/index.vue'
 
 // CAMPAIGN
 import CampaignIndex from '@/views/pages/Campaign/index.vue'
@@ -64,6 +66,12 @@ const router = createRouter({
       path: '/forgot-password',
       name: 'forgotPassword',
       component: forgotPassword,
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardIndex,
+      meta: { requiresAuth: true },
     },
     {
       path: '/campaigns',
