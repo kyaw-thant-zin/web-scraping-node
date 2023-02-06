@@ -14,12 +14,6 @@ useMeta({
 const $q = useQuasar()
 const authStore = useAuthStore()
 
-// CHECK AUTH AND REDIRECT
-const auth = await authStore.handleCheckAuth()
-if(auth) {
-  authStore.router.push({name: 'campaigns'})
-}
-
 const authForm = ref(null)
 const isPwd = ref(true)
 const formData = ref({
@@ -30,27 +24,25 @@ const formData = ref({
 
 watchEffect( async () => {
 
-if(authStore.loadingState) {
+if(authStore._loading) {
     $q.loading.show()
 } else {
     $q.loading.hide()
 }
 
-}, [authStore.loadingState])
+}, [authStore._loading])
 
 async function submitForm(formData) {
-    authStore.loadingState = true
-    const resposne = await authStore.handleSignIn(formData)
-    authStore.loadingState = false
-    if(resposne === 'WRONG_PASSWORD') {
+  await authStore.handleSignIn(formData)
+  
+  if(authStore._user === 'WRONG_PASSWORD') {
+  
+  } else if(authStore._user === 'USER_NOT_FOUND') {
 
-    } else if(resposne === 'USER_NOT_FOUND') {
-
-    } else if(resposne?.uuid) {
-      resetForm()
-      authStore.setAuthUser(authStore, resposne)
-      authStore.router.replace({ path: '/campaigns' })
-    }
+  } else if(authStore._user) {
+    resetForm()
+    authStore.router.replace({ path: '/campaigns' })
+  }
 }
 
 function resetForm() {

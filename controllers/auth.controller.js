@@ -106,10 +106,11 @@ const validateUnique = asyncHnadler( async (req, res) => {
 // @access Public
 const checkAuth = asyncHnadler( async (req, res) => {
     const user = req.user
+    const { uuid } = req.query
     if(!user) {
         res.json(false)
     } else {
-        res.json(true)
+        res.json(user)
     }
 })
 

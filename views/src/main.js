@@ -40,7 +40,8 @@ export default i18n
 const pinia = createPinia()
 pinia.use(({ store }) => {
   store.router = markRaw(router)
-})
+},
+)
 
 createApp(App)
   .use(i18n)

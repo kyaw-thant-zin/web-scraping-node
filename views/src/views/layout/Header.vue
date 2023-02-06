@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, watchEffect } from 'vue'
+  import { ref, watchEffect } from 'vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useRoute } from 'vue-router'
 
@@ -21,9 +21,10 @@
       activeLink.value = routeName
     }
 
-    // change the username
-    if(authStore.user) {
-      userName.value = authStore.user.userName.charAt(0)
+
+    const user = authStore._user
+    if(user) {
+      userName.value = user.userName
     }
 
   }, [route, authStore])

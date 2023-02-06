@@ -1,34 +1,84 @@
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { API } from '@/api/index.js'
+import { useLocalStorage } from '@vueuse/core'
 
-export const useAuthStore = defineStore('auth', {
-    state: () => ({
-        authUser: null,
-        loadingState: false
-    }),
-    getters: {
-        user: (state) => state.authUser, 
-        loading: (state) => state.loadingState
-    },
-    actions: {
-        async handleCheckAuth() {
-            const response = await API.checkAuth()
-            return response
-        },
-        async handleSignUp(data) {
-            const response = await API.user.signUp(data)
-            return response
-        },
-        async handleUniqueFields(field, val) {
-            const response = await API.user.checkUniqueFields(field, val)
-            return response
-        },
-        async handleSignIn(data) {
-            const response = await API.user.signIn(data)
-            return response
-        },
-        setAuthUser (state, user) {
-            state.authUser = user
+export const useAuthStore = defineStore('auth', () => {
+
+    const _loading = ref(false)
+    const _user = ref(null)
+    const _uuid = ref(useLocalStorage('_uuid', null))
+    const _isLoggedIn = ref(useLocalStorage('_isLoggedIn', false))
+    const _rememberMe = ref(useLocalStorage('_rememberMe', false))
+
+    const storeUser = (user) => {
+        _user.value = user
+    }
+
+    const storeUUID = (uuid) => {
+        _uuid.value = uuid
+    }
+
+    const storeRememberMe = (rememberMe) => {
+        _rememberMe.value = rememberMe
+    }
+
+    const storeIsLoggedIn = (isLoggedIn) => {
+        _isLoggedIn.value = isLoggedIn
+    }
+
+    const storeLoading = (loading) => {
+        _loading.value = loading
+    }
+
+    const handleCheckAuth = async (uuid) => {
+        const response = await API.checkAuth(uuid)
+        if(response !== false) {
+            storeUser(response)
+            storeUUID(response.uuid)
+            storeIsLoggedIn(true)
+            return true
+        } else {
+            return false
         }
+    }
+
+    const handleSignUp = async (data) => {
+        const response = await API.user.signUp(data)
+        return response
+    }
+
+    const handleUniqueFields = async (field, val) => {
+        const response = await API.user.checkUniqueFields(field, val)
+        return response
+    }
+
+    const handleSignIn = async (data) => {
+        storeRememberMe(data.rememberMe)
+        storeLoading(true)
+        const response = await API.user.signIn(data)
+        storeUser(response)
+        storeUUID(response.uuid)
+        storeIsLoggedIn(true)
+        storeLoading(false)
+    }
+
+    const handleSignOut = async () => {
+        const response = await API.user.signOut()
+        storeIsLoggedIn(false)
+        storeUUID(null)
+    }
+
+    return {
+        _uuid,
+        _isLoggedIn,
+        _rememberMe,
+        _loading,
+        _user,
+        handleCheckAuth,
+        handleSignUp,
+        handleUniqueFields,
+        handleSignIn,
+        handleSignOut
     }
 })

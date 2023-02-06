@@ -12,9 +12,12 @@ const instance = axios.create({
 });
 
 export const API = {
-    'checkAuth': async () => {
+    'checkAuth': async (uuid) => {
         const response = await instance.get(apiURL + '/user/check-auth', { 
             headers: headers ,
+            params: {
+                'uuid': uuid
+            }
         })
         return response.data
     },

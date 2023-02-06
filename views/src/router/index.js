@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/pages/HomePage.vue'
 
-// API
-import { API } from '@/api/index.js'
+import { useAuthStore } from '@/stores/auth.js'
 
 // AUTH
 import signIn from '@/views/pages/Auth/signIn.vue'
@@ -25,8 +24,12 @@ import notFound from '@/views/pages/NotFound.vue'
 
 const isLoggedIn = async () => {
   // CHECK AUTH AND REDIRECT
-  const response = await API.checkAuth()
-  return response
+  const authStore = useAuthStore()
+  if(authStore._uuid != null) {
+    return authStore.handleCheckAuth(authStore.uuid)
+  } else {
+    return false
+  }
 }
 
 const router = createRouter({
@@ -52,8 +55,8 @@ const router = createRouter({
       name: 'signOut',
       async beforeEnter (to, from, next) {
         // Perform sign out logic here (e.g. clear authentication token)
-        const response = await API.user.signOut()
-        console.log(response)
+        const authStore = useAuthStore()
+        await authStore.handleSignOut()
         next('/sign-in')
       }
     },

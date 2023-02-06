@@ -44,9 +44,9 @@ passportConfig()
 /**
  * Routes Definitions
  */
-app.get("/", (req, res) => {
-    res.status(200).send("Happy Scraping!")
-})
+// app.get("/", (req, res) => {
+//     res.status(200).send("Happy Scraping!")
+// })
 
 // AUTH ROUTES
 app.use('/api/v2/user', require('./routes/auth.routes')) // auth
