@@ -94,12 +94,13 @@ const store = asyncHnadler( async (req, res) => {
 
 })
 
-// @desc GET update-visibility
-// @route GET /api/v2/campaign/visibility/update
+// @desc POST update-visibility
+// @route POST /api/v2/campaign/visibility/update
 // @access Private
 const updateVisibility = asyncHnadler( async (req, res) => {
 
     const { id, visibility } = req.body
+    const userId = 12
 
     if(id === undefined || visibility === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -108,6 +109,7 @@ const updateVisibility = asyncHnadler( async (req, res) => {
     const campaign = await await Campaign.update({ visibility: visibility }, {
         where: {
             id: id,
+            userId: userId
         }
     })
 
@@ -119,9 +121,69 @@ const updateVisibility = asyncHnadler( async (req, res) => {
 
 })
 
+// @desc GET show
+// @route GET /api/v2/campaign/:id/show
+// @access Private
+const show = asyncHnadler( async (req, res) => {
+
+    const userId = 12
+    const { id } = req.params
+
+    if(!userId && id === undefined) {
+        res.status(400).send({ error: { required: 'Please add all fields' } })
+        throw new Error('Please add all fields')
+    }
+
+    let campaign = await Campaign.findOne({ 
+        where: {
+            userId: userId,
+            id: id
+        },
+        include: [ CollectionType, LinkType ],
+        order: [
+            ['id', 'ASC'],
+        ],
+    })
+
+    if(campaign) {
+        res.json(campaign)
+    } else {
+        res.json(false)
+    }
+})
+
+// @desc GET destroy
+// @route GET /api/v2/campaign/destroy
+// @access Private
+const destroy = asyncHnadler( async (req, res) => {
+
+    const userId = 12
+    const { id } = req.body
+
+    if(!userId && id === undefined) {
+        res.status(400).send({ error: { required: 'Please add all fields' } })
+        throw new Error('Please add all fields')
+    }
+
+    let campaign = await Campaign.destroy({
+        where: {
+            id: id,
+            userId: userId
+        }
+    })
+
+    if(campaign) {
+        res.json(true)
+    } else {
+        res.json(false)
+    }
+})
+
 module.exports = {
     index,
     store,
+    show,
+    destroy,
     validateUnique,
     updateVisibility,
 }

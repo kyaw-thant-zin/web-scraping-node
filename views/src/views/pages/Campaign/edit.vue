@@ -14,6 +14,8 @@
 
   const $q = useQuasar()
   const campaignStore = useCampaignStore()
+  const campaignID = campaignStore.router.currentRoute.value.params.id
+  campaignStore.handleCampaign(campaignID)
   campaignStore.handleCollectionTypes()
   campaignStore.handleLinkTypes()
   const collectionTypes = ref([])
@@ -44,11 +46,11 @@
   }
 
   function submitForm() {
-    campaignCreateForm.value.submit()
+    // campaignCreateForm.value.submit()
   }
 
   function onSubmit() {
-    const resposne = campaignStore.handleCampaignCreate(formData.value)
+    // const resposne = campaignStore.handleCampaignCreate(formData.value)
   }
 
   const campaignNameLoading = ref(false)
@@ -71,22 +73,7 @@
     }
   }
 
-  function resetForm() {
-    formData.value.campaignName = ''
-    formData.value.collectionType = {
-      label: 'Hashtag',
-      value: '1'
-    }
-    formData.value.account = ''
-    formData.value.hashtag = ''
-    formData.value.linkType = {
-      label: 'TikTok',
-      value: '1'
-    }
-    campaignCreateForm.value.resetValidation()
-  }
-
-  watchEffect( () => {
+  watchEffect( async () => {
     
     if(campaignStore._loading) {
         $q.loading.show()
@@ -102,9 +89,10 @@
       linkTypes.value = campaignStore._linkTypes
     }
 
-  }, [campaignStore._loading, campaignStore._collectionTypes, campaignStore._linkTypes])
+    if(campaignStore._campaign !== null) {
+        formData.value = campaignStore._campaign
+    }
 
-  watchEffect(() => {
     if(campaignStore._created) {
       $q.notify({
         caption: 'Congratulations, campaign has been successfully created.',
@@ -114,8 +102,11 @@
       })
       resetForm()
       campaignStore.router.replace({ name: 'campaign.index' })
+    } else {
+
     }
-  }, [campaignStore._created])
+
+  }, [campaignStore])
 
 </script>
 
@@ -144,8 +135,8 @@
       <div class="col-12">
         <q-card class="common-card">
           <q-card-section class="row justify-between items-center q-py-md q-px-lg">
-            <div class="common-card-ttl">New Campaign</div>
-            <q-btn class="btn-common q-px-xl shadow-3" outline :label="`Create`" @click="submitForm()" no-caps />
+            <div class="common-card-ttl">Edit Campaign</div>
+            <q-btn class="btn-common q-px-xl shadow-3" outline :label="`Save Changes`" @click="submitForm()" no-caps />
           </q-card-section>
           <q-separator />
           <q-card-section class="q-px-none">

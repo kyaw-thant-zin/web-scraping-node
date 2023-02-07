@@ -79,10 +79,23 @@ export const API = {
             return response.data
         },
         'show': async (id) => {
-
+            const response = await instance.get(apiURL+ `/campaign/${id}/show`, {
+                headers: headers,
+                params: {
+                    id: id
+                }
+            })
+            return response.data
         },
         'update': async (id, formData) => {
 
+        },
+        'destroy': async (id) => {
+            const formData = {
+                id: id
+            }
+            const response = await instance.post(apiURL + '/campaign/destroy', formData, { headers: headers })
+            return response.data
         },
         'updateVisibility': async (id, visibility) => {
             const formData = {

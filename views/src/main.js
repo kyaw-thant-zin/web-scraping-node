@@ -2,7 +2,7 @@ import App from './App.vue'
 import router from './router'
 import messages from './lang'
 import { createApp, markRaw } from 'vue'
-import { Quasar, Loading, Notify } from 'quasar'
+import { Quasar, Loading, Notify, Dialog } from 'quasar'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { createMetaManager } from 'vue-meta'
@@ -51,7 +51,8 @@ createApp(App)
   .use(Quasar, {
     plugins: {
       Loading,
-      Notify
+      Notify,
+      Dialog
     }, // import Quasar plugins and add here
   })
   .mount('#app')

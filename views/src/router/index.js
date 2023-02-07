@@ -14,6 +14,7 @@ import Dashboard from '@/views/pages/Dashboard/index.vue'
 // CAMPAIGN
 import CampaignIndex from '@/views/pages/Campaign/index.vue'
 import CampaignCreate from '@/views/pages/Campaign/create.vue'
+import CampaignEdit from '@/views/pages/Campaign/edit.vue'
 
 // CAMPAIGN OUTPUT
 import CampaignOutputIndex from '@/views/pages/CampaignOutput/index.vue'
@@ -86,6 +87,11 @@ const router = createRouter({
           path: 'create',
           name: 'campaign.create',
           component: CampaignCreate,
+        },
+        {
+          path: ':id/edit',
+          name: 'campaign.edit',
+          component: CampaignEdit,
         }
       ]
     },

@@ -5,9 +5,11 @@ import { useLocalStorage } from '@vueuse/core'
 
 export const useCampaignStore = defineStore('campaign', () => {
 
+    const _campaign = ref(null)
     const _loading = ref(false)
     const _error = ref(false)
     const _created = ref(false)
+    const _destroyed = ref(false)
     const _updateVisibility = ref(false)
     const _collectionTypes = ref(null)
     const _linkTypes = ref(null)
@@ -24,6 +26,10 @@ export const useCampaignStore = defineStore('campaign', () => {
 
     const storeCreated = (created) => {
         _created.value = created
+    }
+
+    const storeDestroyed = (destroy) => {
+        _destroyed.value = destroy
     }
 
     const storeUpdateVisibility = (visibility) => {
@@ -89,6 +95,23 @@ export const useCampaignStore = defineStore('campaign', () => {
         _campaigns.value = filteredCampaign
     }
 
+    const storeCampaign = (campaign) => {
+        const filteredCampaign = {}
+        filteredCampaign.id = campaign.id
+        filteredCampaign.campaignName = campaign.campaignName
+        filteredCampaign.collectionType = {
+            label: campaign.collectionType.type,
+            value: campaign.collectionType.id
+        }
+        filteredCampaign.account = campaign.account
+        filteredCampaign.hashtag = campaign.hashtag
+        filteredCampaign.linkType = {
+            label: campaign.linkType.type,
+            value: campaign.linkType.id
+        }
+        _campaign.value = filteredCampaign
+    }
+
     const storeCampaignTablePage = (page) => {
         _campaignTablePage.value = page
     }
@@ -96,6 +119,11 @@ export const useCampaignStore = defineStore('campaign', () => {
     const handleCampaigns = async () => {
         const response = await API.campaign.index()
         storeCampaigns(response)
+    }
+
+    const handleCampaign = async (id) => {
+        const response = await API.campaign.show(id)
+        storeCampaign(response)
     }
 
     const handleUniqueField = async (campaignName) => {
@@ -120,6 +148,9 @@ export const useCampaignStore = defineStore('campaign', () => {
         const response = await API.campaign.store(formData)
         storeCreated(response)
         storeLoading(false)
+        setTimeout(() => {
+            storeCreated(false)
+        }, 500)
     }
 
     const handleCampaignVisibilityUpdate = async (id, visibility) => {
@@ -129,21 +160,33 @@ export const useCampaignStore = defineStore('campaign', () => {
         storeLoading(false)
         setTimeout(() => {
             storeUpdateVisibility(false)
-        }, 500);
+        }, 500)
     }
 
     const handleCampaignUpdate = async (formData) => {
 
     }
 
+    const handleCampaignDestroy = async (id) => {
+        storeLoading(true)
+        const response = await API.campaign.destroy(id)
+        storeDestroyed(response)
+        storeLoading(false)
+        setTimeout(() => {
+            storeDestroyed(false)
+        }, 500)
+    }
+
     return {
         _loading,
         _error,
         _created,
+        _destroyed,
         _updateVisibility,
         _collectionTypes,
         _linkTypes,
         _campaignTablePage,
+        _campaign,
         _campaigns,
         storeLoading,
         storeError,
@@ -152,11 +195,13 @@ export const useCampaignStore = defineStore('campaign', () => {
         storeLinkTypes,
         storeCampaignTablePage,
         handleCampaigns,
+        handleCampaign,
         handleUniqueField,
         handleCollectionTypes,
         handleLinkTypes,
         handleCampaignCreate,
         handleCampaignUpdate,
+        handleCampaignDestroy,
         handleCampaignVisibilityUpdate
     }
 

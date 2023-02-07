@@ -56,6 +56,22 @@
     campaignStore.storeCampaignTablePage(page)
   }
 
+  function showConfirmDialog(row) {
+    $q.dialog({
+      title: `Are you sure you want to delete <br>"${row.campaignName}"?`,
+      message: 'This campaign will be deleted immediately. You can\'t undo this action.',
+      cancel: true,
+      persistent: true,
+      html: true,
+      ok: {
+        push: true,
+        color: 'negative'
+      },
+    }).onOk(() => {
+        campaignStore.handleCampaignDestroy(row.id)
+    })
+  }
+
   onBeforeRouteLeave((to, from, next) => {
     campaignStore.storeCampaignTablePage(1)
     next()
@@ -76,7 +92,21 @@
       })
     }
 
-  }, [campaignStore])
+  }, [campaignStore._campaigns, campaignStore._updateVisibility])
+
+  watchEffect(() => {
+
+    if(campaignStore._destroyed === true) {
+      campaignStore.handleCampaigns()
+      $q.notify({
+        caption: 'The campaign is successful deleted!',
+        message: 'SUCCESS',
+        type: 'positive',
+        timeout: 1000
+      })
+    }
+
+  }, [campaignStore._destroyed])
 
 
 </script>
@@ -137,10 +167,10 @@
                     <q-btn color="grey-7" round flat icon="more_vert">
                       <q-menu auto-close :offset="[-7, 5]">
                         <q-list>
-                          <q-item clickable to="/">
+                          <q-item clickable :to="{ name: 'campaign.edit', params: { id: props.row.id } }">
                             <q-item-section>Edit</q-item-section>
                           </q-item>
-                          <q-item clickable>
+                          <q-item clickable @click="showConfirmDialog(props.row)">
                             <q-item-section>Delete</q-item-section>
                           </q-item>
                         </q-list>
