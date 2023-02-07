@@ -1,8 +1,10 @@
 <script setup>
 
   import { useMeta } from 'vue-meta'
-  import { ref, computed, onMounted } from 'vue'
+  import { useQuasar } from 'quasar'
+  import { ref, watchEffect } from 'vue'
   import { WebsiteName } from '@/api/constants.js'
+  import { useCampaignStore } from '@/stores/campaign.js'
 
 
   /* app config */
@@ -10,26 +12,12 @@
     title: 'CAMPAIGN',
   })
 
-  const collectionTypes = [
-    {
-      label: 'Hashtag',
-      value: '1'
-    },
-    {
-      label: 'Account',
-      value: '2'
-    },
-  ]
-  const linkTypes = [
-    {
-      label: 'TikTok',
-      value: '1'
-    },
-    {
-      label: 'Server',
-      value: '2'
-    },
-  ]
+  const $q = useQuasar()
+  const campaignStore = useCampaignStore()
+  campaignStore.handleCollectionTypes()
+  campaignStore.handleLinkTypes()
+  const collectionTypes = ref([])
+  const linkTypes = ref([])
 
   const campaignCreateForm = ref(null)
   const formData = ref({
@@ -60,11 +48,15 @@
   }
 
   function onSubmit() {
-    console.log(formData.value)
+    const resposne = campaignStore.handleCampaignCreate(formData.value)
   }
 
-  function validateUnique(val) {
-
+  const campaignNameLoading = ref(false)
+  async function validateUnique(val) {
+    campaignNameLoading.value = true
+    const resposne = await campaignStore.handleUniqueField(val)
+    campaignNameLoading.value = false
+    return resposne || 'Campaign already exists.'
   }
 
   function requireOnce(val, field) {
@@ -78,6 +70,53 @@
       }
     }
   }
+
+  function resetForm() {
+    formData.value.campaignName = ''
+    formData.value.collectionType = {
+      label: 'Hashtag',
+      value: '1'
+    }
+    formData.value.account = ''
+    formData.value.hashtag = ''
+    formData.value.linkType = {
+      label: 'TikTok',
+      value: '1'
+    }
+    campaignCreateForm.value.resetValidation()
+  }
+
+  watchEffect( async () => {
+    
+    if(campaignStore._loading) {
+        $q.loading.show()
+    } else {
+        $q.loading.hide()
+    }
+
+    if(campaignStore._collectionTypes !== null) {
+      collectionTypes.value = campaignStore._collectionTypes
+    }
+
+    if(campaignStore._linkTypes !== null) {
+      linkTypes.value = campaignStore._linkTypes
+    }
+
+    if(campaignStore._created) {
+      $q.notify({
+        caption: 'Congratulations, campaign has been successfully created.',
+        message: 'SUCCESS',
+        icon: 'mdi-check-circle-outline',
+        color: 'positive',
+        timeout: 1000
+      })
+      resetForm()
+      campaignStore.router.replace({ name: 'campaign.index' })
+    } else {
+      
+    }
+
+  }, [campaignStore])
 
 </script>
 
@@ -125,6 +164,7 @@
                       borderless 
                       class="common-input-text" 
                       v-model="formData.campaignName"
+                      :loading="campaignNameLoading"
                       lazy-rules
                       :rules="[
                         val => !!val.replace(/\s/g, '') || 'Field is required', 

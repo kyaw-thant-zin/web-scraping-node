@@ -51,6 +51,15 @@ passportConfig()
 // AUTH ROUTES
 app.use('/api/v2/user', require('./routes/auth.routes')) // auth
 
+// COLLECTION TYPE ROUTES
+app.use('/api/v2/collection-types', require('./routes/collectionType.routes')) // collection type
+
+// LINK TYPE ROUTES
+app.use('/api/v2/link-types', require('./routes/linkType.routes')) // link type
+
+// CAMPAIGN ROUTES
+app.use('/api/v2/campaign', require('./routes/campaign.routes')) // campaign
+
 /**
  * Server Activation
  */

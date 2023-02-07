@@ -75,13 +75,19 @@ const router = createRouter({
     {
       path: '/campaigns',
       name: 'campaigns',
-      component: CampaignIndex,
       // meta: { requiresAuth: true },
-    },
-    {
-      path: '/campaigns/create',
-      name: 'campaignCreate',
-      component: CampaignCreate,
+      children: [
+        {
+          path: '',
+          name: 'campaign.index',
+          component: CampaignIndex,
+        },
+        {
+          path: 'create',
+          name: 'campaign.create',
+          component: CampaignCreate,
+        }
+      ]
     },
     {
       path: '/campaign-outputs',

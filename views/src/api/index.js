@@ -45,5 +45,44 @@ export const API = {
             const response = await instance.post(apiURL + '/user/sign-out', { headers: headers })
             return response.data
         },
+    },
+    'campaign': {
+        'index': async () => {
+            const response = await instance.get(apiURL+ '/campaign', {
+                headers: headers
+            })
+            return response.data
+        },
+        'checkUniqueField': async (campaignName) => {
+            const response = await instance.get(apiURL + '/campaign/validate-unique', { 
+                headers: headers ,
+                params: {
+                    'campaignName': campaignName
+                }
+            })
+            return response.data
+        },
+        'getCollectionTypes': async () => {
+            const response = await instance.get(apiURL + '/collection-types', { 
+                headers: headers ,
+            })
+            return response.data
+        },
+        'getLinkTypes': async () => {
+            const response = await instance.get(apiURL + '/link-types', { 
+                headers: headers ,
+            })
+            return response.data
+        },
+        'store': async (formData) => {
+            const response = await instance.post(apiURL + '/campaign/store', formData, { headers: headers })
+            return response.data
+        },
+        'show': async (id) => {
+
+        },
+        'update': async (id, formData) => {
+
+        }
     }
 }

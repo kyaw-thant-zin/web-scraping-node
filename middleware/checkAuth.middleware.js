@@ -6,11 +6,14 @@ const asyncHnadler = require('express-async-handler')
 
 const private = asyncHnadler( async (req, res, next) => {
 
-    if(!req.user) {
-        res.json(false)
-    } else {
-        next()
-    }
+    // if(!req.user) {
+    //     console.log('not auth')
+    //     res.json(false)
+    // } else {
+    //     next()
+    // }
+
+    next()
 
 })
 

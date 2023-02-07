@@ -32,13 +32,13 @@ const acceptAgreement = ref(false)
 
 watchEffect( async () => {
 
-    if(authStore.loadingState) {
+    if(authStore._loading.value) {
         $q.loading.show()
     } else {
         $q.loading.hide()
     }
 
-}, [authStore.loadingState])
+}, [authStore._loading])
 
 const formIsValid = () => { 
 
@@ -88,7 +88,7 @@ async function validateUnique(val, rules, field) {
             emailLoadingState.value = true
             const resposne = await authStore.handleUniqueFields(field, val)
             emailLoadingState.value = false
-            return resposne || 'Email already exists.'
+            return !resposne || 'Email already exists.'
         } 
         return rules.email(val) || 'Please enter a valid email address'
     }else if(field === 'userName') {
@@ -98,7 +98,7 @@ async function validateUnique(val, rules, field) {
             usernameLoadingState.value = true
             const resposne = await authStore.handleUniqueFields(field, val)
             usernameLoadingState.value = false
-            return resposne || 'Username already exists.'
+            return !resposne || 'Username already exists.'
         } 
         return validate || 'Username can only contain letters, numbers, underscores, and periods'
     }

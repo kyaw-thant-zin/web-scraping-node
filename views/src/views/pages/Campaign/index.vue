@@ -1,19 +1,18 @@
 <script setup>
 
   import { useMeta } from 'vue-meta'
-  import { ref, computed, onMounted,  reactive} from 'vue'
+  import { ref, computed, watchEffect } from 'vue'
   import { WebsiteName } from '@/api/constants.js'
+  import { useCampaignStore } from '@/stores/campaign.js'
+  import { onBeforeRouteLeave } from 'vue-router'
 
   /* app config */
   useMeta({
     title: 'CAMPAIGN',
   })
 
-  function togglePublicPrivate(props, val) {
-
-    console.log(props)
-    console.log(val)
-  }
+  const campaignStore = useCampaignStore()
+  campaignStore.handleCampaigns()
 
   const columns = [
     {
@@ -34,83 +33,39 @@
     { name: 'action', label: '', field: 'action', align: 'center', sortable: true },
   ]
 
-  const rows = [
-    {
-      campaignName: '超しまむら学園1',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
-    },
-    {
-      campaignName: '超しまむら学園2',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
-    },
-    {
-      campaignName: '超しまむら学園3',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
-    },
-    {
-      campaignName: '超しまむら学園4',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
-    },
-    {
-      campaignName: '超しまむら学園5',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
-    },
-    {
-      campaignName: '超しまむら学園6',
-      createdAt: '28/09/2022',
-      collectionType: 'Hashtag',
-      account: '-',
-      tags: '#超しまむら学園',
-      linkType: 'TikTok',
-      publicPrivate: true,
-      action: true
-    },
-  ]
+  const rows = ref([])
 
   const pagination = ref({
     sortBy: 'desc',
     descending: false,
-    page: 1,
+    page: campaignStore._campaignTablePage,
     rowsPerPage: 2
-    // rowsNumber: xx if getting data from a server
+  })
+  const pagesNumber = computed(() => Math.ceil(rows.value.length / pagination.value.rowsPerPage))
+
+  function togglePublicPrivate(props, val) {
+
+    console.log(props)
+    console.log(val)
+  }
+
+  function onChangePagination(page) {
+    campaignStore.storeCampaignTablePage(page)
+  }
+
+  onBeforeRouteLeave((to, from, next) => {
+    campaignStore.storeCampaignTablePage(1)
+    next()
   })
 
-  const pagesNumber = computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
+  watchEffect(() => {
 
-  onMounted(() => {
-    // init function
-    console.log('mounted')
-  })
+    if(campaignStore._campaigns !== null) {
+      rows.value = campaignStore._campaigns
+    }
+
+  }, [campaignStore])
+
 
 </script>
 
@@ -181,8 +136,9 @@
                   </q-td>
                 </template>
               </q-table>
-              <div class="row justify-end q-mt-md">
+              <div class="row justify-end q-mt-md q-pr-lg">
                 <q-pagination
+                  @update:model-value="onChangePagination"
                   v-model="pagination.page"
                   color="primary"
                   :max="pagesNumber"

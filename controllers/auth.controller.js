@@ -77,15 +77,15 @@ const validateUnique = asyncHnadler( async (req, res) => {
         throw new Error('Please add all fields')
     }
 
-    let foundUser = false
+    let foundUser = true
     if(field === 'email') {
         foundUser = await User.findOne({
             where: {
                 email: val
             }
         })
-        if (foundUser !== null || foundUser !== false) {
-            foundUser = true
+        if (foundUser !== null) {
+            foundUser = false
         }
 
     } else if(field === 'userName') {
@@ -94,8 +94,8 @@ const validateUnique = asyncHnadler( async (req, res) => {
                 userName: val
             }
         })
-        if (foundUser !== null || foundUser !== false) {
-            foundUser = true
+        if (foundUser !== null) {
+            foundUser = false
         }
     }
     res.json(foundUser)

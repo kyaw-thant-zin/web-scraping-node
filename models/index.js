@@ -46,6 +46,11 @@ db.roles = require('./role.model')(sequelize, DataTypes)
 db.userTypes = require('./userType.model')(sequelize, DataTypes)
 db.users = require('./user.model')(sequelize, DataTypes)
 
+db.collectionTypes = require('./collectionType.model')(sequelize, DataTypes)
+db.linkTypes = require('./linkType.model')(sequelize, DataTypes)
+
+db.campaigns = require('./campaign.model')(sequelize, DataTypes)
+
 db.sequelize.sync({ force: false })
 .then(() => console.log('re-sync done!') )
 
@@ -58,5 +63,23 @@ db.roles.hasOne(db.users, {
     onUpdate: 'CASCADE'
 }) // roles => user
 db.users.belongsTo(db.roles) // user => roles
+
+db.users.hasMany(db.campaigns, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // users => campaign
+db.campaigns.belongsTo(db.users) // campaign => users
+
+db.collectionTypes.hasMany(db.campaigns, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // collectionType => campaign
+db.campaigns.belongsTo(db.collectionTypes) // campaign => collectionType
+
+db.linkTypes.hasMany(db.campaigns, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // linkType => campaign
+db.campaigns.belongsTo(db.linkTypes) // campaign => linkType
 
 module.exports = db
