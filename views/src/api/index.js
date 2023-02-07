@@ -83,6 +83,14 @@ export const API = {
         },
         'update': async (id, formData) => {
 
+        },
+        'updateVisibility': async (id, visibility) => {
+            const formData = {
+                id: id,
+                visibility: visibility === true ? 1:0
+            }
+            const response = await instance.post(apiURL + '/campaign/visibility/update/', formData, { headers: headers })
+            return response.data
         }
     }
 }

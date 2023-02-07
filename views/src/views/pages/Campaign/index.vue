@@ -1,6 +1,7 @@
 <script setup>
 
   import { useMeta } from 'vue-meta'
+  import { useQuasar } from 'quasar'
   import { ref, computed, watchEffect } from 'vue'
   import { WebsiteName } from '@/api/constants.js'
   import { useCampaignStore } from '@/stores/campaign.js'
@@ -11,17 +12,19 @@
     title: 'CAMPAIGN',
   })
 
+  const $q = useQuasar()
   const campaignStore = useCampaignStore()
   campaignStore.handleCampaigns()
 
   const columns = [
+    { name: 'id', required: false, label: 'ID', sortable: false },
     {
       name: 'campaignName',
       required: true,
       label: 'Campaign Name',
-      align: 'center',
       field: row => row.campaignName,
       format: val => `${val}`,
+      align: 'center',
       sortable: true,
     },
     { name: 'createdAt', label: 'Created', field: 'createdAt', align: 'center', sortable: true },
@@ -33,20 +36,20 @@
     { name: 'action', label: '', field: 'action', align: 'center', sortable: true },
   ]
 
+  const visibileColumns = ['campaignName', 'createdAt', 'collectionType', 'account', 'tags', 'linkType', 'publicPrivate', 'action']
+
   const rows = ref([])
 
   const pagination = ref({
     sortBy: 'desc',
     descending: false,
     page: campaignStore._campaignTablePage,
-    rowsPerPage: 2
+    rowsPerPage: 1
   })
   const pagesNumber = computed(() => Math.ceil(rows.value.length / pagination.value.rowsPerPage))
 
-  function togglePublicPrivate(props, val) {
-
-    console.log(props)
-    console.log(val)
+  async function togglePublicPrivate(props, val) {
+    await campaignStore.handleCampaignVisibilityUpdate(props.row.id, val)
   }
 
   function onChangePagination(page) {
@@ -62,6 +65,15 @@
 
     if(campaignStore._campaigns !== null) {
       rows.value = campaignStore._campaigns
+    }
+
+    if(campaignStore._updateVisibility === true) {
+      $q.notify({
+        caption: 'The campaign is successful updated Public Private',
+        message: 'SUCCESS',
+        type: 'positive',
+        timeout: 1000
+      })
     }
 
   }, [campaignStore])
@@ -107,6 +119,7 @@
                 row-key="campaignName"
                 v-model:pagination="pagination"
                 hide-pagination
+                :visible-columns="visibileColumns"
               >
                 <template v-slot:body-cell-publicPrivate="props">
                   <q-td :props="props">
@@ -122,7 +135,7 @@
                 <template v-slot:body-cell-action="props">
                   <q-td>
                     <q-btn color="grey-7" round flat icon="more_vert">
-                      <q-menu auto-close :offset="[-5, 5]">
+                      <q-menu auto-close :offset="[-7, 5]">
                         <q-list>
                           <q-item clickable to="/">
                             <q-item-section>Edit</q-item-section>

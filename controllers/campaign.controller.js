@@ -78,7 +78,7 @@ const store = asyncHnadler( async (req, res) => {
         hashtag: hashtag,
         collectionTypeId: collectionType.value,
         linkTypeId: linkType.value,
-        visibility: 1,
+        visibility: 0,
         userId: 12
     }
 
@@ -94,8 +94,34 @@ const store = asyncHnadler( async (req, res) => {
 
 })
 
+// @desc GET update-visibility
+// @route GET /api/v2/campaign/visibility/update
+// @access Private
+const updateVisibility = asyncHnadler( async (req, res) => {
+
+    const { id, visibility } = req.body
+
+    if(id === undefined || visibility === undefined) {
+        res.status(400).send({ error: { required: 'Please add all fields' } })
+        throw new Error('Please add all fields')
+    }
+    const campaign = await await Campaign.update({ visibility: visibility }, {
+        where: {
+            id: id,
+        }
+    })
+
+    if(campaign) {
+        res.json(true)
+    } else {
+        res.json(false)
+    }
+
+})
+
 module.exports = {
     index,
     store,
     validateUnique,
+    updateVisibility,
 }

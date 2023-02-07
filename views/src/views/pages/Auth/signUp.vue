@@ -60,8 +60,7 @@ async function submitForm(formData) {
             $q.notify({
                 caption: 'Congratulations, your account has been successfully created.',
                 message: 'SUCCESS',
-                icon: 'mdi-check-circle-outline',
-                color: 'positive',
+                type: 'positive',
                 timeout: 1000
             })
             resetForm()
@@ -70,8 +69,7 @@ async function submitForm(formData) {
             $q.notify({
                 caption: 'Oops, something went wrong. Please try again later.',
                 message: 'ERROR',
-                icon: 'mdi-close-box-outline',
-                color: 'negative',
+                type: 'negative',
                 timeout: 1000
             })
         }

@@ -8,6 +8,7 @@ export const useCampaignStore = defineStore('campaign', () => {
     const _loading = ref(false)
     const _error = ref(false)
     const _created = ref(false)
+    const _updateVisibility = ref(false)
     const _collectionTypes = ref(null)
     const _linkTypes = ref(null)
     const _campaigns = ref(null)
@@ -23,6 +24,10 @@ export const useCampaignStore = defineStore('campaign', () => {
 
     const storeCreated = (created) => {
         _created.value = created
+    }
+
+    const storeUpdateVisibility = (visibility) => {
+        _updateVisibility.value = visibility
     }
 
     const storeCollectionTypes = (collectionTypes) => {
@@ -70,6 +75,7 @@ export const useCampaignStore = defineStore('campaign', () => {
                 year: 'numeric',
             }).replace(/\//g, '/')
 
+            dumpCampaign.id = campaign.id
             dumpCampaign.campaignName = campaign.campaignName
             dumpCampaign.createdAt = formattedDate
             dumpCampaign.collectionType = campaign.collectionType.type
@@ -85,7 +91,6 @@ export const useCampaignStore = defineStore('campaign', () => {
 
     const storeCampaignTablePage = (page) => {
         _campaignTablePage.value = page
-        console.log(_campaignTablePage.value)
     }
 
     const handleCampaigns = async () => {
@@ -117,6 +122,16 @@ export const useCampaignStore = defineStore('campaign', () => {
         storeLoading(false)
     }
 
+    const handleCampaignVisibilityUpdate = async (id, visibility) => {
+        storeLoading(true)
+        const response = await API.campaign.updateVisibility(id, visibility)
+        storeUpdateVisibility(response)
+        storeLoading(false)
+        setTimeout(() => {
+            storeUpdateVisibility(false)
+        }, 500);
+    }
+
     const handleCampaignUpdate = async (formData) => {
 
     }
@@ -125,6 +140,7 @@ export const useCampaignStore = defineStore('campaign', () => {
         _loading,
         _error,
         _created,
+        _updateVisibility,
         _collectionTypes,
         _linkTypes,
         _campaignTablePage,
@@ -140,7 +156,8 @@ export const useCampaignStore = defineStore('campaign', () => {
         handleCollectionTypes,
         handleLinkTypes,
         handleCampaignCreate,
-        handleCampaignUpdate
+        handleCampaignUpdate,
+        handleCampaignVisibilityUpdate
     }
 
 

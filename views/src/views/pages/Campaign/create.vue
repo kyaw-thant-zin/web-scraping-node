@@ -106,14 +106,13 @@
       $q.notify({
         caption: 'Congratulations, campaign has been successfully created.',
         message: 'SUCCESS',
-        icon: 'mdi-check-circle-outline',
-        color: 'positive',
+        type: 'positive',
         timeout: 1000
       })
       resetForm()
       campaignStore.router.replace({ name: 'campaign.index' })
     } else {
-      
+
     }
 
   }, [campaignStore])

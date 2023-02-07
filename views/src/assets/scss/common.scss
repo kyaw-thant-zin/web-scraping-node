@@ -40,6 +40,19 @@ body {
   }
 }
 
+.hidden-column {
+  display: none;
+}
+
+.q-notification__message {
+  font-weight: 800;
+  .q-notification__caption {
+    font-weight: 500;
+    color: #fff;
+    opacity: 1;
+  }
+}
+
 .auth {
 
   &-alret {
