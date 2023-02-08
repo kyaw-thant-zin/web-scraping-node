@@ -44,7 +44,7 @@
     sortBy: 'desc',
     descending: false,
     page: campaignStore._campaignTablePage,
-    rowsPerPage: 1
+    rowsPerPage: 10
   })
   const pagesNumber = computed(() => Math.ceil(rows.value.length / pagination.value.rowsPerPage))
 

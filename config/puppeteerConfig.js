@@ -1,13 +1,3 @@
-const { executablePath } = require("puppeteer")
-
-const chromiumBrowser = {
-    "setting": {
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--window-size=1000,1080", "--use-gl=egl", "--disable-dev-shm-usage"],
-        ignoreDefaultArgs: ["--disable-extensions"],
-        executablePath: executablePath(),
-    },
-}
 
 const chromiumPage = {
     "setCacheEnabled": true,
@@ -39,6 +29,5 @@ const chromiumPage = {
 
 
 module.exports = {
-    chromiumBrowser,
     chromiumPage
 }

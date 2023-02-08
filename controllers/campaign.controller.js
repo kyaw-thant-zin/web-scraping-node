@@ -1,5 +1,6 @@
 const asyncHnadler = require('express-async-handler')
 const db = require('../models/index')
+const Scraper = require('../scraper/index')
 
 // Create main Model
 const Campaign = db.campaigns
@@ -72,10 +73,20 @@ const store = asyncHnadler( async (req, res) => {
         throw new Error('Please add all fields')
     }
 
+    let tag = ''
+    let acc = ''
+    if(collectionType.value == 1) {
+        tag = hashtag.replace('#', '')
+        tag = '#'+tag
+    } else {
+        acc = account.replace('@', '')
+        acc = '@'+acc
+    }
+
     const campaignData = {
         campaignName: campaignName,
-        account: account,
-        hashtag: hashtag,
+        account: acc,
+        hashtag: tag,
         collectionTypeId: collectionType.value,
         linkTypeId: linkType.value,
         visibility: 0,
@@ -87,6 +98,24 @@ const store = asyncHnadler( async (req, res) => {
     })
 
     if(campaign) {
+
+        if(campaign.collectionTypeId == 1) {
+            console.log('---------------- Hashtag ------------------')
+            const response = await Scraper.tiktok.getVideosByHashtag(campaign.hashtag)
+            if(response) {
+                console.log(response)
+            } else {
+                console.log('error')
+            }
+            
+            console.log('---------------- Hashtag ------------------')
+        } else {
+            console.log('---------------- Hashtag ------------------')
+            const response = await Scraper.tiktok.getVideosByAccount(campaign.account)
+            
+            console.log('---------------- Hashtag ------------------')
+        }
+
         res.json(true)
     } else {
         res.json(false)
