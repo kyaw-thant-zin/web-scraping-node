@@ -4,7 +4,11 @@ const tConfig = {
     "algorithm": "aes-128-cbc",
     "videoListCount": 30,
     "cursor": 0,
-    "offset": 0
+    "offset": 0,
+    "key": {
+        "create": "CREATE",
+        "scheduleUpdate": "SCHEDULE_UPDATE",
+    }
 }
 
 const tAppURLs = {

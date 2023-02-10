@@ -4,10 +4,11 @@ const { Op } = require('sequelize')
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const db = require('../models/index')
+const { appConfig } = require('./appConfig.js')
 
 // Create user Model
 const User = db.users
-const screctKey = 'webapp0.2'
+const screctKey = appConfig.screctKey
 
 module.exports.passportConfig = () => {
     passport.use(

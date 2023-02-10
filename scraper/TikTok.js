@@ -255,11 +255,14 @@ const getVideosByAccount = async (account) => {
                     const videoList = await getVideoList(page)
                     if(videoList) {
                         user.items = videoList
-                    } 
+                    } else {
+                        console.log("not getting video list")
+                    }
                     await allDone(page)
                     resovle(user)
 
                 } else {
+                    console.log("not getting user info")
                     resovle(false)
                 }
                 

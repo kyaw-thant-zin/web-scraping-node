@@ -50,6 +50,11 @@ db.collectionTypes = require('./collectionType.model')(sequelize, DataTypes)
 db.linkTypes = require('./linkType.model')(sequelize, DataTypes)
 
 db.campaigns = require('./campaign.model')(sequelize, DataTypes)
+db.campaignOutputs = require('./campaignOutput.model')(sequelize, DataTypes)
+db.tUsers = require('./tUser.model')(sequelize, DataTypes)
+db.tVideos = require('./tVideo.model')(sequelize, DataTypes)
+db.linkSettings = require('./linkSetting.model')(sequelize, DataTypes)
+db.apiLayouts = require('./apiLayout.model')(sequelize, DataTypes)
 
 db.sequelize.sync({ force: false })
 .then(() => console.log('re-sync done!') )
@@ -64,22 +69,67 @@ db.roles.hasOne(db.users, {
 }) // roles => user
 db.users.belongsTo(db.roles) // user => roles
 
-db.users.hasMany(db.campaigns, {
+db.users.hasOne(db.campaigns, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 }) // users => campaign
 db.campaigns.belongsTo(db.users) // campaign => users
 
-db.collectionTypes.hasMany(db.campaigns, {
+db.collectionTypes.hasOne(db.campaigns, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 }) // collectionType => campaign
 db.campaigns.belongsTo(db.collectionTypes) // campaign => collectionType
 
-db.linkTypes.hasMany(db.campaigns, {
+db.linkTypes.hasOne(db.campaigns, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 }) // linkType => campaign
 db.campaigns.belongsTo(db.linkTypes) // campaign => linkType
+
+db.campaigns.hasOne(db.campaignOutputs, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // campaigns => campaignOutputs
+db.campaignOutputs.belongsTo(db.campaigns, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // campaignOutputs => campaigns
+
+db.campaignOutputs.hasOne(db.tUsers, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // campaignOutputs => tUsers
+db.tUsers.belongsTo(db.campaignOutputs, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tUsers => campaignOutputs
+
+db.tUsers.hasOne(db.tVideos, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tUsers => tVideos
+db.tVideos.belongsTo(db.tUsers, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tVideos => tUsers
+
+db.tVideos.hasOne(db.linkSettings, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tVideos => linkSettings
+db.linkSettings.belongsTo(db.tVideos, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // linkSettings => tVideos
+
+db.linkSettings.hasOne(db.apiLayouts, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // linkSettings => apiLayouts
+db.apiLayouts.belongsTo(db.linkSettings, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // apiLayouts => linkSettings
 
 module.exports = db

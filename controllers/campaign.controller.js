@@ -1,11 +1,19 @@
+const CryptoJS = require("crypto-js")
+const moment = require('moment')
 const asyncHnadler = require('express-async-handler')
 const db = require('../models/index')
 const Scraper = require('../scraper/index')
+const { tConfig } = require('../config/tiktokConfig')
+const { appConfig } = require('../config/appConfig')
 
 // Create main Model
 const Campaign = db.campaigns
 const CollectionType = db.collectionTypes
 const LinkType = db.linkTypes
+const CampaignOutput = db.campaignOutputs
+const TUser = db.tUsers
+const TVideo = db.tVideos
+const ApiLayout = db.apiLayouts
 
 // @desc GET validateUnique
 // @route GET /api/v2/campaign/validate-unique
@@ -35,7 +43,6 @@ const validateUnique = asyncHnadler( async (req, res) => {
     res.json(foundCampaignName)
 })
 
-
 // @desc GET index
 // @route GET /api/v2/campaign
 // @access Private
@@ -60,6 +67,85 @@ const index = asyncHnadler( async (req, res) => {
 
     res.send(campaigns)
 })
+
+// get create time
+const getCreateDate = (createTime) => {
+    return moment.unix(createTime).format("YYYY/MM/DD")
+}
+
+// get expires date
+const getExpiresDate = (videoURL) => {
+    const videoUrl = new URL( videoURL )
+    const searchParams = videoUrl.searchParams
+    const expire = searchParams.get('expire')
+    const actualExpiresIn = moment.unix(expire)
+    const expiresIn = moment(actualExpiresIn).subtract(5, 'minutes').format("YYYY/MM/DD HH:mm:ss")
+    return expiresIn
+}
+
+// create an array for create or update tUser
+const bulkCreateTUser = (userInfo, campaignOutputId, state) => {
+
+    let row = {}
+
+    if(state === tConfig.key.create) {
+
+        row.accountId = userInfo.user.id
+        row.uniqueId = userInfo.user.uniqueId
+        row.nickname = userInfo.user.nickname
+        row.followerCount = userInfo.stats.followerCount
+        row.followingCount = userInfo.stats.followingCount
+        row.videoCount = userInfo.stats.videoCount
+        row.heartCount = userInfo.stats.heartCount
+        row.avatarLarger = userInfo.user.avatarLarger
+        row.campaignOutputId = campaignOutputId
+
+    } else if(state === tConfig.key.scheduleUpdate) {
+
+
+
+    }
+
+    return row
+
+}
+
+// create an array for create or update tVideo
+const bulkCreateTVideos = (userItems, tUser, state) => {
+
+    return new Promise(async (resovle, reject) => {
+
+        const rows = userItems.map((item, index) => {
+
+            if(state === tConfig.key.create) {
+    
+                const row = {
+                    videoId: item.video.id,
+                    desc: item.desc,
+                    playCount: item.stats.playCount,
+                    diggCount: item.stats.diggCount,
+                    commentCount: item.stats.commentCount,
+                    shareCount: item.stats.shareCount,
+                    originCoverURL: item.video.originCover,
+                    videoURL: item.video.playAddr,
+                    webVideoURL: `https:www.tiktok.com/@${tUser.uniqueId}/video/${item.video.id}`,
+                    expiresIn: getExpiresDate(item.video.playAddr),
+                    createTime: getCreateDate(item.createTime),
+                    tUserId: tUser.id
+                }     
+                
+                return row
+    
+            }   
+    
+        })
+    
+        resovle(rows)
+    
+    })
+    
+
+}
 
 // @desc GET store
 // @route GET /api/v2/campaign/store
@@ -89,7 +175,7 @@ const store = asyncHnadler( async (req, res) => {
         hashtag: tag,
         collectionTypeId: collectionType.value,
         linkTypeId: linkType.value,
-        visibility: 0,
+        visibility: appConfig.key.visibility,
         userId: 12
     }
 
@@ -110,13 +196,82 @@ const store = asyncHnadler( async (req, res) => {
             
             console.log('---------------- Hashtag ------------------')
         } else {
-            console.log('---------------- Hashtag ------------------')
+            console.log('---------------- Account ------------------')
             const response = await Scraper.tiktok.getVideosByAccount(campaign.account)
-            
-            console.log('---------------- Hashtag ------------------')
-        }
+            // got the resposne and user info
+            if(response && response?.userInfo) {
+                console.log('----- got user info ------')
+                // got the video list
+                if(response?.items) {
+                    console.log('----- got user items ------')
+                    console.log('Camapign Output Creating.....')
+                    // store in the campaing output table
+                    const campaignOutput = await CampaignOutput.create({
+                        visibility: appConfig.key.visibility,
+                        linkURL: '',
+                        priority: appConfig.key.priority,
+                        campaignId: campaign.id
+                    }).then(campaignOutput => {
+                        return campaignOutput.get({ plain: true })
+                    })
+                    if(campaignOutput) {
+                        console.log('Camapign Output Created.....')
+                        console.log('tUser Creating.....')
+                        // store in the tUser table
+                        const tUserRow = bulkCreateTUser(response.userInfo, campaignOutput.id, tConfig.key.create)
+                        let tUser = null
 
-        res.json(true)
+                        try {
+                            tUser = await TUser.create(tUserRow).then(tUser => {
+                                return tUser.get({ plain: true })
+                            })
+
+                            if(tUser) {
+                                console.log('tUser Created.....')
+                                console.log('tVideos Creating.....')
+    
+                                // store in the iVideo table
+                                const tVideoRows = await bulkCreateTVideos(response.items, tUser, tConfig.key.create)
+                                let tVideos = null
+                                try {
+                                    tVideos = await TVideo.bulkCreate(tVideoRows)
+                                    if(tVideos) {
+                                        console.log('tVideos Created.....')
+                                        console.log('apiLayout Creating.....')
+
+                                        // store in the apiLayout table
+                                        const apiLayout = await ApiLayout.create({
+                                            layoutType: appConfig.key.layoutType,
+                                            showAccount: appConfig.key.showAccount,
+                                            showTitle: appConfig.key.showTitle,
+                                            showHashtag: appConfig.key.showHashtag,
+                                            apiToken: CryptoJS.AES.decrypt(campaign.uuid, appConfig.screctKey).toString(CryptoJS.enc.Utf8),
+                                        })
+        
+                                        if(apiLayout) {
+                                            console.log('apiLayout Created.....')
+                                            res.json(true)
+                                        } else {
+                                            res.json(false)
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.log(error)
+                                    res.json(false)
+                                }
+
+                            }
+
+                        } catch (error) {
+                            console.log(error)
+                            res.json(false)
+                        }
+                    }
+                    
+                }
+            }
+            console.log('---------------- Account ------------------')
+        }
     } else {
         res.json(false)
     }
@@ -194,12 +349,17 @@ const destroy = asyncHnadler( async (req, res) => {
         throw new Error('Please add all fields')
     }
 
-    let campaign = await Campaign.destroy({
-        where: {
-            id: id,
-            userId: userId
-        }
-    })
+    let campaign = null
+    try {
+        campaign = await Campaign.destroy({
+            where: {
+                id: id,
+                userId: userId
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
 
     if(campaign) {
         res.json(true)
