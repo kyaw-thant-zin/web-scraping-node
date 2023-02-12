@@ -32,6 +32,7 @@
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
     "express-session": "^1.17.3",
+    "fs-extra": "^11.1.0",
     "mariadb": "^3.0.2",
     "moment": "^2.29.4",
     "passport": "^0.6.0",
@@ -42,6 +43,7 @@
     "puppeteer-extra-plugin-anonymize-ua": "^2.4.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",
     "puppeteer-har": "^1.1.2",
-    "sequelize": "^6.28.0"
+    "sequelize": "^6.28.0",
+    "user-agents": "^1.0.1288"
   }
 }

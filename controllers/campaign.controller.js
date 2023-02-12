@@ -1,10 +1,11 @@
-const CryptoJS = require("crypto-js")
+const fs = require('fs-extra')
 const moment = require('moment')
-const asyncHnadler = require('express-async-handler')
+const CryptoJS = require("crypto-js")
 const db = require('../models/index')
 const Scraper = require('../scraper/index')
-const { tConfig } = require('../config/tiktokConfig')
 const { appConfig } = require('../config/appConfig')
+const { tConfig } = require('../config/tiktokConfig')
+const asyncHnadler = require('express-async-handler')
 
 // Create main Model
 const Campaign = db.campaigns
@@ -189,6 +190,7 @@ const store = asyncHnadler( async (req, res) => {
             console.log('---------------- Hashtag ------------------')
             const response = await Scraper.tiktok.getVideosByHashtag(campaign.hashtag)
             if(response) {
+                res.json(true)
                 console.log(response)
             } else {
                 console.log('error')

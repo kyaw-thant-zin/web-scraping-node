@@ -21,7 +21,7 @@ const tAppURLs = {
     "hashtag": {
         "getSearchURL": (hashtag) => {
             hashtag = hashtag.replace('#', '')
-            reutrn `https://www.tiktok.com/search?q=${hashtag}`
+            return `https://www.tiktok.com/search?q=%23${hashtag}`
         }
     },
     "video": {

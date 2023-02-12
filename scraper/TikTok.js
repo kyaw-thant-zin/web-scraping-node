@@ -1,13 +1,12 @@
-const fs = require("fs")
 const url = require("url")
 const path = require("path")
 const util = require('util')
+const fs = require('fs-extra')
 
 const crypto = require('crypto')
 const express = require("express")
 const {executablePath} = require('puppeteer')
 const puppeteer = require('puppeteer-extra')
-const PuppeteerHar = require('puppeteer-har')
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const { scrollPageToBottom } = require('puppeteer-autoscroll-down')
 const { chromiumPage } = require('../config/puppeteerConfig')
@@ -21,16 +20,20 @@ let apiUserURL = ''
 let apiUserHeaders = {}
 let apiListURL = ''
 let apiListHeaders = {}
+let apiHashtagURL = ''
+let apiHashtagHeaders = {}
 
 // Browser Setting
 const browserSetting = {
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1000,1080', '--use-gl=egl', '--disable-dev-shm-usage'],
-    ignoreDefaultArgs: ['--disable-extensions'],
+    headless: false,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1000,1080', '--use-gl=egl', '--disable-dev-shm-usage', '--user-data-dir= profiles'],
+    ignoreDefaultArgs: ['--disable-extensions', '--enable-automation'],
     executablePath: executablePath(),
 }
 
-let mainBrowser = {}
+let browser = null
+let mainBrowser = null
+let chromeTmpDataDir = null
 
 /**
  *  Scraper Configuration
@@ -57,36 +60,50 @@ const setXTTPARAMS = (decrpytedVideoListQuery) => {
     apiListHeaders['x-tt-params'] = xttParams
 }
 
-// launch the browser and go to tiktok
-const launchAndGo = async (scrapingMethod) => {
+// launch the browser
+const browserLaunch = async () => {
     return new Promise(async (resovle, reject) => {
         try {
-            const browser = await puppeteer.launch( browserSetting )
-            mainBrowser = browser
+            browser = await puppeteer.launch( browserSetting )
+            if(chromeTmpDataDir === null) {
+                let chromeSpawnArgs = browser.process().spawnargs;
+                for (let i = 0; i < chromeSpawnArgs.length; i++) {
+                    if (chromeSpawnArgs[i].indexOf("--user-data-dir=") === 0) {
+                        chromeTmpDataDir = chromeSpawnArgs[i].replace("--user-data-dir=", "");
+                    }
+                }
+            }
 
-            // Create a new page
-            const page = await browser.newPage()
-
-            // Disable Cache
-            await page.setCacheEnabled(chromiumPage.setCacheEnabled)
-
-            // Set Browser Width and Height
-            await page.setViewport(chromiumPage.setViewport)
-
-            // prevent timeout error
-            await page.setDefaultNavigationTimeout(chromiumPage.setDefaultNavigationTimeout)
-
-            await page.setRequestInterception(chromiumPage.setRequestInterception)
-
-            // skip unnecessary network requests
-            const newPage = await skipUnnecessaryRequests( scrapingMethod, page)
-
-            resovle(newPage)
+            resovle(browser)
 
         } catch (error) {
             resovle(error)
         }
     })
+}
+
+// create a new tab 
+const openNewPage = async (localBrowser, scrapingMethod) => {
+
+    // Create a new page
+    const page = await localBrowser.newPage()
+
+    // Disable Cache
+    await page.setCacheEnabled(chromiumPage.setCacheEnabled)
+
+    // Set Browser Width and Height
+    // await page.setViewport(chromiumPage.setViewport)
+
+    // prevent timeout error
+    await page.setDefaultNavigationTimeout(chromiumPage.setDefaultNavigationTimeout)
+
+    await page.setRequestInterception(chromiumPage.setRequestInterception)
+
+    // skip unnecessary network requests
+    const newPage = await skipUnnecessaryRequests( scrapingMethod, page)
+
+    resovle(newPage)
+
 }
 
 // skip unnecessary network requests
@@ -104,6 +121,23 @@ const skipUnnecessaryRequests = async (scrapingMethod, page) => {
                         if(request.url().includes("api/user/detail")) {
                             apiUserURL = request.url()
                             apiUserHeaders = request.headers()
+                        }
+                        request.continue()
+                    } else if(removeResourceTypes.includes(request.resourceType())) {
+                        request.abort()
+                    } else if(request.resourceType() === 'script') {
+                        request.continue()
+                    } else {
+                        request.continue()
+                    }
+                })
+                resovle(page)
+            } else if(scrapingMethod === 'hashtag') {
+                page.on('request', request => {
+                    if (request.resourceType() === 'fetch') {
+                        if(request.url().includes("api/search/general/full")) {
+                            apiHashtagURL = request.url()
+                            apiHashtagHeaders = request.headers()
                         }
                         request.continue()
                     } else if(removeResourceTypes.includes(request.resourceType())) {
@@ -168,6 +202,11 @@ const allDone = async (page) => {
         console.log("Page closed!")
         await mainBrowser.close()
         console.log("Browser closed!")
+
+        if (chromeTmpDataDir !== null) {
+            fs.removeSync(chromeTmpDataDir);
+        }
+
         resovle(true)
     })
 }
@@ -248,7 +287,13 @@ const getVideosByAccount = async (account) => {
             const user = {}
 
             if(account != '') {
-                const page = await launchAndGo('account')
+                const localBrowser = null
+                if(browser === null) {
+                    localBrowser = await browserLaunch()
+                } else {
+                    localBrowser = browser
+                }
+                const page = await openNewPage(localBrowser, 'account')
                 const t = await getAccountInfo(page, account)
                 if(t?.userInfo) {
                     user.userInfo = t.userInfo
@@ -258,7 +303,6 @@ const getVideosByAccount = async (account) => {
                     } else {
                         console.log("not getting video list")
                     }
-                    await allDone(page)
                     resovle(user)
 
                 } else {
@@ -275,13 +319,55 @@ const getVideosByAccount = async (account) => {
 // ------------------------- ***** account ***** ----------------------------//
 
 // ------------------------- ***** hashtag ***** ----------------------------//
+const getSearchResults = async (page, hashtag) => {
+
+    return new Promise(async (resovle, reject) => {
+        try {
+            console.log('----- getSearchResult ------')
+
+            const appURL = tAppURLs.hashtag.getSearchURL(hashtag)
+            
+
+            await page.goto('https://www.tiktok.com/search/video?q='+hashtag, {
+                waitUntil: 'networkidle2',
+            })
+
+            
+
+            resovle(true)
+
+        } catch (error) {
+            resovle(error)
+        }
+    })
+
+}
+
+
 const getVideosByHashtag = async (hashtag) => {
 
     return new Promise(async (resovle, reject) => {
         try {
-            console.log('tiktok scraping by hashtag....')
+
+            const hashtagResults = {}
             
-            const page = await launchAndGo()
+            if(hashtag != '') {
+                console.log('tiktok scraping by hashtag....')
+            
+                const localBrowser = null
+                if(browser === null) {
+                    localBrowser = await browserLaunch()
+                } else {
+                    localBrowser = browser
+                }
+                const page = await openNewPage(localBrowser, 'hashtag')
+                const t = await getSearchResults(page, hashtag)
+                resovle(true)
+                // if(t?.data) {
+                //     hashtagResults.items = t.data
+                //     console.log(hashtagResults)
+                // }
+            }
 
         } catch (error) {
             
@@ -291,6 +377,7 @@ const getVideosByHashtag = async (hashtag) => {
 // ------------------------- ***** hashtag ***** ----------------------------//
 
 module.exports = {
+    browserLaunch,
     getVideosByHashtag,
     getVideosByAccount
 }

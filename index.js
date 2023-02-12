@@ -8,6 +8,7 @@ const session = require("express-session")
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const { passportConfig } = require("./config/passportConfig")
+const { browserLaunch } = require('./scraper/TikTok')
 
 
 /**
@@ -44,9 +45,9 @@ passportConfig()
 /**
  * Routes Definitions
  */
-// app.get("/", (req, res) => {
-//     res.status(200).send("Happy Scraping!")
-// })
+app.get("/", (req, res) => {
+    res.status(200).send("Happy Scraping!")
+})
 
 // AUTH ROUTES
 app.use('/api/v2/user', require('./routes/auth.routes')) // auth
@@ -63,17 +64,29 @@ app.use('/api/v2/campaign', require('./routes/campaign.routes')) // campaign
 /**
  * Server Activation
  */
-const root = require('path').join(__dirname, './views', 'dist')
-console.log(root)
-app.use(express.static(root))
-app.get('*', (req, res) => {
-    console.log(req.originalUrl)
-    res.sendFile('index.html', { root })
-})
+// const root = require('path').join(__dirname, './views', 'dist')
+// console.log(root)
+// app.use(express.static(root))
+// app.get('*', (req, res) => {
+//     console.log(req.originalUrl)
+//     res.sendFile('index.html', { root })
+// })
 
 
-app.listen(port, () => {
+app.listen(port, async () => {
 
     console.log(`Listening to requests on http://localhost:${port}`)
+
+    const browser = await browserLaunch()
+    const page = await browser.newPage()
+    
+            await page.setCacheEnabled(true)
+    
+            // // prevent timeout error
+            await page.setDefaultNavigationTimeout(0)
+
+            await page.goto('https://www.tiktok.com/', {
+                waitUntil: 'networkidle2',
+            })
 
 })
