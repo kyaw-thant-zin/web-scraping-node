@@ -262,27 +262,30 @@ const getAccountInfo = async (page, account) => {
         try {
             console.log('----- getAccountInfo ------')
             const appURL = tAppURLs.user.getProfileURL(account)
-
+            
             await page.goto(appURL, {
                 waitUntil: chromiumPage.waitUntil.networkidle0,
             })
 
             const lastPosition = await scrollPageToBottom(page, chromiumPage.scrollSetting)
 
-            await page.setExtraHTTPHeaders(apiUserHeaders)
-            await page.goto(apiUserURL, {
-                waitUntil: 'domcontentloaded',
-            })
-
-            await page.waitForSelector('pre')
-            const element = await page.$('pre')
-            const profileInfo = await page.evaluate(el => el.textContent, element)
-            if(profileInfo) {
-                resovle(JSON.parse(profileInfo))
+            if(apiUserURL != '') {
+                console.log('----- request user info api -----')
+                await page.setExtraHTTPHeaders(apiUserHeaders)
+                await page.goto(apiUserURL, {
+                    waitUntil: 'domcontentloaded',
+                })
+                await page.waitForSelector('pre')
+                const element = await page.$('pre')
+                const profileInfo = await page.evaluate(el => el.textContent, element)
+                if(profileInfo) {
+                    resovle(JSON.parse(profileInfo))
+                } else {
+                    resovle(false)
+                }
             } else {
                 resovle(false)
             }
-
         } catch (error) {
             resovle(error)
         }
@@ -299,6 +302,7 @@ const getVideoList = async (page) => {
             const decrpytedVideoListQuery = setCursor()
             setXTTPARAMS(decrpytedVideoListQuery)
 
+            console.log('----- request video list api -----')
             await page.setExtraHTTPHeaders(apiListHeaders)
             await page.goto(apiListURL, {
                 waitUntil: 'domcontentloaded',
@@ -313,7 +317,7 @@ const getVideoList = async (page) => {
                     const beautifyVideoList = await beautify(videoList.itemList.slice(0, 11))
                     resovle(beautifyVideoList)
                 } else {
-                    resovle({})
+                    resovle(false)
                 }
             } else {
                 resovle(false)
@@ -376,7 +380,7 @@ const getSearchResults = async (page, hashtag) => {
                 waitUntil: 'networkidle2',
             })
 
-            if(apiHashtagURL != '' && apiHashtagHeaders != '') {
+            if(apiHashtagURL != '') {
 
                 console.log('---- request hashtag api ------')
                 await page.setExtraHTTPHeaders(apiHashtagHeaders)

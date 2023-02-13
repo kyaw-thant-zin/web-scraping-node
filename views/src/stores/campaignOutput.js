@@ -6,6 +6,10 @@ import { useLocalStorage } from '@vueuse/core'
 
 export const useCampaignOutputStore = defineStore('campaignOutput', () => {
 
+    const _campaign = ref(useLocalStorage('_selectedCampaign', {
+        label: 'All Campaigns',
+        value: 0
+    }))
     const _campaigns = ref([
         {
             label: 'All Campaigns',
@@ -26,20 +30,23 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         _error.value = error
     }
 
+    const storeCampaign = (campaign) => {
+        _campaign.value = campaign
+    }
+
     const storeCampaigns = (campaigns) => {
-        const filteredCampaigns = []
+        const filteredCampaign = [{
+            label: 'All Campaigns',
+            value: '0'
+        }]
         campaigns.forEach((campaign) => {
             const dumpCampaign = {}
-            for(const key in campaign) {
-                if(key === 'id') {
-                    dumpCampaign.value = campaign.id
-                } else {
-                    dumpCampaign.label = campaign.campaignName
-                }
-            }
-            filteredCampaigns.push(dumpCampaign)
+            dumpCampaign.value = campaign.id
+            dumpCampaign.label = campaign.campaignName
+            filteredCampaign.push(dumpCampaign)
         })
-        _campaigns.value = filteredCampaigns
+
+        _campaigns.value = filteredCampaign
     }
 
     const storeUpdatePriority = (priority) => {
@@ -84,9 +91,13 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         _campaignOutputTablePage.value = page
     }
 
+    const handleCampaign = (campaign) => {
+        
+    }
+
     const handleCampaigns = async () => {
-        const campaigns = await API.campaigns.index()
-        storeCampaigns(response)
+        const campaigns = await API.campaign.index()
+        storeCampaigns(campaigns)
     }
 
     const handleCampaignOutputs = async () => {
@@ -101,10 +112,13 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
     return {
         _error,
         _loading,
+        _campaign,
         _campaigns,
         _campaignOutputs,
         _updatePriority,
         _campaignOutputTablePage,
+        storeCampaign,
+        handleCampaign,
         handleCampaigns,
         handleCampaignOutputs,
         handleCampaignOutputPriority,

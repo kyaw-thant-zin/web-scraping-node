@@ -13,25 +13,24 @@
   const $q = useQuasar()
   const campaignOutputStore = useCampaignOutputStore()
   campaignOutputStore.handleCampaignOutputs()
+  campaignOutputStore.handleCampaigns()
 
   /* app config */
   useMeta({
     title: 'CAMPAIGN OUTPUT',
   })
 
-  const campaign = ref({
-    label: 'All Campaigns',
-    value: '0'
-  })
-  const campaigns = ref([
-    {
-      label: 'All Campaigns',
-      value: '0'
-    }
-  ])
-  function filterByCampaign(val) {
-    console.log(val)
+  const campaigns = ref([])
+  function filterByCampaign(obj) {
+    campaignOutputStore.storeCampaign(obj)
   }
+  watchEffect(() => {
+
+    if(campaignOutputStore._campaigns !== null) {
+      campaigns.value = campaignOutputStore._campaigns
+    }
+
+  }, [campaignOutputStore._campaigns])
 
   function togglePublicPrivate(props, val) {
     console.log(props)
@@ -61,10 +60,17 @@
     { name: 'url', label: '', field: 'url', align: 'center', sortable: true },
   ]
   const rows = ref([])
+  const filteredRows = (rows) => {
+    if(campaignOutputStore._campaign.value == 0) {
+      return rows
+    } else {
+      return rows.filter(row => row.id == campaignOutputStore._campaign.value)
+    }
+  }
   watchEffect(() => {
 
     if(campaignOutputStore._campaignOutputs !== null) {
-      rows.value = campaignOutputStore._campaignOutputs
+      rows.value = filteredRows(campaignOutputStore._campaignOutputs)
     }
 
   }, [campaignOutputStore._campaignOutputs])
@@ -81,6 +87,10 @@
   }
   onBeforeRouteLeave((to, from, next) => {
     campaignOutputStore.storeCampaignOutputTablePage(1)
+    campaignOutputStore.storeCampaign({
+      label: 'All Campaigns',
+      value: 0
+    })
     next()
   })
 
@@ -113,7 +123,7 @@
             <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
               <div class="common-card-ttl">Campaign Output</div>
               <div class="col-4">
-                <q-select @update:model-value="val => filterByCampaign(val)"  name="campaign" borderless v-model="campaign" :options="campaigns" class="common-select p-sm" />
+                <q-select @update:model-value="val => filterByCampaign(val)"  name="campaign" borderless v-model="campaignOutputStore._campaign" :options="campaigns" class="common-select p-sm" />
               </div>
             </q-card-section>
             <q-card-section class="q-px-none">
