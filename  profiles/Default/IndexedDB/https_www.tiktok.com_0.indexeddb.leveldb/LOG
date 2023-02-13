@@ -1,3 +1,7 @@
-2023/02/12-20:46:48.647 8a03 Reusing MANIFEST /Users/kyawthantzin/Documents/GitHub/kyawthantzin/sn-followers/ profiles/Default/IndexedDB/https_www.tiktok.com_0.indexeddb.leveldb/MANIFEST-000001
-2023/02/12-20:46:48.647 8a03 Recovering log #3
-2023/02/12-20:46:48.649 8a03 Reusing old log /Users/kyawthantzin/Documents/GitHub/kyawthantzin/sn-followers/ profiles/Default/IndexedDB/https_www.tiktok.com_0.indexeddb.leveldb/000003.log 
+2023/02/13-16:34:05.693 8503 Reusing MANIFEST /Users/kyawthantzin/Documents/ICDL MM/nodejs/web-scraping-node/ profiles/Default/IndexedDB/https_www.tiktok.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/02/13-16:34:05.694 8503 Recovering log #3
+2023/02/13-16:34:05.699 8503 Reusing old log /Users/kyawthantzin/Documents/ICDL MM/nodejs/web-scraping-node/ profiles/Default/IndexedDB/https_www.tiktok.com_0.indexeddb.leveldb/000003.log 
+2023/02/13-16:34:13.468 2a343 Level-0 table #5: started
+2023/02/13-16:34:13.481 2a343 Level-0 table #5: 125982 bytes OK
+2023/02/13-16:34:13.490 2a343 Delete type=0 #3
+2023/02/13-16:34:13.498 2a343 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

@@ -3,6 +3,9 @@ const path = require("path")
 const util = require('util')
 const fs = require('fs-extra')
 
+const needle = require('needle')
+const { load } = require('cheerio')
+
 const crypto = require('crypto')
 const express = require("express")
 const {executablePath} = require('puppeteer')
@@ -25,13 +28,15 @@ let apiHashtagHeaders = {}
 
 // Browser Setting
 const browserSetting = {
-    headless: false,
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1000,1080', '--use-gl=egl', '--disable-dev-shm-usage', '--user-data-dir= profiles'],
     ignoreDefaultArgs: ['--disable-extensions', '--enable-automation'],
     executablePath: executablePath(),
 }
 
-let browser = null
+const browser = {
+    'chromium': null
+}
 let mainBrowser = null
 let chromeTmpDataDir = null
 
@@ -64,9 +69,10 @@ const setXTTPARAMS = (decrpytedVideoListQuery) => {
 const browserLaunch = async () => {
     return new Promise(async (resovle, reject) => {
         try {
-            browser = await puppeteer.launch( browserSetting )
+            console.log('open browser.......')
+            browser.chromium = await puppeteer.launch( browserSetting )
             if(chromeTmpDataDir === null) {
-                let chromeSpawnArgs = browser.process().spawnargs;
+                let chromeSpawnArgs = browser.chromium.process().spawnargs;
                 for (let i = 0; i < chromeSpawnArgs.length; i++) {
                     if (chromeSpawnArgs[i].indexOf("--user-data-dir=") === 0) {
                         chromeTmpDataDir = chromeSpawnArgs[i].replace("--user-data-dir=", "");
@@ -74,7 +80,7 @@ const browserLaunch = async () => {
                 }
             }
 
-            resovle(browser)
+            resovle(browser.chromium)
 
         } catch (error) {
             resovle(error)
@@ -85,24 +91,26 @@ const browserLaunch = async () => {
 // create a new tab 
 const openNewPage = async (localBrowser, scrapingMethod) => {
 
-    // Create a new page
-    const page = await localBrowser.newPage()
+    return new Promise(async (resovle, reject) => {
+        console.log('create a new page.....')
+        // Create a new page
+        const page = await localBrowser.newPage()
 
-    // Disable Cache
-    await page.setCacheEnabled(chromiumPage.setCacheEnabled)
+        // Disable Cache
+        await page.setCacheEnabled(chromiumPage.setCacheEnabled)
 
-    // Set Browser Width and Height
-    // await page.setViewport(chromiumPage.setViewport)
+        // Set Browser Width and Height
+        // await page.setViewport(chromiumPage.setViewport)
 
-    // prevent timeout error
-    await page.setDefaultNavigationTimeout(chromiumPage.setDefaultNavigationTimeout)
+        // prevent timeout error
+        await page.setDefaultNavigationTimeout(chromiumPage.setDefaultNavigationTimeout)
 
-    await page.setRequestInterception(chromiumPage.setRequestInterception)
+        await page.setRequestInterception(chromiumPage.setRequestInterception)
 
-    // skip unnecessary network requests
-    const newPage = await skipUnnecessaryRequests( scrapingMethod, page)
-
-    resovle(newPage)
+        // skip unnecessary network requests
+        const newPage = await skipUnnecessaryRequests( scrapingMethod, page)
+        resovle(newPage)
+    })
 
 }
 
@@ -112,6 +120,7 @@ const skipUnnecessaryRequests = async (scrapingMethod, page) => {
     return new Promise(async (resovle, reject) => {
         try {
             if(scrapingMethod === 'account') {
+                console.log('skip requests by account')
                 page.on('request', request => {
                     if (request.resourceType() === 'fetch') {
                         if(request.url().includes("api/post/item_list")) {
@@ -135,7 +144,7 @@ const skipUnnecessaryRequests = async (scrapingMethod, page) => {
             } else if(scrapingMethod === 'hashtag') {
                 page.on('request', request => {
                     if (request.resourceType() === 'fetch') {
-                        if(request.url().includes("api/search/general/full")) {
+                        if(request.url().includes("api/search/item/full")) {
                             apiHashtagURL = request.url()
                             apiHashtagHeaders = request.headers()
                         }
@@ -157,16 +166,42 @@ const skipUnnecessaryRequests = async (scrapingMethod, page) => {
 
 }
 
+// get playable tiktok video url
+const getVideoPlayAbleURL = async (id, userId) => {
+
+    return new Promise(async (resovle, reject) => {
+        const host = 'https://ttsave.app/download'
+        const body = { id: `https://www.tiktok.com/${userId}/video/${id}` }
+
+        const res  = await needle("post", host, body, {json: true})
+        try {
+
+            const $ = load(res.body)
+            const video = {
+                url: {
+                  no_wm: $("a:contains('DOWNLOAD (WITHOUT WATERMARK)')").attr("href"),
+                  wm: $("a:contains('DOWNLOAD (WITH WATERMARK)')").attr("href"),
+                }
+            }
+
+            resovle(video)
+
+        } catch (error) {
+            resovle(false)
+        }
+    })
+}
+
 // beautify data
 const beautify = async (videoList) => {
     return new Promise(async (resovle, reject) => {
         try {
             console.log('----- beautify ------')
             if(videoList && videoList.length > 0) {
-                const videoListKey = ['id', 'stats', 'createTime', 'desc', 'video']
+                const videoListKey = [ 'author', 'id', 'stats', 'createTime', 'desc', 'video']
                 const videoKey = ['id', 'format', 'duration', 'originCover', 'playAddr', 'videoQuality']
                 let bVideoList = []
-                videoList.forEach(video => {
+                for(const video of videoList) {
                     const dumpVideo = {}
                     for(const key in video) {
                         if(videoListKey.includes(key)) {
@@ -175,7 +210,16 @@ const beautify = async (videoList) => {
                                 const dumpVideoChild = {}
                                 for(const childKey in videoObj) {
                                     if(videoKey.includes(childKey)) {
-                                        dumpVideoChild[childKey] = videoObj[childKey]
+                                        if(childKey == 'playAddr') {
+                                            const playAddr = await getVideoPlayAbleURL(video.id, video.author.uniqueId)
+                                            if(playAddr) {
+                                                dumpVideoChild[childKey] = playAddr.url.wm
+                                            } else {
+                                                dumpVideoChild[childKey] = videoObj[childKey]
+                                            }
+                                        } else {
+                                            dumpVideoChild[childKey] = videoObj[childKey]
+                                        }
                                     }
                                 }
                                 dumpVideo[key] = dumpVideoChild
@@ -185,7 +229,8 @@ const beautify = async (videoList) => {
                         }
                     }
                     bVideoList.push(dumpVideo)
-                })
+                }
+                console.log('beautify done....')
                 resovle(bVideoList)
             } else {
                 resovle(false)
@@ -265,7 +310,7 @@ const getVideoList = async (page) => {
             if(videoListData) {
                 const videoList = JSON.parse(videoListData)
                 if(videoList?.itemList) {
-                    const beautifyVideoList = await beautify(videoList.itemList)
+                    const beautifyVideoList = await beautify(videoList.itemList.slice(0, 11))
                     resovle(beautifyVideoList)
                 } else {
                     resovle({})
@@ -283,15 +328,15 @@ const getVideosByAccount = async (account) => {
 
     return new Promise(async (resovle, reject) => {
         try {
-
+            console.log('tiktok scraping by account....')
             const user = {}
 
             if(account != '') {
-                const localBrowser = null
-                if(browser === null) {
+                let localBrowser = null
+                if(browser.chromium == null) {
                     localBrowser = await browserLaunch()
                 } else {
-                    localBrowser = browser
+                    localBrowser = browser.chromium
                 }
                 const page = await openNewPage(localBrowser, 'account')
                 const t = await getAccountInfo(page, account)
@@ -327,14 +372,39 @@ const getSearchResults = async (page, hashtag) => {
 
             const appURL = tAppURLs.hashtag.getSearchURL(hashtag)
             
-
-            await page.goto('https://www.tiktok.com/search/video?q='+hashtag, {
+            await page.goto(appURL, {
                 waitUntil: 'networkidle2',
             })
 
-            
+            if(apiHashtagURL != '' && apiHashtagHeaders != '') {
 
-            resovle(true)
+                console.log('---- request hashtag api ------')
+                await page.setExtraHTTPHeaders(apiHashtagHeaders)
+                await page.goto(apiHashtagURL, {
+                    waitUntil: 'domcontentloaded',
+                })
+
+                await page.waitForSelector('pre')
+                const element = await page.$('pre')
+                const videoListData = await page.evaluate(el => el.textContent, element)
+                if(videoListData) {
+                    const videoList = JSON.parse(videoListData)
+                    if(videoList?.item_list) {
+                        const beautifyVideoList = await beautify(videoList.item_list)
+                        resovle(beautifyVideoList)
+                    } else {
+                        console.log("not getting item list")
+                        resovle(false)
+                    }
+                } else {
+                    console.log("not getting video list")
+                    resovle(false)
+                }
+
+            } else {
+                console.log("not getting hashtag api link")
+                resovle(false)
+            }
 
         } catch (error) {
             resovle(error)
@@ -342,7 +412,6 @@ const getSearchResults = async (page, hashtag) => {
     })
 
 }
-
 
 const getVideosByHashtag = async (hashtag) => {
 
@@ -353,30 +422,32 @@ const getVideosByHashtag = async (hashtag) => {
             
             if(hashtag != '') {
                 console.log('tiktok scraping by hashtag....')
-            
-                const localBrowser = null
-                if(browser === null) {
+                const tag = hashtag.replace('#', '')
+                let localBrowser = null
+                if(browser.chromium == null) {
                     localBrowser = await browserLaunch()
                 } else {
-                    localBrowser = browser
+                    localBrowser = browser.chromium
                 }
                 const page = await openNewPage(localBrowser, 'hashtag')
-                const t = await getSearchResults(page, hashtag)
-                resovle(true)
-                // if(t?.data) {
-                //     hashtagResults.items = t.data
-                //     console.log(hashtagResults)
-                // }
+                const t = await getSearchResults(page, tag)
+                if(t) {
+                    hashtagResults.items = t
+                } else {
+                    console.log("not getting video list")
+                }
+                resovle(hashtagResults)
             }
 
         } catch (error) {
-            
+            resovle(false)
         }
     })
 }
 // ------------------------- ***** hashtag ***** ----------------------------//
 
 module.exports = {
+    browser,
     browserLaunch,
     getVideosByHashtag,
     getVideosByAccount

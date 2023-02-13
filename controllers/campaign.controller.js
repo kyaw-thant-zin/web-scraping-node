@@ -13,6 +13,7 @@ const CollectionType = db.collectionTypes
 const LinkType = db.linkTypes
 const CampaignOutput = db.campaignOutputs
 const TUser = db.tUsers
+const THAshtag = db.tHashtags
 const TVideo = db.tVideos
 const ApiLayout = db.apiLayouts
 
@@ -112,7 +113,7 @@ const bulkCreateTUser = (userInfo, campaignOutputId, state) => {
 }
 
 // create an array for create or update tVideo
-const bulkCreateTVideos = (userItems, tUser, state) => {
+const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
 
     return new Promise(async (resovle, reject) => {
 
@@ -120,22 +121,41 @@ const bulkCreateTVideos = (userItems, tUser, state) => {
 
             if(state === tConfig.key.create) {
     
-                const row = {
-                    videoId: item.video.id,
-                    desc: item.desc,
-                    playCount: item.stats.playCount,
-                    diggCount: item.stats.diggCount,
-                    commentCount: item.stats.commentCount,
-                    shareCount: item.stats.shareCount,
-                    originCoverURL: item.video.originCover,
-                    videoURL: item.video.playAddr,
-                    webVideoURL: `https:www.tiktok.com/@${tUser.uniqueId}/video/${item.video.id}`,
-                    expiresIn: getExpiresDate(item.video.playAddr),
-                    createTime: getCreateDate(item.createTime),
-                    tUserId: tUser.id
-                }     
-                
-                return row
+                if(scrapingMethod === 'account') {
+                    const row = {
+                        videoId: item.video.id,
+                        desc: item.desc,
+                        playCount: item.stats.playCount,
+                        diggCount: item.stats.diggCount,
+                        commentCount: item.stats.commentCount,
+                        shareCount: item.stats.shareCount,
+                        originCoverURL: item.video.originCover,
+                        videoURL: item.video.playAddr,
+                        webVideoURL: `https:www.tiktok.com/@${t.uniqueId}/video/${item.video.id}`,
+                        expiresIn: getExpiresDate(item.video.playAddr),
+                        createTime: getCreateDate(item.createTime),
+                        tUserId: t.id
+                    }     
+                    
+                    return row
+                } else if(scrapingMethod === 'hashtag') {
+                    const row = {
+                        videoId: item.video.id,
+                        desc: item.desc,
+                        playCount: item.stats.playCount,
+                        diggCount: item.stats.diggCount,
+                        commentCount: item.stats.commentCount,
+                        shareCount: item.stats.shareCount,
+                        originCoverURL: item.video.originCover,
+                        videoURL: item.video.playAddr,
+                        webVideoURL: `https:www.tiktok.com/@${item.author.uniqueId}/video/${item.video.id}`,
+                        expiresIn: getExpiresDate(item.video.playAddr),
+                        createTime: getCreateDate(item.createTime),
+                        tHashtagId: t.id
+                    }     
+                    
+                    return row
+                }
     
             }   
     
@@ -188,10 +208,80 @@ const store = asyncHnadler( async (req, res) => {
 
         if(campaign.collectionTypeId == 1) {
             console.log('---------------- Hashtag ------------------')
-            const response = await Scraper.tiktok.getVideosByHashtag(campaign.hashtag)
-            if(response) {
-                res.json(true)
-                console.log(response)
+            const responseHastag = await Scraper.tiktok.getVideosByHashtag(campaign.hashtag)
+            if(responseHastag) {
+                if(responseHastag?.items) {
+                    console.log('----- got hashtag items ------')
+                    console.log('Camapign Output Creating.....')
+                    // store in the campaing output table
+                    const campaignOutput = await CampaignOutput.create({
+                        visibility: appConfig.key.visibility,
+                        linkURL: '',
+                        priority: appConfig.key.priority,
+                        campaignId: campaign.id
+                    }).then(campaignOutput => {
+                        return campaignOutput.get({ plain: true })
+                    })
+                    if(campaignOutput) {
+                        console.log('Camapign Output Created.....')
+                        console.log('tHashtag Creating.....')
+                        // store in the tUser table
+                        const tHashtagRow = {
+                            hashtag: campaign.hashtag,
+                            campaignOutputId: campaignOutput.id
+                        }
+                        let tHashtag = null
+
+                        try {
+                            tHashtag = await THAshtag.create(tHashtagRow).then(tHashtag => {
+                                return tHashtag.get({ plain: true })
+                            })
+
+                            if(tHashtag) {
+                                console.log('tHashtag Created.....')
+                                console.log('tVideos Creating.....')
+    
+                                // store in the iVideo table
+                                const tVideoRows = await bulkCreateTVideos(responseHastag.items, tHashtag, tConfig.key.create, 'hashtag')
+                                let tVideos = null
+                                try {
+                                    tVideos = await TVideo.bulkCreate(tVideoRows)
+                                    if(tVideos) {
+                                        console.log('tVideos Created.....')
+                                        console.log('apiLayout Creating.....')
+
+                                        // store in the apiLayout table
+                                        const apiLayout = await ApiLayout.create({
+                                            layoutType: appConfig.key.layoutType,
+                                            showAccount: appConfig.key.showAccount,
+                                            showTitle: appConfig.key.showTitle,
+                                            showHashtag: appConfig.key.showHashtag,
+                                            apiToken: CryptoJS.AES.decrypt(campaign.uuid, appConfig.screctKey).toString(CryptoJS.enc.Utf8),
+                                        })
+        
+                                        if(apiLayout) {
+                                            console.log('apiLayout Created.....')
+                                            res.json(true)
+                                        } else {
+                                            res.json(false)
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.log(error)
+                                    res.json(false)
+                                }
+
+                            }
+
+                        } catch (error) {
+                            console.log(error)
+                            res.json(false)
+                        }
+                    }
+                } else {
+                    console.log('error')
+                    res.json(false)
+                }
             } else {
                 console.log('error')
             }
@@ -220,7 +310,7 @@ const store = asyncHnadler( async (req, res) => {
                         console.log('Camapign Output Created.....')
                         console.log('tUser Creating.....')
                         // store in the tUser table
-                        const tUserRow = bulkCreateTUser(response.userInfo, campaignOutput.id, tConfig.key.create)
+                        const tUserRow = bulkCreateTUser(response.userInfo, campaignOutput.id, tConfig.key.create, 'account')
                         let tUser = null
 
                         try {
@@ -233,7 +323,7 @@ const store = asyncHnadler( async (req, res) => {
                                 console.log('tVideos Creating.....')
     
                                 // store in the iVideo table
-                                const tVideoRows = await bulkCreateTVideos(response.items, tUser, tConfig.key.create)
+                                const tVideoRows = await bulkCreateTVideos(response.items, tUser, tConfig.key.create, 'account')
                                 let tVideos = null
                                 try {
                                     tVideos = await TVideo.bulkCreate(tVideoRows)

@@ -4,7 +4,12 @@ const Scraper = {
     'tiktok': {
         'getVideosByHashtag': async (hashtag) => {
             console.log('hashtag scraper......')
-            await TikTok.getVideosByHashtag(hashtag)
+            const response = await TikTok.getVideosByHashtag(hashtag)
+            if(response) {
+                return response
+            } else {
+                return false
+            }
         },
         'getVideosByAccount': async (account) => {
             console.log('account scraping......')

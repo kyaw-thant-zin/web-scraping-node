@@ -66,6 +66,15 @@ module.exports = (sequelize, DataTypes) => {
                 deferrable: Deferrable.INITIALLY_IMMEDIATE
             }
         },
+        tHashtagId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'tHashtags',
+                key: 'id',
+                deferrable: Deferrable.INITIALLY_IMMEDIATE
+            }
+        },
     }
 
     const modelOpts = {

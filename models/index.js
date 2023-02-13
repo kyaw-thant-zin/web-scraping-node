@@ -52,6 +52,7 @@ db.linkTypes = require('./linkType.model')(sequelize, DataTypes)
 db.campaigns = require('./campaign.model')(sequelize, DataTypes)
 db.campaignOutputs = require('./campaignOutput.model')(sequelize, DataTypes)
 db.tUsers = require('./tUser.model')(sequelize, DataTypes)
+db.tHashtags = require('./tHashtag.model')(sequelize, DataTypes)
 db.tVideos = require('./tVideo.model')(sequelize, DataTypes)
 db.linkSettings = require('./linkSetting.model')(sequelize, DataTypes)
 db.apiLayouts = require('./apiLayout.model')(sequelize, DataTypes)
@@ -105,6 +106,15 @@ db.tUsers.belongsTo(db.campaignOutputs, {
     onUpdate: 'CASCADE'
 }) // tUsers => campaignOutputs
 
+db.campaignOutputs.hasOne(db.tHashtags, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // campaignOutputs => tHashtags
+db.tHashtags.belongsTo(db.campaignOutputs, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tHashtags => campaignOutputs
+
 db.tUsers.hasOne(db.tVideos, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
@@ -113,6 +123,15 @@ db.tVideos.belongsTo(db.tUsers, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 }) // tVideos => tUsers
+
+db.tHashtags.hasOne(db.tVideos, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tHashtags => tVideos
+db.tVideos.belongsTo(db.tHashtags, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // tVideos => tHashtags
 
 db.tVideos.hasOne(db.linkSettings, {
     onDelete: 'CASCADE',
