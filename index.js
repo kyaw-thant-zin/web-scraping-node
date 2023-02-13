@@ -60,6 +60,9 @@ app.use('/api/v2/link-types', require('./routes/linkType.routes')) // link type
 // CAMPAIGN ROUTES
 app.use('/api/v2/campaign', require('./routes/campaign.routes')) // campaign
 
+// CAMPAIGN OUTPUT ROUTES
+app.use('/api/v2/campaignOutput', require('./routes/campaignOutput.routes')) // campaign
+
 /**
  * Server Activation
  */

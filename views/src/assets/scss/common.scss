@@ -30,6 +30,32 @@ body {
   min-height: inherit;
 }
 
+.campaignOutput-t-video {
+  width: 120px;
+  height: 160px;
+  position: relative;
+
+  .video-wr {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 5px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      -ms-border-radius: 5px;
+      -o-border-radius: 5px;
+    }
+  }
+}
+
 .bg-none {
   background-color: unset !important;
 }

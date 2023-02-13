@@ -1,39 +1,46 @@
 <script setup>
 
   import { useMeta } from 'vue-meta'
-  import { ref, computed, onMounted } from 'vue'
+  import { useQuasar } from 'quasar'
+  import { ref, computed, watchEffect } from 'vue'
+  import { onBeforeRouteLeave } from 'vue-router'
   import { WebsiteName } from '@/api/constants.js'
+  import { useCampaignOutputStore } from '@/stores/campaignOutput.js'
 
+  // video component
+  import Video from '@/views/components/Video.vue'
+
+  const $q = useQuasar()
+  const campaignOutputStore = useCampaignOutputStore()
+  campaignOutputStore.handleCampaignOutputs()
 
   /* app config */
   useMeta({
     title: 'CAMPAIGN OUTPUT',
   })
 
-  const campaign = ref('All Campaign')
-  const campaigns = [
+  const campaign = ref({
+    label: 'All Campaigns',
+    value: '0'
+  })
+  const campaigns = ref([
     {
-      label: 'All Campaign',
-      value: '1'
-    },
-    {
-      label: 'Account',
-      value: '2'
-    },
-  ]
-
+      label: 'All Campaigns',
+      value: '0'
+    }
+  ])
   function filterByCampaign(val) {
-
+    console.log(val)
   }
 
   function togglePublicPrivate(props, val) {
-
     console.log(props)
     console.log(val)
   }
 
+  const visibileColumns = ['publicPrivate', 'campaignName', 'tiktok', 'postDate', 'account', 'hashtag', 'views', 'link', 'priority', 'url']
   const columns = [
-
+    { name: 'id', required: false, label: 'ID', sortable: false },
     { name: 'publicPrivate', label: 'Public Private', field: 'publicPrivate', align: 'center', sortable: true },
     {
       name: 'campaignName',
@@ -53,95 +60,28 @@
     { name: 'priority', label: 'Priority', field: 'priority', align: 'center', sortable: true },
     { name: 'url', label: '', field: 'url', align: 'center', sortable: true },
   ]
+  const rows = ref([])
+  watchEffect(() => {
 
-  const rows = [
-    {
-      publicPrivate: true,
-      campaignName: '超しまむら学園1',
-      tiktok: '',
-      postDate: '28/09/2022',
-      account: '@Hashtag',
-      hashtag: '#超しまむら学園',
-      views: '1.2M',
-      link: 'TikTok',
-      priority: false,
-      url: true
-    },
-    {
-      publicPrivate: true,
-      campaignName: '超しまむら学園2',
-      tiktok: '',
-      postDate: '28/09/2022',
-      account: '@Hashtag',
-      hashtag: '#超しまむら学園',
-      views: '1.2M',
-      link: 'TikTok',
-      priority: false,
-      url: true
-    },
-    {
-      publicPrivate: true,
-      campaignName: '超しまむら学園3',
-      tiktok: '',
-      postDate: '28/09/2022',
-      account: '@Hashtag',
-      hashtag: '#超しまむら学園',
-      views: '1.2M',
-      link: 'TikTok',
-      priority: false,
-      url: true
-    },
-    {
-      publicPrivate: true,
-      campaignName: '超しまむら学園4',
-      tiktok: '',
-      postDate: '28/09/2022',
-      account: '@Hashtag',
-      hashtag: '#超しまむら学園',
-      views: '1.2M',
-      link: 'TikTok',
-      priority: false,
-      url: true
-    },
-    {
-      publicPrivate: true,
-      campaignName: '超しまむら学園5',
-      tiktok: '',
-      postDate: '28/09/2022',
-      account: '@Hashtag',
-      hashtag: '#超しまむら学園',
-      views: '1.2M',
-      link: 'TikTok',
-      priority: false,
-      url: true
-    },
-    {
-      publicPrivate: true,
-      campaignName: '超しまむら学園6',
-      tiktok: '',
-      postDate: '28/09/2022',
-      account: '@Hashtag',
-      hashtag: '#超しまむら学園',
-      views: '1.2M',
-      link: 'TikTok',
-      priority: false,
-      url: true
-    },
-  ]
+    if(campaignOutputStore._campaignOutputs !== null) {
+      rows.value = campaignOutputStore._campaignOutputs
+    }
+
+  }, [campaignOutputStore._campaignOutputs])
 
   const pagination = ref({
     sortBy: 'desc',
     descending: false,
-    page: 1,
-    rowsPerPage: 2
-    // rowsNumber: xx if getting data from a server
+    page: campaignOutputStore._campaignOutputTablePage,
+    rowsPerPage: 12
   })
-
-  const pagesNumber = computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
-
-  onMounted(() => {
-    // init function
-    console.log('mounted')
+  const pagesNumber = computed(() => Math.ceil(rows.value.length / pagination.value.rowsPerPage))
+  function onChangePagination(page) {
+    campaignOutputStore.storeCampaignOutputTablePage(page)
+  }
+  onBeforeRouteLeave((to, from, next) => {
+    campaignOutputStore.storeCampaignOutputTablePage(1)
+    next()
   })
 
 </script>
@@ -186,6 +126,7 @@
                 row-key="campaignName"
                 v-model:pagination="pagination"
                 hide-pagination
+                :visible-columns="visibileColumns"
               >
                 <template v-slot:body-cell-publicPrivate="props">
                   <q-td :props="props">
@@ -198,19 +139,27 @@
                     />
                   </q-td>
                 </template>
+                <template v-slot:body-cell-tiktok="props">
+                  <q-td class="text-center">
+                    <Video v-bind:url="props.row.tiktok"></Video>
+                  </q-td>
+                </template>
                 <template v-slot:body-cell-priority="props">
-                  <q-td>
+                  <q-td class="text-center">
                     <q-checkbox v-model="props.row.priority" class="common-checkbox" />
                   </q-td>
                 </template>
                 <template v-slot:body-cell-url="props">
                   <q-td>
-                    <q-btn to="/" class="common-anchor" round flat icon="mdi-open-in-new"></q-btn>
+                    <a :href="props.row.url" target="_blank" rel="noopener noreferrer">
+                      <q-btn class="common-anchor" round flat icon="mdi-open-in-new"></q-btn>
+                    </a>
                   </q-td>
                 </template>
               </q-table>
               <div class="row justify-end q-mt-md">
                 <q-pagination
+                  @update:model-value="onChangePagination"
                   v-model="pagination.page"
                   color="primary"
                   :max="pagesNumber"

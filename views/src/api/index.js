@@ -105,5 +105,13 @@ export const API = {
             const response = await instance.post(apiURL + '/campaign/visibility/update/', formData, { headers: headers })
             return response.data
         }
+    },
+    'campaignOutput': {
+        'index': async () => {
+            const resposne = await instance.get(apiURL+'/campaignOutput', {
+                headers: headers
+            })
+            return resposne.data
+        }
     }
 }

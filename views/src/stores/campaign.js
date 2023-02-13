@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 import { API } from '@/api/index.js'
 import { useLocalStorage } from '@vueuse/core'
@@ -74,12 +75,8 @@ export const useCampaignStore = defineStore('campaign', () => {
         campaigns.forEach((campaign) => {
             const dumpCampaign = {}
 
-            const date = new Date(campaign.createTimestamp)
-            const formattedDate = date.toLocaleString(undefined, {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            }).replace(/\//g, '/')
+            const date = dayjs(campaign.createTimestamp)
+            const formattedDate = date.format('DD/MM/YYYY')
 
             dumpCampaign.id = campaign.id
             dumpCampaign.campaignName = campaign.campaignName
