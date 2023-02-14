@@ -108,6 +108,16 @@
 
   }, [campaignStore._destroyed])
 
+  watchEffect( () => {
+    
+    if(campaignStore._loading) {
+        $q.loading.show()
+    } else {
+        $q.loading.hide()
+    }
+
+  }, [campaignStore._loading])
+
 
 </script>
 

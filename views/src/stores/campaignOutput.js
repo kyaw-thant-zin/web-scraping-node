@@ -72,6 +72,7 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
             const formattedDate = date.format('DD/MM/YYYY')
 
             dumpCo.id = co.id
+            dumpCo.tVideoId = video.id
             dumpCo.publicPrivate = co.campaignOutput.visibility
             dumpCo.campaignName = co.campaignName
             dumpCo.tiktok = video.videoURL
@@ -98,14 +99,21 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
     const handleCampaigns = async () => {
         const campaigns = await API.campaign.index()
         storeCampaigns(campaigns)
+        storeLoading(false)
     }
 
     const handleCampaignOutputs = async () => {
+        storeLoading(true)
         const campaigns = await API.campaignOutput.index()
         storeCamapignOutputs(campaigns)
     }
 
     const handleCampaignOutputPriority = () => {
+
+    }
+
+    const handleCampaignOutputVisibilityUpdate = (id, visibility) => {
+        storeLoading(true)
 
     }
 
@@ -122,7 +130,8 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         handleCampaigns,
         handleCampaignOutputs,
         handleCampaignOutputPriority,
-        storeCampaignOutputTablePage
+        storeCampaignOutputTablePage,
+        handleCampaignOutputVisibilityUpdate
     }
 
 })

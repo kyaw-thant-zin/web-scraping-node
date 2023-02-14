@@ -33,13 +33,13 @@
   }, [campaignOutputStore._campaigns])
 
   function togglePublicPrivate(props, val) {
-    console.log(props)
-    console.log(val)
+    campaignOutputStore.handleCampaignOutputVisibilityUpdate(props.row.id, val)
   }
 
   const visibileColumns = ['publicPrivate', 'campaignName', 'tiktok', 'postDate', 'account', 'hashtag', 'views', 'link', 'priority', 'url']
   const columns = [
     { name: 'id', required: false, label: 'ID', sortable: false },
+    { name: 'tVideoId', required: false, label: 'TViode ID', sortable: false },
     { name: 'publicPrivate', label: 'Public Private', field: 'publicPrivate', align: 'center', sortable: true },
     {
       name: 'campaignName',
@@ -93,6 +93,16 @@
     })
     next()
   })
+
+  watchEffect( () => {
+    
+    if(campaignOutputStore._loading) {
+        $q.loading.show()
+    } else {
+        $q.loading.hide()
+    }
+
+  }, [campaignOutputStore._loading])
 
 </script>
 
