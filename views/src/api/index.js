@@ -112,6 +112,30 @@ export const API = {
                 headers: headers
             })
             return resposne.data
-        }
+        },
+        'updateVisibility': async (tVideoId, visibility) => {
+            const formData = {
+                tVideoId: tVideoId,
+                visibility: visibility === true ? 1:0
+            }
+            const response = await instance.post(apiURL + '/campaignOutput/visibility/update/', formData, { headers: headers })
+            return response.data
+        },
+        'updatePriority': async (tVideoId, priority) => {
+            const formData = {
+                tVideoId: tVideoId,
+                priority: priority === true ? 1:0
+            }
+            const response = await instance.post(apiURL + '/campaignOutput/priority/update/', formData, { headers: headers })
+            return response.data
+        },
+        'updateLink': async (tVideoId, link) => {
+            const formData = {
+                tVideoId: tVideoId,
+                link: link
+            }
+            const response = await instance.post(apiURL + '/campaignOutput/link/update/', formData, { headers: headers })
+            return response.data
+        },
     }
 }

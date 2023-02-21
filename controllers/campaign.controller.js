@@ -11,7 +11,6 @@ const asyncHnadler = require('express-async-handler')
 const Campaign = db.campaigns
 const CollectionType = db.collectionTypes
 const LinkType = db.linkTypes
-const CampaignOutput = db.campaignOutputs
 const TUser = db.tUsers
 const THAshtag = db.tHashtags
 const TVideo = db.tVideos
@@ -81,12 +80,12 @@ const getExpiresDate = (videoURL) => {
     const searchParams = videoUrl.searchParams
     const expire = searchParams.get('expire')
     const actualExpiresIn = moment.unix(expire)
-    const expiresIn = moment(actualExpiresIn).subtract(5, 'minutes').format("YYYY/MM/DD HH:mm:ss")
+    const expiresIn = moment(actualExpiresIn).subtract(10, 'minutes').format("YYYY/MM/DD HH:mm:ss")
     return expiresIn
 }
 
 // create an array for create or update tUser
-const bulkCreateTUser = (userInfo, campaignOutputId, state) => {
+const bulkCreateTUser = (userInfo, campaignId, state) => {
 
     let row = {}
 
@@ -100,7 +99,7 @@ const bulkCreateTUser = (userInfo, campaignOutputId, state) => {
         row.videoCount = userInfo.stats.videoCount
         row.heartCount = userInfo.stats.heartCount
         row.avatarLarger = userInfo.user.avatarLarger
-        row.campaignOutputId = campaignOutputId
+        row.campaignId = campaignId
 
     } else if(state === tConfig.key.scheduleUpdate) {
 
@@ -124,6 +123,8 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                 if(scrapingMethod === 'account') {
                     const row = {
                         videoId: item.video.id,
+                        visibility: 0,
+                        priority: 0,
                         desc: item.desc,
                         playCount: item.stats.playCount,
                         diggCount: item.stats.diggCount,
@@ -131,16 +132,24 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                         shareCount: item.stats.shareCount,
                         originCoverURL: item.video.originCover,
                         videoURL: item.video.playAddr,
+                        secVideoURL: '',
                         webVideoURL: `https:www.tiktok.com/@${t.uniqueId}/video/${item.video.id}`,
-                        expiresIn: getExpiresDate(item.video.playAddr),
+                        expiresIn: getExpiresDate(item.video.originalPlayAddr),
                         createTime: getCreateDate(item.createTime),
+                        authorUniqueId: item.author.uniqueId,
+                        authorNickName: item.author.nickname,
+                        authorSignature: item.author.signature,
+                        authorAvatarLarger: item.author.avatarLarger,
                         tUserId: t.id
                     }     
                     
                     return row
                 } else if(scrapingMethod === 'hashtag') {
+                    console.log(item.author)
                     const row = {
                         videoId: item.video.id,
+                        visibility: 0,
+                        priority: 0,
                         desc: item.desc,
                         playCount: item.stats.playCount,
                         diggCount: item.stats.diggCount,
@@ -148,9 +157,14 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                         shareCount: item.stats.shareCount,
                         originCoverURL: item.video.originCover,
                         videoURL: item.video.playAddr,
+                        secVideoURL: '',
                         webVideoURL: `https:www.tiktok.com/@${item.author.uniqueId}/video/${item.video.id}`,
-                        expiresIn: getExpiresDate(item.video.playAddr),
+                        expiresIn: getExpiresDate(item.video.originalPlayAddr),
                         createTime: getCreateDate(item.createTime),
+                        authorUniqueId: item.author.uniqueId,
+                        authorNickName: item.author.nickname,
+                        authorSignature: item.author.signature,
+                        authorAvatarLarger: item.author.avatarLarger,
                         tHashtagId: t.id
                     }     
                     
@@ -168,8 +182,8 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
 
 }
 
-// @desc GET store
-// @route GET /api/v2/campaign/store
+// @desc POST store
+// @route POST /api/v2/campaign/store
 // @access Private
 const store = asyncHnadler( async (req, res) => {
 
@@ -212,23 +226,11 @@ const store = asyncHnadler( async (req, res) => {
             if(responseHastag) {
                 if(responseHastag?.items) {
                     console.log('----- got hashtag items ------')
-                    console.log('Camapign Output Creating.....')
-                    // store in the campaing output table
-                    const campaignOutput = await CampaignOutput.create({
-                        visibility: appConfig.key.visibility,
-                        linkURL: '',
-                        priority: appConfig.key.priority,
-                        campaignId: campaign.id
-                    }).then(campaignOutput => {
-                        return campaignOutput.get({ plain: true })
-                    })
-                    if(campaignOutput) {
-                        console.log('Camapign Output Created.....')
-                        console.log('tHashtag Creating.....')
+                    console.log('tHashtag Creating.....')
                         // store in the tUser table
                         const tHashtagRow = {
                             hashtag: campaign.hashtag,
-                            campaignOutputId: campaignOutput.id
+                            campaignId: campaign.id
                         }
                         let tHashtag = null
 
@@ -277,7 +279,6 @@ const store = asyncHnadler( async (req, res) => {
                             console.log(error)
                             res.json(false)
                         }
-                    }
                 } else {
                     console.log('error')
                     res.json(false)
@@ -296,21 +297,9 @@ const store = asyncHnadler( async (req, res) => {
                 // got the video list
                 if(response?.items) {
                     console.log('----- got user items ------')
-                    console.log('Camapign Output Creating.....')
-                    // store in the campaing output table
-                    const campaignOutput = await CampaignOutput.create({
-                        visibility: appConfig.key.visibility,
-                        linkURL: '',
-                        priority: appConfig.key.priority,
-                        campaignId: campaign.id
-                    }).then(campaignOutput => {
-                        return campaignOutput.get({ plain: true })
-                    })
-                    if(campaignOutput) {
-                        console.log('Camapign Output Created.....')
-                        console.log('tUser Creating.....')
+                    console.log('tUser Creating.....')
                         // store in the tUser table
-                        const tUserRow = bulkCreateTUser(response.userInfo, campaignOutput.id, tConfig.key.create, 'account')
+                        const tUserRow = bulkCreateTUser(response.userInfo, campaign.id, tConfig.key.create, 'account')
                         let tUser = null
 
                         try {
@@ -358,8 +347,6 @@ const store = asyncHnadler( async (req, res) => {
                             console.log(error)
                             res.json(false)
                         }
-                    }
-                    
                 }
             }
             console.log('---------------- Account ------------------')

@@ -45,11 +45,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        campaignOutputId: {
+        campaignId: {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: 'campaignOutputs',
+                model: 'campaigns',
                 key: 'id',
                 deferrable: Deferrable.INITIALLY_IMMEDIATE
             }

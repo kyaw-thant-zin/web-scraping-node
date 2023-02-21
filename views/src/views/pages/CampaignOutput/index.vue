@@ -1,5 +1,5 @@
 <script setup>
-
+  import dayjs from 'dayjs'
   import { useMeta } from 'vue-meta'
   import { useQuasar } from 'quasar'
   import { ref, computed, watchEffect } from 'vue'
@@ -33,7 +33,11 @@
   }, [campaignOutputStore._campaigns])
 
   function togglePublicPrivate(props, val) {
-    campaignOutputStore.handleCampaignOutputVisibilityUpdate(props.row.id, val)
+    campaignOutputStore.handleCampaignOutputVisibilityUpdate(props.row.tVideoId, val)
+  }
+
+  function togglePriority(props, val) {
+    campaignOutputStore.handleCampaignOutputPriority(props.row.tVideoId, val)
   }
 
   const visibileColumns = ['publicPrivate', 'campaignName', 'tiktok', 'postDate', 'account', 'hashtag', 'views', 'link', 'priority', 'url']
@@ -56,6 +60,7 @@
     { name: 'hashtag', label: 'Hashtag', field: 'hashtag', align: 'center', sortable: true },
     { name: 'views', label: 'View', field: 'views', align: 'center', sortable: true },
     { name: 'link', label: 'Link', field: 'link', align: 'center', sortable: true },
+    { name: 'showText', label: 'Show Text', field: 'showText', align: 'center', sortable: true },
     { name: 'priority', label: 'Priority', field: 'priority', align: 'center', sortable: true },
     { name: 'url', label: '', field: 'url', align: 'center', sortable: true },
   ]
@@ -103,6 +108,91 @@
     }
 
   }, [campaignOutputStore._loading])
+
+  watchEffect( () => {
+    
+    if(campaignOutputStore._updatedVisibility) {
+      $q.notify({
+        caption: 'The video is successful updated Public Private',
+        message: 'SUCCESS',
+        type: 'positive',
+        timeout: 1000
+      })
+    }
+
+  }, [campaignOutputStore._updatedVisibility])
+
+  const editCell = (e, row) => {
+    if(row.showText) {
+      row.showText = false
+    }
+  }
+
+  const updateLink  = async (e, row) => {
+    const val = e.target.value
+    if(val.replace(/\s/g, '') != '' && val != row.link) {
+      try {
+        const linkObj = new URL(val)
+        const resposne = await campaignOutputStore.handleCampaignOutputLinkUpdate( row.tVideoId, linkObj.href)
+        if(resposne) {
+          let tags = ''
+          const hashtags = str.match(/#[\p{L}0-9_]+/ug)
+          if(hashtags.length > 0) {
+            tags = hashtags.join(',')
+          }
+          row.tiktok = resposne.secVideoURL
+          row.postDate = resposne.createTime
+          row.account = '@'+resposne.authorUniqueId
+          if(tags != '') {
+            row.hashtag = tags
+          }
+          row.views = resposne.playCount
+          row.url = resposne.webVideoURL
+          row.link = e.target.value
+          row.showText = true
+
+        } else {
+          return 'Got error!'
+        }
+
+      } catch (error) {
+        return 'Invalid URL'
+      }
+
+    } else {
+      row.showText = true
+    }
+    
+  }
+
+  const validateURL = (val) => {
+    try {
+      new URL(val)
+      return true
+    } catch (error) {
+      return 'Invalid URL'
+    }
+  }
+
+  watchEffect( () => {
+    
+    if(campaignOutputStore._updatedLink.error && !campaignOutputStore._updatedLink.success) {
+      $q.notify({
+        caption: 'Please check, the video URL is worng or something.',
+        message: 'INVALID',
+        type: 'negative',
+        timeout: 1000
+      })
+    } else if(campaignOutputStore._updatedLink.success && !campaignOutputStore._updatedLink.error) {
+      $q.notify({
+        caption: 'The video is successful updated URL.',
+        message: 'SUCCESS',
+        type: 'positive',
+        timeout: 1000
+      })
+    } 
+
+  }, [campaignOutputStore._updatedLink])
 
 </script>
 
@@ -166,9 +256,38 @@
                 </template>
                 <template v-slot:body-cell-priority="props">
                   <q-td class="text-center">
-                    <q-checkbox v-model="props.row.priority" class="common-checkbox" />
+                    <q-checkbox
+                      indeterminate-icon="help"
+                      class="common-checkbox"
+                      checked-icon="star"
+                      unchecked-icon="star_border"
+                      v-model="props.row.priority"
+                      @update:model-value="val => togglePriority(props, val)"
+                    />
                   </q-td>
                 </template>
+                <template v-slot:body-cell-link="props">
+                  <q-td @dblclick="$event => editCell($event, props.row)">
+                    <div v-if="props.row.showText" class="ellipsis" style="width: 170px;">{{ props.row.link }}</div>
+                    <div v-else class="input-wr">
+                      <q-input 
+                        type="url"
+                        outlined 
+                        autofocus
+                        class="input-sm"
+                        v-model="props.row.link" 
+                        @keyup.enter="$event =>updateLink($event , props.row)"
+                        @blur="$event =>updateLink($event , props.row)"
+                        lazy-rules
+                        :rules="[
+                          val => !!val.replace(/\s/g, '') || 'Field is required', 
+                          (val, rules) => validateURL(val),
+                        ]"
+                       />
+                    </div>
+                  </q-td>
+                </template>
+                    
                 <template v-slot:body-cell-url="props">
                   <q-td>
                     <a :href="props.row.url" target="_blank" rel="noopener noreferrer">

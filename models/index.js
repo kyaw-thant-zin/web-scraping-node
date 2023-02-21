@@ -50,7 +50,6 @@ db.collectionTypes = require('./collectionType.model')(sequelize, DataTypes)
 db.linkTypes = require('./linkType.model')(sequelize, DataTypes)
 
 db.campaigns = require('./campaign.model')(sequelize, DataTypes)
-db.campaignOutputs = require('./campaignOutput.model')(sequelize, DataTypes)
 db.tUsers = require('./tUser.model')(sequelize, DataTypes)
 db.tHashtags = require('./tHashtag.model')(sequelize, DataTypes)
 db.tVideos = require('./tVideo.model')(sequelize, DataTypes)
@@ -88,32 +87,23 @@ db.linkTypes.hasOne(db.campaigns, {
 }) // linkType => campaign
 db.campaigns.belongsTo(db.linkTypes) // campaign => linkType
 
-db.campaigns.hasOne(db.campaignOutputs, {
+db.campaigns.hasOne(db.tUsers, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
-}) // campaigns => campaignOutputs
-db.campaignOutputs.belongsTo(db.campaigns, {
+}) // campaigns => tUsers
+db.tUsers.belongsTo(db.campaigns, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
-}) // campaignOutputs => campaigns
+}) // tUsers => campaigns
 
-db.campaignOutputs.hasOne(db.tUsers, {
+db.campaigns.hasOne(db.tHashtags, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
-}) // campaignOutputs => tUsers
-db.tUsers.belongsTo(db.campaignOutputs, {
+}) // campaigns => tHashtags
+db.tHashtags.belongsTo(db.campaigns, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
-}) // tUsers => campaignOutputs
-
-db.campaignOutputs.hasOne(db.tHashtags, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // campaignOutputs => tHashtags
-db.tHashtags.belongsTo(db.campaignOutputs, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // tHashtags => campaignOutputs
+}) // tHashtags => campaigns
 
 db.tUsers.hasOne(db.tVideos, {
     onDelete: 'CASCADE',

@@ -17,6 +17,19 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
+        secVideoId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: null
+        },
+        priority: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        },
+        visibility: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        },
         desc: {
             type: DataTypes.TEXT,
             allowNull: false
@@ -45,6 +58,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: false
         },
+        secVideoURL: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
         webVideoURL: {
             type: DataTypes.TEXT,
             allowNull: false
@@ -56,6 +73,22 @@ module.exports = (sequelize, DataTypes) => {
         createTime: {
             type: DataTypes.DATE,
             allowNull: false
+        },
+        authorUniqueId: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        authorNickName: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        authorSignature: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
+        authorAvatarLarger: {
+            type: DataTypes.TEXT,
+            allowNull: true
         },
         tUserId: {
             type: DataTypes.INTEGER,

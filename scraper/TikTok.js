@@ -2,6 +2,7 @@ const url = require("url")
 const path = require("path")
 const util = require('util')
 const fs = require('fs-extra')
+const moment = require('moment-timezone')
 
 const needle = require('needle')
 const { load } = require('cheerio')
@@ -70,9 +71,9 @@ const browserLaunch = async () => {
     return new Promise(async (resovle, reject) => {
         try {
             console.log('open browser.......')
-            browser.chromium = await puppeteer.launch( browserSetting )
+            const browserNew = await puppeteer.launch( browserSetting )
             if(chromeTmpDataDir === null) {
-                let chromeSpawnArgs = browser.chromium.process().spawnargs;
+                let chromeSpawnArgs = browserNew.process().spawnargs;
                 for (let i = 0; i < chromeSpawnArgs.length; i++) {
                     if (chromeSpawnArgs[i].indexOf("--user-data-dir=") === 0) {
                         chromeTmpDataDir = chromeSpawnArgs[i].replace("--user-data-dir=", "");
@@ -80,7 +81,8 @@ const browserLaunch = async () => {
                 }
             }
 
-            resovle(browser.chromium)
+            browser.chromium = browserNew
+            resovle(browserNew)
 
         } catch (error) {
             resovle(error)
@@ -93,8 +95,14 @@ const openNewPage = async (localBrowser, scrapingMethod) => {
 
     return new Promise(async (resovle, reject) => {
         console.log('create a new page.....')
+        let page
         // Create a new page
-        const page = await localBrowser.newPage()
+        if(localBrowser != null) {
+            page = await localBrowser.newPage()
+        } else {
+            const browser = browserLaunch()
+            page = await browser.newPage()
+        }
 
         // Disable Cache
         await page.setCacheEnabled(chromiumPage.setCacheEnabled)
@@ -212,6 +220,7 @@ const beautify = async (videoList) => {
                                     if(videoKey.includes(childKey)) {
                                         if(childKey == 'playAddr') {
                                             const playAddr = await getVideoPlayAbleURL(video.id, video.author.uniqueId)
+                                            dumpVideoChild['originalPlayAddr'] = videoObj[childKey]
                                             if(playAddr) {
                                                 dumpVideoChild[childKey] = playAddr.url.wm
                                             } else {
@@ -450,9 +459,69 @@ const getVideosByHashtag = async (hashtag) => {
 }
 // ------------------------- ***** hashtag ***** ----------------------------//
 
+// ------------------------- ***** URL ***** ----------------------------//
+const getVideoByURL = async (urlObj) => {
+    return new Promise(async (resovle, reject) => {
+
+        // const api = 'https://api.ssstiktok.ws/api?url='+url
+        const webVideoURL = urlObj.href
+        const pathArray = urlObj.pathname.split('/')
+        const uniqueId = pathArray[1]
+        const videoId = pathArray[3]
+        const api = 'https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/feed/?aweme_id='+videoId
+
+        try {
+            const res  = await needle("get", api, {json: true})
+            if(res.body?.aweme_list) {
+                const aweme = res.body.aweme_list[0]
+                if(aweme) {
+                    const desc = aweme.desc
+                    const videoObj = aweme.video
+
+                    const next4Hours = moment().add(4, 'hours').add(50, 'minutes')
+                    const expiresIn  = next4Hours.format('YYYY/MM/DD HH:mm:ss')
+                    const createTime = moment.unix(aweme.create_time).format("YYYY/MM/DD")
+                    const tVideoRow = {
+                        secVideoId: videoId,
+                        desc: desc,
+                        playCount: aweme.statistics.play_count,
+                        diggCount: aweme.statistics.digg_count,
+                        commentCount: aweme.statistics.comment_count,
+                        shareCount: aweme.statistics.share_count,
+                        originCoverURL: videoObj.origin_cover.url_list[0],
+                        secVideoURL: videoObj.download_addr.url_list[1],
+                        webVideoURL: webVideoURL,
+                        expiresIn: expiresIn,
+                        createTime: createTime,
+                        authorUniqueId: uniqueId.replace('@', ''),
+                        authorNickName: aweme.author.nickname,
+                        authorSignature: aweme.author.signature,
+                        authorAvatarLarger: aweme.author.avatar_larger.url_list[1]
+                    }
+
+                    resovle({
+                        data: tVideoRow
+                    })
+
+                } else {
+                    resovle(false)
+                }
+            } else {
+                resovle(false)
+            }
+
+        } catch (error) {
+            resovle(false)
+        }
+
+    })
+}
+// ------------------------- ***** URL ***** ----------------------------//
+
 module.exports = {
     browser,
     browserLaunch,
     getVideosByHashtag,
-    getVideosByAccount
+    getVideosByAccount,
+    getVideoByURL
 }

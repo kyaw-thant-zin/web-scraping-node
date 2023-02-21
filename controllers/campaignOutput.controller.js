@@ -1,5 +1,4 @@
 const fs = require('fs-extra')
-const moment = require('moment')
 const CryptoJS = require("crypto-js")
 const db = require('../models/index')
 const Scraper = require('../scraper/index')
@@ -10,7 +9,6 @@ const asyncHnadler = require('express-async-handler')
 // Create main Model
 const Campaign = db.campaigns
 const LinkType = db.linkTypes
-const CampaignOutput = db.campaignOutputs
 const TUser = db.tUsers
 const THAshtag = db.tHashtags
 const TVideo = db.tVideos
@@ -32,17 +30,14 @@ const index = asyncHnadler( async (req, res) => {
             userId: userId
         },
         include: [{
-            model: CampaignOutput,
+            model: TUser,
             include: [{
-                model: TUser,
-                include: [{
-                    model: TVideo
-                }]
-            }, {
-                model: THAshtag,
-                include: [{
-                    model: TVideo
-                }]
+                model: TVideo
+            }]
+        }, {
+            model: THAshtag,
+            include: [{
+                model: TVideo
             }]
         }, {
             model: LinkType
@@ -55,7 +50,118 @@ const index = asyncHnadler( async (req, res) => {
 
 })
 
+// @desc POST update-visibility
+// @route POST /api/v2/campaignOutput/visibility/update
+// @access Private
+const updateVisibility = asyncHnadler( async (req, res) => {
+
+    const { tVideoId, visibility } = req.body
+    const userId = 12
+
+    if(tVideoId === undefined || visibility === undefined) {
+        res.status(400).send({ error: { required: 'Please add all fields' } })
+        throw new Error('Please add all fields')
+    }
+    
+    try {
+        const tVideo = await await TVideo.update({ visibility: visibility }, {
+            where: {
+                id: tVideoId,
+            }
+        })
+
+        if(tVideo) {
+            res.json(true)
+        } else {
+            res.json(false)
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+
+    
+
+})
+
+// @desc POST update-priority
+// @route POST /api/v2/campaignOutput/priority/update
+// @access Private
+const updatePriority = asyncHnadler( async (req, res) => {
+
+    const { tVideoId, priority } = req.body
+    const userId = 12
+
+    if(tVideoId === undefined || priority === undefined) {
+        res.status(400).send({ error: { required: 'Please add all fields' } })
+        throw new Error('Please add all fields')
+    }
+    const tVideo = await await TVideo.update({ priority: priority }, {
+        where: {
+            id: tVideoId,
+        }
+    })
+
+    if(tVideo) {
+        res.json(true)
+    } else {
+        res.json(false)
+    }
+})
+
+
+// @desc POST update-link
+// @route POST /api/v2/campaignOutput/link/update
+// @access Private
+const updateLink = asyncHnadler( async (req, res) => {
+
+    const { tVideoId, link } = req.body
+    const userId = 12
+
+    if(tVideoId === undefined || link === undefined) {
+        res.status(400).send({ error: { required: 'Please add all fields' } })
+        throw new Error('Please add all fields')
+    }
+
+    const urlObj = new URL(link)
+    if(urlObj.host == 'www.tiktok.com' || urlObj.host == 'tiktok.com') {
+        const pathArray = urlObj.pathname.split('/')
+        if(pathArray[2] == 'video') {
+            const response = await Scraper.tiktok.getVideoByURL(urlObj)
+            if(response?.data) {
+                const tVideoRow = response.data
+                try {
+                    const tVideo =  await TVideo.update( tVideoRow, {
+                        where: {
+                            id: tVideoId,
+                        }
+                    })
+                    if(tVideo) {
+                        res.json(tVideoRow)
+                    } else {
+                        res.json(false)
+                    }
+                } catch (error) {
+                    console.log(error)
+                    res.json(false)   
+                }
+            }
+        }
+    }
+
+    
+
+    // if(tVideo) {
+    //     res.json(true)
+    // } else {
+    //     res.json(false)
+    // }
+})
+
 
 module.exports = {
     index,
+    updateLink,
+    updateVisibility,
+    updatePriority
 }

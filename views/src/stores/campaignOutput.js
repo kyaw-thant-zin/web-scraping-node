@@ -18,7 +18,13 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
     ])
     const _loading = ref(false)
     const _error = ref(false)
-    const _updatePriority = ref(false)
+    const _updatedPriority = ref(false)
+    const _updatedVisibility = ref(false)
+    const _updatedLink = ref({
+        error: false,
+        success: false,
+        message: ''
+    })
     const _campaignOutputs = ref(null)
     const _campaignOutputTablePage = ref(useLocalStorage('_campaignOutputTablePage', 1))
 
@@ -49,8 +55,16 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         _campaigns.value = filteredCampaign
     }
 
+    const storeUpdatedLink = (link) => {
+        _updatedLink.value = link
+    }
+
     const storeUpdatePriority = (priority) => {
-        _updatePriority.value = priority
+        _updatedPriority.value = priority
+    }
+
+    const storeUpdateVisibility = (visibility) => {
+        _updatedVisibility.value = visibility
     }
 
     const storeCamapignOutputs = (campaigns) => {
@@ -59,30 +73,54 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
             const dumpCo = {}
             let account = '-'
             let hashtag = '-'
+            let visibility = false
+            let priority = false
             let video = {}
-            if(co.campaignOutput.tHashtag == null) {
-                video = co.campaignOutput.tUser.tVideo
+            if(co.tHashtag == null) {
+                video = co.tUser.tVideo
                 account = co.account
+                const desc = co.tUser.tVideo.desc
+                const hashtagPattern = /#[\p{L}0-9_]+/ug
+                const tags = desc.match(hashtagPattern).toString()
+                hashtag = tags
+                visibility = co.tUser.tVideo.visibility
+                priority = co.tUser.tVideo.priority
             } else {
-                video = co.campaignOutput.tHashtag.tVideo
+                video = co.tHashtag.tVideo
                 hashtag = co.hashtag
+                account = '@'+co.tHashtag.tVideo.authorUniqueId
+                visibility = co.tHashtag.tVideo.visibility
+                priority = co.tHashtag.tVideo.priority
             }
+
+
+            let secTags = ''
+            if(video.secVideoURL != '') {
+                const hashtags = video.desc.match(/#[\p{L}0-9_]+/ug)
+                if(hashtags.length > 0) {
+                    secTags = hashtags.join(',')
+                } 
+            } else {
+                secTags = hashtag
+            }
+
 
             const date = dayjs(video.createTime)
             const formattedDate = date.format('DD/MM/YYYY')
 
             dumpCo.id = co.id
             dumpCo.tVideoId = video.id
-            dumpCo.publicPrivate = co.campaignOutput.visibility
+            dumpCo.publicPrivate = visibility
             dumpCo.campaignName = co.campaignName
-            dumpCo.tiktok = video.videoURL
+            dumpCo.tiktok = video.secVideoURL != '' ? video.secVideoURL : video.videoURL
             dumpCo.postDate = formattedDate
             dumpCo.account = account
-            dumpCo.hashtag = hashtag
+            dumpCo.hashtag = secTags
             dumpCo.views = video.playCount
-            dumpCo.link = co.linkType.type
-            dumpCo.priority = co.campaignOutput.priority
+            dumpCo.link = video.webVideoURL
+            dumpCo.priority = priority
             dumpCo.url = video.webVideoURL
+            dumpCo.showText = true
             filteredCampaignOutputs.push(dumpCo)
         })
         _campaignOutputs.value = filteredCampaignOutputs
@@ -108,13 +146,52 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         storeCamapignOutputs(campaigns)
     }
 
-    const handleCampaignOutputPriority = () => {
-
+    const handleCampaignOutputPriority = async (id, priority) => {
+        storeLoading(true)
+        const response = await API.campaignOutput.updatePriority(id, priority)
+        storeUpdatePriority(response)
+        storeLoading(false)
+        setTimeout(() => {
+            storeUpdatePriority(false)
+        }, 500)
     }
 
-    const handleCampaignOutputVisibilityUpdate = (id, visibility) => {
+    const handleCampaignOutputVisibilityUpdate = async (id, visibility) => {
         storeLoading(true)
+        const response = await API.campaignOutput.updateVisibility(id, visibility)
+        storeUpdateVisibility(response)
+        storeLoading(false)
+        setTimeout(() => {
+            storeUpdateVisibility(false)
+        }, 500)
+        
+    }
 
+    const handleCampaignOutputLinkUpdate = async (id, link) => {
+        storeLoading(true)
+        const response = await API.campaignOutput.updateLink(id, link)
+        if(response) {
+            storeUpdatedLink({
+                error: false,
+                success: true,
+                message: 'Successfully updated link!'
+            })
+            setTimeout(() => {
+                storeUpdatedLink({
+                    error: false,
+                    success: false,
+                    message: ''
+                })
+            }, 500)
+        } else {
+            storeUpdatedLink({
+                error: true,
+                success: false,
+                message: 'Please check entered URL.'
+            })
+        }
+        storeLoading(false)
+        return response
     }
 
     return {
@@ -123,7 +200,9 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         _campaign,
         _campaigns,
         _campaignOutputs,
-        _updatePriority,
+        _updatedLink,
+        _updatedPriority,
+        _updatedVisibility,
         _campaignOutputTablePage,
         storeCampaign,
         handleCampaign,
@@ -131,7 +210,8 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
         handleCampaignOutputs,
         handleCampaignOutputPriority,
         storeCampaignOutputTablePage,
-        handleCampaignOutputVisibilityUpdate
+        handleCampaignOutputVisibilityUpdate,
+        handleCampaignOutputLinkUpdate
     }
 
 })
