@@ -170,28 +170,29 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
     const handleCampaignOutputLinkUpdate = async (id, link) => {
         storeLoading(true)
         const response = await API.campaignOutput.updateLink(id, link)
-        if(response) {
-            storeUpdatedLink({
-                error: false,
-                success: true,
-                message: 'Successfully updated link!'
-            })
-            setTimeout(() => {
+            if(response) {
                 storeUpdatedLink({
                     error: false,
-                    success: false,
-                    message: ''
+                    success: true,
+                    message: 'Successfully updated link!'
                 })
-            }, 500)
-        } else {
-            storeUpdatedLink({
-                error: true,
-                success: false,
-                message: 'Please check entered URL.'
-            })
-        }
-        storeLoading(false)
-        return response
+                setTimeout(() => {
+                    storeUpdatedLink({
+                        error: false,
+                        success: false,
+                        message: ''
+                    })
+                }, 500)
+            } else {
+                storeUpdatedLink({
+                    error: true,
+                    success: false,
+                    message: 'Please check entered URL.'
+                })
+            }
+
+            storeLoading(false)
+            return response
     }
 
     return {

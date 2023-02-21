@@ -133,7 +133,7 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                         originCoverURL: item.video.originCover,
                         videoURL: item.video.playAddr,
                         secVideoURL: '',
-                        webVideoURL: `https:www.tiktok.com/@${t.uniqueId}/video/${item.video.id}`,
+                        webVideoURL: `https://www.tiktok.com/@${t.uniqueId}/video/${item.video.id}`,
                         expiresIn: getExpiresDate(item.video.originalPlayAddr),
                         createTime: getCreateDate(item.createTime),
                         authorUniqueId: item.author.uniqueId,

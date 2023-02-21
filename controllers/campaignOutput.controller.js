@@ -123,33 +123,43 @@ const updateLink = asyncHnadler( async (req, res) => {
         throw new Error('Please add all fields')
     }
 
-    const urlObj = new URL(link)
-    if(urlObj.host == 'www.tiktok.com' || urlObj.host == 'tiktok.com') {
-        const pathArray = urlObj.pathname.split('/')
-        if(pathArray[2] == 'video') {
-            const response = await Scraper.tiktok.getVideoByURL(urlObj)
-            if(response?.data) {
-                const tVideoRow = response.data
-                try {
-                    const tVideo =  await TVideo.update( tVideoRow, {
-                        where: {
-                            id: tVideoId,
+    const tV  = await TVideo.findOne({
+        where: {
+            id: tVideoId
+        }
+    })
+    const tvideo = tV.get({ plain: true })
+
+    if(tV && tvideo.webVideoURL != link) {
+        const urlObj = new URL(link)
+        if(urlObj.host == 'www.tiktok.com' || urlObj.host == 'tiktok.com') {
+            const pathArray = urlObj.pathname.split('/')
+            if(pathArray[2] == 'video') {
+                const response = await Scraper.tiktok.getVideoByURL(urlObj)
+                if(response?.data) {
+                    const tVideoRow = response.data
+                    try {
+                        const tVideo =  await TVideo.update( tVideoRow, {
+                            where: {
+                                id: tVideoId,
+                            }
+                        })
+                        if(tVideo) {
+                            res.json(tVideoRow)
+                        } else {
+                            res.json(false)
                         }
-                    })
-                    if(tVideo) {
-                        res.json(tVideoRow)
-                    } else {
-                        res.json(false)
+                    } catch (error) {
+                        console.log(error)
+                        res.json(false)   
                     }
-                } catch (error) {
-                    console.log(error)
-                    res.json(false)   
                 }
             }
         }
+    } else {
+        res.json(true)
     }
 
-    
 
     // if(tVideo) {
     //     res.json(true)

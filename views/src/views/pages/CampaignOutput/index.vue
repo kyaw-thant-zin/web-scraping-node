@@ -122,6 +122,19 @@
 
   }, [campaignOutputStore._updatedVisibility])
 
+  watchEffect( () => {
+    
+    if(campaignOutputStore._updatedPriority) {
+      $q.notify({
+        caption: 'The video is successful updated priority',
+        message: 'SUCCESS',
+        type: 'positive',
+        timeout: 1000
+      })
+    }
+
+  }, [campaignOutputStore._updatedPriority])
+
   const editCell = (e, row) => {
     if(row.showText) {
       row.showText = false
@@ -130,13 +143,19 @@
 
   const updateLink  = async (e, row) => {
     const val = e.target.value
-    if(val.replace(/\s/g, '') != '' && val != row.link) {
+    if(val.replace(/\s/g, '')) {
+      let resposne = {}
       try {
         const linkObj = new URL(val)
-        const resposne = await campaignOutputStore.handleCampaignOutputLinkUpdate( row.tVideoId, linkObj.href)
-        if(resposne) {
+        resposne = await campaignOutputStore.handleCampaignOutputLinkUpdate( row.tVideoId, linkObj.href)
+      } catch (error) {
+        row.showText = true
+        return 'Invalid URL'
+      }
+
+      if(resposne?.secVideoURL) {
           let tags = ''
-          const hashtags = str.match(/#[\p{L}0-9_]+/ug)
+          const hashtags = resposne.desc.match(/#[\p{L}0-9_]+/ug)
           if(hashtags.length > 0) {
             tags = hashtags.join(',')
           }
@@ -148,28 +167,25 @@
           }
           row.views = resposne.playCount
           row.url = resposne.webVideoURL
-          row.link = e.target.value
           row.showText = true
 
         } else {
+          row.showText = true
           return 'Got error!'
         }
 
-      } catch (error) {
-        return 'Invalid URL'
-      }
-
-    } else {
-      row.showText = true
     }
+
     
   }
 
   const validateURL = (val) => {
+    console.log(val)
     try {
       new URL(val)
       return true
     } catch (error) {
+      console.log(error)
       return 'Invalid URL'
     }
   }
@@ -264,6 +280,11 @@
                       v-model="props.row.priority"
                       @update:model-value="val => togglePriority(props, val)"
                     />
+                  </q-td>
+                </template>
+                <template v-slot:body-cell-hashtag="props">
+                  <q-td class="text-center">
+                    <div style="width: 170px;" class="ellipsis">{{ props.row.hashtag }}</div>
                   </q-td>
                 </template>
                 <template v-slot:body-cell-link="props">
