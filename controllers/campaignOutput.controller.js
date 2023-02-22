@@ -110,6 +110,51 @@ const updatePriority = asyncHnadler( async (req, res) => {
 })
 
 
+const getNewVideoAndUpdate = async (tVideoId, link) => {
+
+    return new Promise(async (resovle, reject) => {
+        const tV  = await TVideo.findOne({
+            where: {
+                id: tVideoId
+            }
+        })
+        const tvideo = tV.get({ plain: true })
+    
+        if(tV && tvideo.webVideoURL != link) {
+            const urlObj = new URL(link)
+            if(urlObj.host == 'www.tiktok.com' || urlObj.host == 'tiktok.com') {
+                const pathArray = urlObj.pathname.split('/')
+                if(pathArray[2] == 'video') {
+                    const response = await Scraper.tiktok.getVideoByURL(urlObj)
+                    if(response?.data) {
+                        const tVideoRow = response.data
+                        try {
+                            const tVideo =  await TVideo.update( tVideoRow, {
+                                where: {
+                                    id: tVideoId,
+                                }
+                            })
+                            if(tVideo) {
+                                resovle(tVideoRow)
+                            } else {
+                                resovle(false)
+                            }
+                        } catch (error) {
+                            console.log(error)
+                            resovle(false)   
+                        }
+                    } else {
+                        
+                    }
+                }
+            }
+        } else {
+            resovle(true)
+        }
+    })
+}
+
+
 // @desc POST update-link
 // @route POST /api/v2/campaignOutput/link/update
 // @access Private
@@ -123,49 +168,13 @@ const updateLink = asyncHnadler( async (req, res) => {
         throw new Error('Please add all fields')
     }
 
-    const tV  = await TVideo.findOne({
-        where: {
-            id: tVideoId
-        }
-    })
-    const tvideo = tV.get({ plain: true })
-
-    if(tV && tvideo.webVideoURL != link) {
-        const urlObj = new URL(link)
-        if(urlObj.host == 'www.tiktok.com' || urlObj.host == 'tiktok.com') {
-            const pathArray = urlObj.pathname.split('/')
-            if(pathArray[2] == 'video') {
-                const response = await Scraper.tiktok.getVideoByURL(urlObj)
-                if(response?.data) {
-                    const tVideoRow = response.data
-                    try {
-                        const tVideo =  await TVideo.update( tVideoRow, {
-                            where: {
-                                id: tVideoId,
-                            }
-                        })
-                        if(tVideo) {
-                            res.json(tVideoRow)
-                        } else {
-                            res.json(false)
-                        }
-                    } catch (error) {
-                        console.log(error)
-                        res.json(false)   
-                    }
-                }
-            }
-        }
+    const response = await getNewVideoAndUpdate(tVideoId, link)
+    if(response) {
+        res.json(response)
     } else {
-        res.json(true)
+        res.json(false)
     }
-
-
-    // if(tVideo) {
-    //     res.json(true)
-    // } else {
-    //     res.json(false)
-    // }
+    
 })
 
 
@@ -173,5 +182,6 @@ module.exports = {
     index,
     updateLink,
     updateVisibility,
-    updatePriority
+    updatePriority,
+    getNewVideoAndUpdate
 }

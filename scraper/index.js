@@ -20,9 +20,9 @@ const Scraper = {
                 return false
             }
         },
-        'getVideoByURL': async (url) => {
+        'getVideoByURL': async (urlObj) => {
             console.log('url scraping......')
-            const response = await TikTok.getVideoByURL(url)
+            const response = await TikTok.getVideoByURL(urlObj)
             if(response) {
                 return response
             } else {

@@ -66,7 +66,7 @@
       icon: 'mdi-file-document-outline',
       label: 'report',
       styleColor: '#FB6340',
-      path: '/'
+      path: '/report'
     },
     {
       icon: 'mdi-message-outline',

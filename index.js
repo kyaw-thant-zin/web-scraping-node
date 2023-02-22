@@ -8,6 +8,7 @@ const session = require("express-session")
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const { passportConfig } = require("./config/passportConfig")
+const Schedule = require("./event/index")
 
 
 /**
@@ -77,4 +78,8 @@ app.get('*', (req, res) => {
 app.listen(port, async () => {
 
     console.log(`Listening to requests on http://localhost:${port}`)
+
+    // check and update video URL
+    Schedule.updateTVideoURL()
+
 })

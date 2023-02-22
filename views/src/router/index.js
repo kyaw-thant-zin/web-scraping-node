@@ -19,6 +19,9 @@ import CampaignEdit from '@/views/pages/Campaign/edit.vue'
 // CAMPAIGN OUTPUT
 import CampaignOutputIndex from '@/views/pages/CampaignOutput/index.vue'
 
+// REPORT
+import Report from '@/views/pages/Report/index.vue'
+
 // USER
 import UserIndex from '@/views/pages/User/index.vue'
 
@@ -107,6 +110,11 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
       ]
+    },
+    {
+      path: '/report',
+      name: 'report',
+      component: Report,
     },
     {
       path: '/user',
