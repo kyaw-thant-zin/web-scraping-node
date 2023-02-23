@@ -143,7 +143,7 @@
 
   const updateLink  = async (e, row) => {
     const val = e.target.value
-    if(val.replace(/\s/g, '')) {
+    if(val && val.replace(/\s/g, '')) {
       let resposne = {}
       try {
         const linkObj = new URL(val)
@@ -237,7 +237,7 @@
         <div class="col-12">
           <q-card class="common-card">
             <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
-              <div class="common-card-ttl">Campaign Output</div>
+              <div class="common-card-ttl">{{ $t('table.title.campaignOutput') }}</div>
               <div class="col-4">
                 <q-select @update:model-value="val => filterByCampaign(val)"  name="campaign" borderless v-model="campaignOutputStore._campaign" :options="campaigns" class="common-select p-sm" />
               </div>

@@ -146,7 +146,7 @@
         <div class="col-12">
           <q-card class="common-card">
             <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
-              <div class="common-card-ttl">Campaign List</div>
+              <div class="common-card-ttl">{{ $t('table.title.campaign') }}</div>
               <q-btn class="btn-common shadow-3" outline :label="$t('table.btn.createNew')" to="/campaigns/create" no-caps />
             </q-card-section>
             <q-card-section class="q-px-none">

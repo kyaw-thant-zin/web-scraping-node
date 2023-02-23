@@ -12,7 +12,10 @@
     },
     "table" : {
         "title" : {
-            "campaign": "Campaign List"
+            "campaign": "Campaign List",
+            "campaignOutput": "Campaign Output List",
+            "linkSetting": "Link Setting List",
+            "inputCode": "InputCode List"
         },
         "btn": {
             "createNew": "New Campaign"

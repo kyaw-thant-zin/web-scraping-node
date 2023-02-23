@@ -72,13 +72,13 @@
       icon: 'mdi-message-outline',
       label: 'linkSetting',
       styleColor: '#FEB969',
-      path: '/'
+      path: '/link-setting'
     },
     {
       icon: 'mdi-cog-outline',
       label: 'inputCode',
       styleColor: '#FB6340',
-      path: '/'
+      path: '/input-code'
     },{
       icon: 'mdi-account-edit',
       label: 'user',

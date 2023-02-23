@@ -137,5 +137,34 @@ export const API = {
             const response = await instance.post(apiURL + '/campaignOutput/link/update/', formData, { headers: headers })
             return response.data
         },
+    },
+    'inputCode': {
+        'index': async () => {
+            const response = await instance.get(apiURL+ '/inputCode', {
+                headers: headers
+            })
+            return response.data
+        },
+        'updateLayoutType': async (id, val) => {
+            const formData = {
+                id: id,
+                layoutType: val
+            }
+            const response = await instance.post(apiURL+'/inputCode/layoutType/update', formData, {
+                headers: headers
+            })
+            return response.data
+        },
+        'updateLayoutContent': async (id, val, type) => {
+            const formData = {
+                id: id,
+                val: val,
+                type: type
+            }
+            const response = await instance.post(apiURL+'/inputCode/layoutContent/update', formData, {
+                headers: headers
+            })
+            return response.data
+        }
     }
 }

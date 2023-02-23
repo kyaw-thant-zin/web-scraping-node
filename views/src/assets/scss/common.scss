@@ -424,3 +424,43 @@ body {
       padding: 10px 10px 40px 10px;
     }
   }
+
+  .input-wr {
+    &.ic-input {
+      .q-field {
+        margin: auto;
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        -ms-border-radius: 5px;
+        -o-border-radius: 5px;
+      }
+      .q-field__control {
+        height: auto;
+      }
+    }
+  }
+
+  .text-outlined {
+    display: inline-block;
+    width: 50px;
+    border: 1px solid #172B4D;
+    padding: 5px 10px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+
+.ic-checkbox {
+  .q-icon {
+    color: #7764E4;
+  }
+}
+
+.ic-copy-btn {
+  .q-icon, .q-btn__content {
+    color: #7764E4;
+  }
+}

@@ -22,6 +22,12 @@ import CampaignOutputIndex from '@/views/pages/CampaignOutput/index.vue'
 // REPORT
 import Report from '@/views/pages/Report/index.vue'
 
+// LINK SETTING
+import LinkSetting from '@/views/pages/LinkSetting/index.vue'
+
+// INPUT CODE
+import InputCode from '@/views/pages/InputCode/index.vue'
+
 // USER
 import UserIndex from '@/views/pages/User/index.vue'
 
@@ -115,6 +121,16 @@ const router = createRouter({
       path: '/report',
       name: 'report',
       component: Report,
+    },
+    {
+      path: '/link-setting',
+      name: 'linkSetting',
+      component: LinkSetting,
+    },
+    {
+      path: '/input-code',
+      name: 'inputCode',
+      component: InputCode,
     },
     {
       path: '/user',

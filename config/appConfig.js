@@ -1,7 +1,7 @@
 
 const appConfig = {
     "port": process.env.PORT || "8000",
-    "screctKey": 'webapp0.2',
+    "secretKey": 'webapp0.2',
     "key": {
         "visibility": false,
         "priority": false,

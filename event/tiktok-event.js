@@ -18,13 +18,13 @@ const TikTokEvent = {
             where: sequelize.where(sequelize.fn('date', sequelize.col('expiresIn')), '<', current),
             raw: true,
         })
+
         if(tVideos) {
+            console.log('---------------------LoopVideos-------------------')
             for(const tvideo of tVideos) {
-                let videURL = tvideo.webVideoURL
-                if(tvideo.secVideoURL != '') {
-                    videURL = tvideo.secVideoURL
-                }
-                const response = await getNewVideoAndUpdate(tvideo.id, videURL)
+                console.log(`---------------------GettingAndSaving - ${tvideo.id}-------------------`)
+                const response = await getNewVideoAndUpdate(tvideo.id, tvideo.webVideoURL)
+                console.log(`---------------------GettingAndSaving - ${tvideo.id} done!-------------------`)
                 if(response) {
                     console.log(response)
                 }

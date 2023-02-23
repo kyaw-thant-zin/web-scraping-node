@@ -48,6 +48,7 @@
     "puppeteer-extra-plugin-stealth": "^2.11.1",
     "puppeteer-har": "^1.1.2",
     "sequelize": "^6.28.0",
-    "user-agents": "^1.0.1288"
+    "user-agents": "^1.0.1288",
+    "uuid": "^9.0.0"
   }
 }

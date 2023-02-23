@@ -12,7 +12,10 @@
     },
     "table" : {
         "title" : {
-            "campaign": "キャンペーン一覧"
+            "campaign": "キャンペーン一覧",
+            "campaignOutput": "表示設定一覧",
+            "linkSetting": "リンク設定一覧",
+            "inputCode": "埋め込みコード一覧"
         },
         "btn": {
             "createNew": "新規作成"

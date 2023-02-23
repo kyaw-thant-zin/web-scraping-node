@@ -2,6 +2,7 @@ const fs = require('fs-extra')
 const moment = require('moment')
 const CryptoJS = require("crypto-js")
 const db = require('../models/index')
+const uuid = require('uuid')
 const Scraper = require('../scraper/index')
 const { appConfig } = require('../config/appConfig')
 const { tConfig } = require('../config/tiktokConfig')
@@ -90,7 +91,7 @@ const bulkCreateTUser = (userInfo, campaignId, state) => {
     let row = {}
 
     if(state === tConfig.key.create) {
-
+        row.uuid = uuid.v4()
         row.accountId = userInfo.user.id
         row.uniqueId = userInfo.user.uniqueId
         row.nickname = userInfo.user.nickname
@@ -120,8 +121,10 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
 
             if(state === tConfig.key.create) {
     
+                const tVideoUUID = uuid.v4()
                 if(scrapingMethod === 'account') {
                     const row = {
+                        uuid: tVideoUUID,
                         videoId: item.video.id,
                         visibility: 0,
                         priority: 0,
@@ -145,8 +148,8 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                     
                     return row
                 } else if(scrapingMethod === 'hashtag') {
-                    console.log(item.author)
                     const row = {
+                        uuid: tVideoUUID,
                         videoId: item.video.id,
                         visibility: 0,
                         priority: 0,
@@ -204,7 +207,9 @@ const store = asyncHnadler( async (req, res) => {
         acc = '@'+acc
     }
 
+    const campaignUUID = uuid.v4()
     const campaignData = {
+        uuid: campaignUUID,
         campaignName: campaignName,
         account: acc,
         hashtag: tag,
@@ -228,7 +233,9 @@ const store = asyncHnadler( async (req, res) => {
                     console.log('----- got hashtag items ------')
                     console.log('tHashtag Creating.....')
                         // store in the tUser table
+                        const tHashtagUUID = uuid.v4()
                         const tHashtagRow = {
+                            uuid: tHashtagUUID,
                             hashtag: campaign.hashtag,
                             campaignId: campaign.id
                         }
@@ -253,12 +260,21 @@ const store = asyncHnadler( async (req, res) => {
                                         console.log('apiLayout Creating.....')
 
                                         // store in the apiLayout table
+                                        const secretKey = appConfig.secretKey
+                                        const cUUID = campaign.uuid
+                                        const apiToken = CryptoJS.AES.encrypt(cUUID, secretKey).toString(CryptoJS.enc.Utf8)
+                                        console.log('secretKey - '+secretKey)
+                                        console.log('cUUID - '+cUUID)
+                                        console.log('apiToken - '+apiToken)
+                                        const apiLayoutUUID = uuid.v4()
                                         const apiLayout = await ApiLayout.create({
+                                            uuid: apiLayoutUUID,
                                             layoutType: appConfig.key.layoutType,
                                             showAccount: appConfig.key.showAccount,
                                             showTitle: appConfig.key.showTitle,
                                             showHashtag: appConfig.key.showHashtag,
-                                            apiToken: CryptoJS.AES.decrypt(campaign.uuid, appConfig.screctKey).toString(CryptoJS.enc.Utf8),
+                                            apiToken: apiToken,
+                                            campaignId: campaign.id
                                         })
         
                                         if(apiLayout) {
@@ -321,12 +337,26 @@ const store = asyncHnadler( async (req, res) => {
                                         console.log('apiLayout Creating.....')
 
                                         // store in the apiLayout table
+                                        const secretKey = appConfig.secretKey
+                                        const cUUID = campaign.uuid
+                                        let apiToken = ''
+                                        try {
+                                            apiToken = CryptoJS.AES.encrypt(cUUID, secretKey).toString()
+                                        } catch (error) {
+                                            console.log(error)
+                                        }
+                                        console.log('secretKey - '+secretKey)
+                                        console.log('cUUID - '+cUUID)
+                                        console.log('apiToken - '+apiToken)
+                                        const apiLayoutUUID = uuid.v4()
                                         const apiLayout = await ApiLayout.create({
+                                            uuid: apiLayoutUUID,
                                             layoutType: appConfig.key.layoutType,
                                             showAccount: appConfig.key.showAccount,
                                             showTitle: appConfig.key.showTitle,
                                             showHashtag: appConfig.key.showHashtag,
-                                            apiToken: CryptoJS.AES.decrypt(campaign.uuid, appConfig.screctKey).toString(CryptoJS.enc.Utf8),
+                                            apiToken: apiToken,
+                                            campaignId: campaign.id
                                         })
         
                                         if(apiLayout) {

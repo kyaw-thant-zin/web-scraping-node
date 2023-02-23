@@ -105,6 +105,24 @@ db.tHashtags.belongsTo(db.campaigns, {
     onUpdate: 'CASCADE'
 }) // tHashtags => campaigns
 
+db.campaigns.hasOne(db.apiLayouts, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // campaigns => apiLayouts
+db.apiLayouts.belongsTo(db.campaigns, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // apiLayouts => campaigns
+
+db.campaigns.hasOne(db.linkSettings, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // campaigns => linkSettings
+db.linkSettings.belongsTo(db.campaigns, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // linkSettings => campaigns
+
 db.tUsers.hasOne(db.tVideos, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
@@ -132,13 +150,13 @@ db.linkSettings.belongsTo(db.tVideos, {
     onUpdate: 'CASCADE'
 }) // linkSettings => tVideos
 
-db.linkSettings.hasOne(db.apiLayouts, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // linkSettings => apiLayouts
-db.apiLayouts.belongsTo(db.linkSettings, {
+db.apiLayouts.hasOne(db.linkSettings, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 }) // apiLayouts => linkSettings
+db.linkSettings.belongsTo(db.apiLayouts, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+}) // linkSettings => apiLayouts
 
 module.exports = db

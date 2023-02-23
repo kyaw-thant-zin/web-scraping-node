@@ -35,9 +35,6 @@ const browserSetting = {
     executablePath: executablePath(),
 }
 
-const browser = {
-    'chromium': null
-}
 let mainBrowser = null
 let chromeTmpDataDir = null
 
@@ -71,53 +68,67 @@ const browserLaunch = async () => {
     return new Promise(async (resovle, reject) => {
         try {
             console.log('open browser.......')
-            const browserNew = await puppeteer.launch( browserSetting )
+            mainBrowser = await puppeteer.launch( browserSetting )
+            console.log('Browser opened.....')
             if(chromeTmpDataDir === null) {
-                let chromeSpawnArgs = browserNew.process().spawnargs;
+                let chromeSpawnArgs = mainBrowser.process().spawnargs;
                 for (let i = 0; i < chromeSpawnArgs.length; i++) {
                     if (chromeSpawnArgs[i].indexOf("--user-data-dir=") === 0) {
                         chromeTmpDataDir = chromeSpawnArgs[i].replace("--user-data-dir=", "");
                     }
                 }
             }
-
-            browser.chromium = browserNew
-            resovle(browserNew)
+            resovle(true)
 
         } catch (error) {
+            console.log(error)
             resovle(error)
         }
     })
 }
 
 // create a new tab 
-const openNewPage = async (localBrowser, scrapingMethod) => {
+const openNewPage = async (scrapingMethod) => {
 
     return new Promise(async (resovle, reject) => {
         console.log('create a new page.....')
         let page
         // Create a new page
-        if(localBrowser != null) {
-            page = await localBrowser.newPage()
-        } else {
-            const browser = browserLaunch()
-            page = await browser.newPage()
+        console.log(mainBrowser)
+        try {
+            if(mainBrowser != null) {
+                page = await mainBrowser.newPage()
+            } else {
+                console.log('---------- else -----------')
+                const browser = await browserLaunch()
+                console.log(mainBrowser)
+                if(mainBrowser) {
+                    console.log('Browser is running.....')
+                    page = await mainBrowser.newPage()
+                }
+            }
+        } catch (error) {
+            console.log(error)            
         }
 
-        // Disable Cache
-        await page.setCacheEnabled(chromiumPage.setCacheEnabled)
+        if(page) {
+            // Disable Cache
+            await page.setCacheEnabled(chromiumPage.setCacheEnabled)
 
-        // Set Browser Width and Height
-        // await page.setViewport(chromiumPage.setViewport)
+            // Set Browser Width and Height
+            // await page.setViewport(chromiumPage.setViewport)
 
-        // prevent timeout error
-        await page.setDefaultNavigationTimeout(chromiumPage.setDefaultNavigationTimeout)
+            // prevent timeout error
+            await page.setDefaultNavigationTimeout(chromiumPage.setDefaultNavigationTimeout)
 
-        await page.setRequestInterception(chromiumPage.setRequestInterception)
+            await page.setRequestInterception(chromiumPage.setRequestInterception)
 
-        // skip unnecessary network requests
-        const newPage = await skipUnnecessaryRequests( scrapingMethod, page)
-        resovle(newPage)
+            // skip unnecessary network requests
+            const newPage = await skipUnnecessaryRequests( scrapingMethod, page)
+            resovle(newPage)
+        } else {
+            resovle(false)
+        }
     })
 
 }
@@ -345,27 +356,25 @@ const getVideosByAccount = async (account) => {
             const user = {}
 
             if(account != '') {
-                let localBrowser = null
-                if(browser.chromium == null) {
-                    localBrowser = await browserLaunch()
-                } else {
-                    localBrowser = browser.chromium
-                }
-                const page = await openNewPage(localBrowser, 'account')
-                const t = await getAccountInfo(page, account)
-                if(t?.userInfo) {
-                    user.userInfo = t.userInfo
-                    const videoList = await getVideoList(page)
-                    if(videoList) {
-                        user.items = videoList
-                    } else {
-                        console.log("not getting video list")
-                    }
-                    resovle(user)
+                const page = await openNewPage('account')
+                if(page) {
+                    const t = await getAccountInfo(page, account)
+                    if(t?.userInfo) {
+                        user.userInfo = t.userInfo
+                        const videoList = await getVideoList(page)
+                        if(videoList) {
+                            user.items = videoList
+                        } else {
+                            console.log("not getting video list")
+                        }
+                        resovle(user)
 
+                    } else {
+                        console.log("not getting user info")
+                        resovle(false)
+                    }
                 } else {
-                    console.log("not getting user info")
-                    resovle(false)
+                    esovle(false)
                 }
                 
             }
@@ -436,20 +445,18 @@ const getVideosByHashtag = async (hashtag) => {
             if(hashtag != '') {
                 console.log('tiktok scraping by hashtag....')
                 const tag = hashtag.replace('#', '')
-                let localBrowser = null
-                if(browser.chromium == null) {
-                    localBrowser = await browserLaunch()
+                const page = await openNewPage('hashtag')
+                if(page) {
+                    const t = await getSearchResults(page, tag)
+                    if(t) {
+                        hashtagResults.items = t
+                    } else {
+                        console.log("not getting video list")
+                    }
+                    resovle(hashtagResults)
                 } else {
-                    localBrowser = browser.chromium
+                    resovle(false)
                 }
-                const page = await openNewPage(localBrowser, 'hashtag')
-                const t = await getSearchResults(page, tag)
-                if(t) {
-                    hashtagResults.items = t
-                } else {
-                    console.log("not getting video list")
-                }
-                resovle(hashtagResults)
             }
 
         } catch (error) {
@@ -519,7 +526,6 @@ const getVideoByURL = async (urlObj) => {
 // ------------------------- ***** URL ***** ----------------------------//
 
 module.exports = {
-    browser,
     browserLaunch,
     getVideosByHashtag,
     getVideosByAccount,

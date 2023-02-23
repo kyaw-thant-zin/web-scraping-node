@@ -7,12 +7,19 @@ const Schedule = {
         const textSched = later.parse.text(`${process.env.TIKTOK_VIDEO_URL_SCHEDULE_CRON}`)
         console.log('----Schedule----')
         const cron = later.setInterval(function () { 
-            try {
-                TikTokEvent.checkAndUpdateVideoURL()
-            } catch (error) {
-                console.log(error)
-            }
+            console.log('update......')
+            // try {
+            //     TikTokEvent.checkAndUpdateVideoURL()
+            // } catch (error) {
+            //     console.log(error)
+            // }
          }, textSched)
+
+        //  try {
+        //         TikTokEvent.checkAndUpdateVideoURL()
+        //     } catch (error) {
+        //         console.log(error)
+        //     }
     }
 }
 

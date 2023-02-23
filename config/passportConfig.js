@@ -8,7 +8,7 @@ const { appConfig } = require('./appConfig.js')
 
 // Create user Model
 const User = db.users
-const screctKey = appConfig.screctKey
+const secretKey = appConfig.secretKey
 
 module.exports.passportConfig = () => {
     passport.use(
@@ -34,7 +34,7 @@ module.exports.passportConfig = () => {
             for(const key in user.dataValues) {
                 if(key === 'uuid' || key === 'userName' || key === 'roleId' || key === 'firstName' || key === 'lastName' ) {
                     if(key === 'uuid') {
-                        filteredUser[key] = CryptoJS.AES.encrypt(user.dataValues[key], screctKey).toString()
+                        filteredUser[key] = CryptoJS.AES.encrypt(user.dataValues[key], secretKey).toString()
                     } else {
                         filteredUser[key] = user.dataValues[key]
                     }
@@ -51,7 +51,7 @@ module.exports.passportConfig = () => {
     })
   
     passport.deserializeUser(async (user, done) => {
-        const decryptedUUID = CryptoJS.AES.decrypt(user.uuid, screctKey).toString(CryptoJS.enc.Utf8)
+        const decryptedUUID = CryptoJS.AES.decrypt(user.uuid, secretKey).toString(CryptoJS.enc.Utf8)
         const users = await User.findOne({
             where: {
                 uuid: decryptedUUID
