@@ -59,7 +59,7 @@
   function showConfirmDialog(row) {
     $q.dialog({
       title: `Are you sure you want to delete <br>"${row.campaignName}"?`,
-      message: 'This campaign will be deleted immediately. You can\'t undo this action.',
+      message: 'This campaign will be deleted immediately and also Campaign Outputs, Link Settings and InputCode. You can\'t undo this action.',
       cancel: true,
       persistent: true,
       html: true,

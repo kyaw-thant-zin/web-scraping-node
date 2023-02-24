@@ -110,7 +110,7 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
 
             dumpCo.id = co.id
             dumpCo.tVideoId = video.id
-            dumpCo.publicPrivate = visibility
+            dumpCo.publicPrivate = !visibility
             dumpCo.campaignName = co.campaignName
             dumpCo.tiktok = video.secVideoURL != '' ? video.secVideoURL : video.videoURL
             dumpCo.postDate = formattedDate
@@ -158,7 +158,7 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
 
     const handleCampaignOutputVisibilityUpdate = async (id, visibility) => {
         storeLoading(true)
-        const response = await API.campaignOutput.updateVisibility(id, visibility)
+        const response = await API.campaignOutput.updateVisibility(id, !visibility)
         storeUpdateVisibility(response)
         storeLoading(false)
         setTimeout(() => {

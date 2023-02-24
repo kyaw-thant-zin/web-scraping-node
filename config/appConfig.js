@@ -3,7 +3,7 @@ const appConfig = {
     "port": process.env.PORT || "8000",
     "secretKey": 'webapp0.2',
     "key": {
-        "visibility": false,
+        "visibility": true,
         "priority": false,
         "layoutType": "12",
         "showAccount": true,

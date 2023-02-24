@@ -425,6 +425,16 @@ body {
     }
   }
 
+  .star-checkbox {
+    .q-icon.fa-solid {
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
+      -webkit-filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
+    }
+    .q-icon.fa-regular {
+      color: #7764e4;
+    }
+  }
+
   .input-wr {
     &.ic-input {
       .q-field {
@@ -463,4 +473,23 @@ body {
   .q-icon, .q-btn__content {
     color: #7764E4;
   }
+}
+
+.row-disabled.disabled {
+  opacity: 0.2 !important;
+}
+
+.import-csv-btn {
+  .hide-q-file {
+    position: absolute;
+    opacity: 0;
+  }
+}
+
+.ls-tb-img {
+  max-width: 100px;
+}
+
+.ls-img-anchor {
+  text-decoration: underline !important;
 }

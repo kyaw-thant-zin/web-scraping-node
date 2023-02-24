@@ -10,7 +10,7 @@ const asyncHnadler = require('express-async-handler')
 const Campaign = db.campaigns
 const LinkType = db.linkTypes
 const TUser = db.tUsers
-const THAshtag = db.tHashtags
+const THashtag = db.tHashtags
 const TVideo = db.tVideos
 
 // @desc GET campaignOutput
@@ -35,7 +35,7 @@ const index = asyncHnadler( async (req, res) => {
                 model: TVideo
             }]
         }, {
-            model: THAshtag,
+            model: THashtag,
             include: [{
                 model: TVideo
             }]

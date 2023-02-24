@@ -150,13 +150,5 @@ db.linkSettings.belongsTo(db.tVideos, {
     onUpdate: 'CASCADE'
 }) // linkSettings => tVideos
 
-db.apiLayouts.hasOne(db.linkSettings, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // apiLayouts => linkSettings
-db.linkSettings.belongsTo(db.apiLayouts, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // linkSettings => apiLayouts
 
 module.exports = db

@@ -3,11 +3,19 @@
   import { useQuasar } from 'quasar'
   import { ref, computed, watchEffect } from 'vue'
   import { WebsiteName } from '@/api/constants.js'
+  import { useLinkSettingStore } from '@/stores/linkSetting.js'
+  import { onBeforeRouteLeave } from 'vue-router'
 
   /* app config */
   useMeta({
     title: 'LINK SETTING',
   })
+
+  const $q = useQuasar()
+  const linkSettingStore = useLinkSettingStore()
+  linkSettingStore.handleLinkSettings()
+
+  const importCSV = ref(null)
 
   const visibileColumns = ['hashtag', 'imgURL', 'title', 'pageURL']
   const columns = [
@@ -21,10 +29,61 @@
   const pagination = ref({
     sortBy: 'desc',
     descending: false,
-    page: 2,
+    page: linkSettingStore._linkSettingTablePage,
     rowsPerPage: 12
   })
   const pagesNumber = computed(() => Math.ceil(rows.value.length / pagination.value.rowsPerPage))
+  function onChangePagination(page) {
+    linkSettingStore.storeLinkSettingTablePage(page)
+  }
+  onBeforeRouteLeave((to, from, next) => {
+    linkSettingStore.storeLinkSettingTablePage(1)
+    next()
+  })
+
+  const onChangeImportCSV = () => {
+    linkSettingStore.handleInportCSV(importCSV.value)
+  }
+
+  const csvExport = async (e) => {
+    await linkSettingStore.handleExportCSV(columns, rows.value)
+  }
+
+  const onRejected = (rejectedEntries) => {
+    $q.notify({
+      type: 'negative',
+      message: `File format did not support, Please select the CSV only!`
+    })
+  } 
+  watchEffect( () => {
+    
+    if(linkSettingStore._linkSettings != null) {
+      rows.value = linkSettingStore._linkSettings
+    } 
+
+  }, [linkSettingStore._linkSettings])
+
+  watchEffect( () => {
+    
+    if(linkSettingStore._loading) {
+        $q.loading.show()
+    } else {
+        $q.loading.hide()
+    }
+
+  }, [linkSettingStore._loading])
+
+  watchEffect( () => {
+    if(linkSettingStore._importedCSV) {
+      $q.notify({
+        caption: 'CSV data successfully imported!',
+        message: 'SUCCESS',
+        type: 'positive',
+        timeout: 1000
+      })
+    } 
+
+  }, [linkSettingStore._importedCSV])
 
 </script>
 
@@ -54,7 +113,23 @@
           <q-card class="common-card">
             <q-card-section class="row justify-between items-center q-py-md  q-px-lg">
               <div class="common-card-ttl">{{ $t('table.title.linkSetting') }}</div>
-            </q-card-section>
+              <div>
+                <q-btn class="btn-common shadow-3" outline label="CSV Export" no-caps @click="e => csvExport(e)"></q-btn>
+                <q-btn class="btn-common shadow-3 q-ml-md import-csv-btn" outline label="CSV Import" no-caps :loading="false">
+                  <template v-slot:loading>
+                    <q-spinner-facebook />
+                  </template>
+                  <q-file 
+                    class="hide-q-file"  
+                    name="importCSV" 
+                    v-model="importCSV" 
+                    accept=".csv"
+                    @update:model-value="onChangeImportCSV"
+                    @rejected="onRejected"
+                  />
+                </q-btn>
+              </div>
+            </q-card-section> 
             <q-card-section class="q-px-none">
               <q-table
                 class="index-table no-shadow"
@@ -67,35 +142,42 @@
                 hide-pagination
                 :visible-columns="visibileColumns"
               >
-                <template v-slot:body-cell-link="props">
-                  <q-td @dblclick="$event => editCell($event, props.row)">
-                    <div v-if="props.row.showText" class="ellipsis" style="width: 170px;">{{ props.row.link }}</div>
-                    <div v-else class="input-wr">
-                      <q-input 
-                        type="url"
-                        outlined 
-                        autofocus
-                        class="input-sm"
-                        v-model="props.row.link" 
-                        @keyup.enter="$event =>updateLink($event , props.row)"
-                        @blur="$event =>updateLink($event , props.row)"
-                        lazy-rules
-                        :rules="[
-                          val => !!val.replace(/\s/g, '') || 'Field is required', 
-                          (val, rules) => validateURL(val),
-                        ]"
-                       />
+                    
+                <template v-slot:body-cell-imgURL="props">
+                  <q-td>
+                    <div class="full-width row no-wrap items-center">
+                      <div class="col-auto">
+                        <q-img
+                          v-if="props.row.imgURL !== null"
+                          :src="props.row.imgURL"
+                          class="q-my-md ls-tb-img"
+                          style="width: 100px"
+                          loading="lazy"
+                          spinner-color="black"
+                        >
+                          <template v-slot:error>
+                            <div class="absolute-full flex flex-center bg-negative text-white">
+                              Cannot load image
+                            </div>
+                          </template>
+                        </q-img>
+                      </div>
+                      <div class="col-auto">
+                        <a :href="props.row.imgURL" target="_blank" class="ls-img-anchor" rel="noopener noreferrer">
+                          <div class="ellipsis q-ml-md" style="width: 170px;">{{ props.row.imgURL }}</div>
+                        </a>
+                      </div>
                     </div>
                   </q-td>
                 </template>
-                    
-                <template v-slot:body-cell-url="props">
+                <template v-slot:body-cell-pageURL="props">
                   <q-td>
-                    <a :href="props.row.url" target="_blank" rel="noopener noreferrer">
-                      <q-btn class="common-anchor" round flat icon="mdi-open-in-new"></q-btn>
+                    <a :href="props.row.pageURL" target="_blank" class="ls-img-anchor" rel="noopener noreferrer">
+                      <div class="ellipsis q-ml-md" style="width: 200px;">{{ props.row.pageURL }}</div>
                     </a>
                   </q-td>
                 </template>
+
               </q-table>
               <div class="row justify-end q-mt-md">
                 <q-pagination

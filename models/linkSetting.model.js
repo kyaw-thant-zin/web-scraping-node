@@ -17,11 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true
         },
-        account: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        imageUrl: {
+        imageURL: {
             type: DataTypes.TEXT,
             allowNull: true
         },
@@ -29,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: true
         },
-        pageUrl: {
+        pageURL: {
             type: DataTypes.TEXT,
             allowNull: true
         },

@@ -10,9 +10,7 @@ export const useInputCodeStore = defineStore('inputCode', () => {
     const _error = ref(false)
     const _inputCodes = ref(null)
     const _updatedLayoutType = ref(false)
-    const _updatedShowAccount = ref(false)
-    const _updatedShowTitle = ref(false)
-    const _updatedShowHashtag = ref(false)
+    const _updatedLayoutContent = ref(false)
     const _inputCodeTablePage = ref(useLocalStorage('_inputCodeTablePage', 1))
 
     const storeLoading = (loading) => {
@@ -37,6 +35,7 @@ export const useInputCodeStore = defineStore('inputCode', () => {
             dumpIC.showHashtag = ic.showHashtag
             dumpIC.apiCode = ic.apiToken
             dumpIC.showText = true
+            dumpIC.visibility = ic.campaign.visibility
             filteredInputCodes.push(dumpIC)
         })
 
@@ -51,20 +50,11 @@ export const useInputCodeStore = defineStore('inputCode', () => {
         _updatedLayoutType.value = updatedLayoutType
     }
 
-    const storeUpdatedShowAccount = (updatedShowAccount) => {
-        _updatedShowAccount.value = updatedShowAccount
-    }
-
-    const storeUpdatedShowTitle = (updatedShowTitle) => {
-        _updatedShowTitle.value = updatedShowTitle
-    }
-
-    const storeUpdatedShowHashtag = (updatedShowHashtag) => {
-        _updatedShowHashtag.value = updatedShowHashtag
+    const storeUpdatedLayoutContent = (updatedLayoutContent) => {
+        _updatedLayoutContent.value = updatedLayoutContent
     }
 
     const handleInputCodes = async () => {
-
         storeLoading(true)
         const inputCodes = await API.inputCode.index()
         storeInputCodes(inputCodes)
@@ -90,18 +80,18 @@ export const useInputCodeStore = defineStore('inputCode', () => {
         storeLoading(false)
     }
 
-    const handleUpdateShowAccount = async (id, val, type) => {
+    const handleUpdateLayoutContent = async (id, val, type) => {
         storeLoading(true)
         const response = await API.inputCode.updateLayoutContent(id, val, type)
         console.log(response)
         if(response) {
-            storeUpdatedShowAccount({
+            storeUpdatedLayoutContent({
                 success: true,
                 error: false,
                 message: 'Layout Content successfully updated!'
             })
         } else {
-            storeUpdatedShowAccount({
+            storeUpdatedLayoutContent({
                 success: false,
                 error: true,
                 message: 'Unable to update Layout Content!'
@@ -110,29 +100,17 @@ export const useInputCodeStore = defineStore('inputCode', () => {
         storeLoading(false)
     }
 
-    const handleUpdateShowTitle = async (id, val) => {
-        
-    }
-
-    const handleUpdateShowHashtag = async (id, val) => {
-        
-    }
-
     return {
         _error,
         _loading,
         _inputCodes,
         _inputCodeTablePage,
         _updatedLayoutType,
-        _updatedShowAccount,
-        _updatedShowTitle,
-        _updatedShowHashtag,
+        _updatedLayoutContent,
         handleInputCodes,
         storeInputCodeTablePage,
         handleUpdateLayoutType,
-        handleUpdateShowAccount,
-        handleUpdateShowTitle,
-        handleUpdateShowHashtag
+        handleUpdateLayoutContent
     }
 
 })

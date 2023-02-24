@@ -46,7 +46,7 @@
   }, [inputCodeStore._inputCodes])
 
   const editCell = (e, row) => {
-    if(row.showText) {
+    if(row.visibility && row.showText) {
       row.showText = false
     }
   }
@@ -80,73 +80,38 @@
   }, [inputCodeStore._updatedLayoutType])
 
   const toggleShowAccount = (row, val) => {
-    inputCodeStore.handleUpdateShowAccount(row.id, val, 'account')
-  }
-
-  watchEffect(() => {
-
-    if(inputCodeStore._updatedShowAccount) {
-      if(inputCodeStore._updatedShowAccount?.success) {
-        $q.notify({
-          caption: inputCodeStore._updatedShowAccount.message,
-          type: 'positive',
-          timeout: 1000
-        })
-
-      } else {
-        $q.notify({
-          caption: inputCodeStore._updatedShowAccount.message,
-          type: 'negative',
-          timeout: 1000
-        })
-      }
+    if(row.visibility) {
+      inputCodeStore.handleUpdateLayoutContent(row.id, val, 'account')
     }
-  }, [inputCodeStore._updatedShowAccount])
-
+  }
   const toggleShowTitle = (row, val) => {
-    inputCodeStore.handleUpdateShowAccount(row.id, val, 'title')
-  }
-  watchEffect(() => {
-
-    if(inputCodeStore._updatedShowTitle) {
-      if(inputCodeStore._updatedShowTitle?.success) {
-        $q.notify({
-          caption: inputCodeStore._updatedShowTitle.message,
-          type: 'positive',
-          timeout: 1000
-        })
-
-      } else {
-        $q.notify({
-          caption: inputCodeStore._updatedShowTitle.message,
-          type: 'negative',
-          timeout: 1000
-        })
-      }
+    if(row.visibility) {
+      inputCodeStore.handleUpdateLayoutContent(row.id, val, 'title')
     }
-  }, [inputCodeStore._updatedShowTitle])
-
+  }
   const toggleShowHashtag = (row, val) => {
-    inputCodeStore.handleUpdateShowAccount(row.id, val, 'hashtag')
+    if(row.visibility) {
+      inputCodeStore.handleUpdateLayoutContent(row.id, val, 'hashtag')
+    }
   }
   watchEffect(() => {
-    if(inputCodeStore._updatedShowHashtag) {
-      if(inputCodeStore._updatedShowHashtag?.success) {
+    if(inputCodeStore._updatedLayoutContent) {
+      if(inputCodeStore._updatedLayoutContent?.success) {
         $q.notify({
-          caption: inputCodeStore._updatedShowHashtag.message,
+          caption: inputCodeStore._updatedLayoutContent.message,
           type: 'positive',
           timeout: 1000
         })
 
       } else {
         $q.notify({
-          caption: inputCodeStore._updatedShowHashtag.message,
+          caption: inputCodeStore._updatedLayoutContent.message,
           type: 'negative',
           timeout: 1000
         })
       }
     }
-  }, [inputCodeStore._updatedShowHashtag])
+  }, [inputCodeStore._updatedLayoutContent])
 
   const copyCodes = (apiCode) => {
 
@@ -162,6 +127,16 @@
     .catch(() => {
       console.log('unable to copy')
     })
+  }
+
+  const checkVisibility = (row) => {
+    if(!row.visibility) {
+      $q.notify({
+        caption: `The campaign "${row.campaignName}" is private!`,
+        type: 'info',
+        timeout: 1000
+      })
+    }
   }
 
 </script>
@@ -205,74 +180,84 @@
                 hide-pagination
                 :visible-columns="visibileColumns"
               >
-                <template v-slot:body-cell-layoutType="props">
-                  <q-td @dblclick="$event => editCell($event, props.row)">
-                    <div v-if="props.row.showText" class="text-center">
-                      <div class="text-outlined shadow-1">{{ props.row.layoutType }}</div>
-                    </div>
-                    <div v-else class="input-wr ic-input">
-                      <q-input 
-                        style="max-width: 50px"
-                        class="shadow-3"
-                        type="url"
-                        outlined 
-                        autofocus
-                        v-model="props.row.layoutType" 
-                        @keyup.enter="$event =>updateLayoutType($event, props.row)"
-                        @blur="$event =>updateLayoutType($event, props.row)"
-                       />
-                    </div>
-                  </q-td>
+                
+                <template v-slot:body="props">
+                  <q-tr :props="props" :class="{ disabled: !props.row.visibility, 'row-disabled': true }" @click="e => checkVisibility(props.row)">
+                    
+                    <q-td key="campaignName" :props="props">
+                      {{ props.row.campaignName }}
+                    </q-td>
+
+                    <q-td key="layoutType" :props="props" @dblclick="$event => editCell($event, props.row)">
+                        <div v-if="props.row.showText" class="text-center">
+                          <div class="text-outlined shadow-1">{{ props.row.layoutType }}</div>
+                        </div>
+                        <div v-else class="input-wr ic-input">
+                          <q-input 
+                            style="max-width: 50px"
+                            class="shadow-3"
+                            type="url"
+                            outlined 
+                            autofocus
+                            v-model="props.row.layoutType" 
+                            @keyup.enter="$event =>updateLayoutType($event, props.row)"
+                            @blur="$event =>updateLayoutType($event, props.row)"
+                          />
+                        </div>
+                    </q-td>
+
+                    <q-td key="layoutContent" :props="props" class="text-center">
+                        <div class="full-width row justify-center">
+                          <div class="col-auto">
+                            <q-checkbox
+                              class="ic-checkbox"
+                              label="Account"
+                              checked-icon="task_alt"
+                              unchecked-icon="highlight_off"
+                              v-model="props.row.showAccount"
+                              @update:model-value="val => toggleShowAccount(props.row, val)"
+                              :disable="!props.row.visibility"
+                            />
+                          </div>
+                          <div class="col-auto q-mx-md">
+                            <q-checkbox
+                              class="ic-checkbox"
+                              label="Title"
+                              checked-icon="task_alt"
+                              unchecked-icon="highlight_off"
+                              v-model="props.row.showTitle"
+                              @update:model-value="val => toggleShowTitle(props.row, val)"
+                              :disable="!props.row.visibility"
+                            />
+                          </div>
+                          <div class="col-auto">
+                            <q-checkbox
+                              class="ic-checkbox"
+                              label="Hashtag"
+                              checked-icon="task_alt"
+                              unchecked-icon="highlight_off"
+                              v-model="props.row.showHashtag"
+                              @update:model-value="val => toggleShowHashtag(props.row, val)"
+                              :disable="!props.row.visibility"
+                            />
+                          </div>
+                        </div>
+                    </q-td>
+                        
+                    <q-td key="apiCode" :props="props" class="text-center">
+                        <q-btn 
+                          no-caps 
+                          class="btn-fixed-width ic-copy-btn" 
+                          label="Copy" 
+                          icon-right="mdi-content-copy" 
+                          @click="copyCodes(props.row.apiCode)"
+                          :disable="!props.row.visibility"
+                        />
+                    </q-td>
+
+                  </q-tr>
                 </template>
 
-                <template v-slot:body-cell-layoutContent="props">
-                  <q-td class="text-center">
-                    <div class="full-width row justify-center">
-                      <div class="col-auto">
-                        <q-checkbox
-                          class="ic-checkbox"
-                          label="Account"
-                          checked-icon="task_alt"
-                          unchecked-icon="highlight_off"
-                          v-model="props.row.showAccount"
-                          @update:model-value="val => toggleShowAccount(props.row, val)"
-                        />
-                      </div>
-                      <div class="col-auto q-mx-md">
-                        <q-checkbox
-                          class="ic-checkbox"
-                          label="Title"
-                          checked-icon="task_alt"
-                          unchecked-icon="highlight_off"
-                          v-model="props.row.showTitle"
-                          @update:model-value="val => toggleShowTitle(props.row, val)"
-                        />
-                      </div>
-                      <div class="col-auto">
-                        <q-checkbox
-                          class="ic-checkbox"
-                          label="Hashtag"
-                          checked-icon="task_alt"
-                          unchecked-icon="highlight_off"
-                          v-model="props.row.showHashtag"
-                          @update:model-value="val => toggleShowHashtag(props.row, val)"
-                        />
-                      </div>
-                    </div>
-                  </q-td>
-                </template>
-                    
-                <template v-slot:body-cell-apiCode="props">
-                  <q-td class="text-center">
-                    <q-btn 
-                      no-caps 
-                      class="btn-fixed-width ic-copy-btn" 
-                      label="Copy" 
-                      icon-right="mdi-content-copy" 
-                      @click="copyCodes(props.row.apiCode)"
-                    />
-                  </q-td>
-                </template>
               </q-table>
               <div class="row justify-end q-mt-md">
                 <q-pagination

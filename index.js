@@ -64,8 +64,11 @@ app.use('/api/v2/campaign', require('./routes/campaign.routes')) // campaign
 // CAMPAIGN OUTPUT ROUTES
 app.use('/api/v2/campaignOutput', require('./routes/campaignOutput.routes')) // campaignOutput
 
-// CAMPAIGN OUTPUT ROUTES
+// INPUT CODE ROUTES
 app.use('/api/v2/inputCode', require('./routes/inputCode.routes')) // inputCode
+
+// LINK SETTING ROUTES
+app.use('/api/v2/linkSetting', require('./routes/linkSetting.routes')) // linkSetting
 
 /**
  * Server Activation

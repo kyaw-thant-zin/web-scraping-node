@@ -166,5 +166,23 @@ export const API = {
             })
             return response.data
         }
+    },
+    'linkSetting': {
+        'index': async () => {
+            const response = await instance.get(apiURL+ '/linkSetting', {
+                headers: headers
+            })
+            return response.data
+        },
+        'store': async (data) => {
+            return new Promise(async (resovle, reject) => {
+
+                const response = await instance.post(apiURL+ '/linkSetting/store', data, {
+                    headers: headers
+                })
+                resovle(response.data)
+
+            })
+        },
     }
 }

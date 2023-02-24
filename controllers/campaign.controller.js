@@ -117,6 +117,7 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
 
     return new Promise(async (resovle, reject) => {
 
+        const tagRows = []
         const rows = userItems.map((item, index) => {
 
             if(state === tConfig.key.create) {
@@ -126,8 +127,8 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                     const row = {
                         uuid: tVideoUUID,
                         videoId: item.video.id,
-                        visibility: 0,
-                        priority: 0,
+                        visibility: appConfig.key.visibility,
+                        priority: appConfig.key.priority,
                         desc: item.desc,
                         playCount: item.stats.playCount,
                         diggCount: item.stats.diggCount,
@@ -151,8 +152,8 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
                     const row = {
                         uuid: tVideoUUID,
                         videoId: item.video.id,
-                        visibility: 0,
-                        priority: 0,
+                        visibility: appConfig.key.visibility,
+                        priority: appConfig.key.priority,
                         desc: item.desc,
                         playCount: item.stats.playCount,
                         diggCount: item.stats.diggCount,
@@ -262,10 +263,7 @@ const store = asyncHnadler( async (req, res) => {
                                         // store in the apiLayout table
                                         const secretKey = appConfig.secretKey
                                         const cUUID = campaign.uuid
-                                        const apiToken = CryptoJS.AES.encrypt(cUUID, secretKey).toString(CryptoJS.enc.Utf8)
-                                        console.log('secretKey - '+secretKey)
-                                        console.log('cUUID - '+cUUID)
-                                        console.log('apiToken - '+apiToken)
+                                        const apiToken = CryptoJS.AES.encrypt(cUUID, secretKey).toString()
                                         const apiLayoutUUID = uuid.v4()
                                         const apiLayout = await ApiLayout.create({
                                             uuid: apiLayoutUUID,
@@ -345,9 +343,6 @@ const store = asyncHnadler( async (req, res) => {
                                         } catch (error) {
                                             console.log(error)
                                         }
-                                        console.log('secretKey - '+secretKey)
-                                        console.log('cUUID - '+cUUID)
-                                        console.log('apiToken - '+apiToken)
                                         const apiLayoutUUID = uuid.v4()
                                         const apiLayout = await ApiLayout.create({
                                             uuid: apiLayoutUUID,

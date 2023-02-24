@@ -273,10 +273,11 @@
                 <template v-slot:body-cell-priority="props">
                   <q-td class="text-center">
                     <q-checkbox
+                      size="md"
                       indeterminate-icon="help"
-                      class="common-checkbox"
-                      checked-icon="star"
-                      unchecked-icon="star_border"
+                      class="common-checkbox star-checkbox"
+                      checked-icon="fa-solid fa-star"
+                      unchecked-icon="fa-regular fa-star"
                       v-model="props.row.priority"
                       @update:model-value="val => togglePriority(props, val)"
                     />
@@ -284,7 +285,12 @@
                 </template>
                 <template v-slot:body-cell-hashtag="props">
                   <q-td class="text-center">
-                    <div style="width: 170px;" class="ellipsis">{{ props.row.hashtag }}</div>
+                    <div style="width: 170px;" class="ellipsis">
+                      {{ props.row.hashtag }}
+                      <q-tooltip class="bg-indigo" :offset="[10, 10]">
+                        Here I am!
+                      </q-tooltip>
+                    </div>
                   </q-td>
                 </template>
                 <template v-slot:body-cell-link="props">
@@ -308,7 +314,6 @@
                     </div>
                   </q-td>
                 </template>
-                    
                 <template v-slot:body-cell-url="props">
                   <q-td>
                     <a :href="props.row.url" target="_blank" rel="noopener noreferrer">

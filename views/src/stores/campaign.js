@@ -85,7 +85,7 @@ export const useCampaignStore = defineStore('campaign', () => {
             dumpCampaign.account = campaign.account
             dumpCampaign.tags = campaign.hashtag
             dumpCampaign.linkType = campaign.linkType.type
-            dumpCampaign.publicPrivate = campaign.visibility
+            dumpCampaign.publicPrivate = !campaign.visibility
             dumpCampaign.action = true
             filteredCampaign.push(dumpCampaign)
         })
@@ -152,7 +152,7 @@ export const useCampaignStore = defineStore('campaign', () => {
 
     const handleCampaignVisibilityUpdate = async (id, visibility) => {
         storeLoading(true)
-        const response = await API.campaign.updateVisibility(id, visibility)
+        const response = await API.campaign.updateVisibility(id, !visibility)
         storeUpdateVisibility(response)
         storeLoading(false)
         setTimeout(() => {
