@@ -114,15 +114,6 @@ db.apiLayouts.belongsTo(db.campaigns, {
     onUpdate: 'CASCADE'
 }) // apiLayouts => campaigns
 
-db.campaigns.hasOne(db.linkSettings, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // campaigns => linkSettings
-db.linkSettings.belongsTo(db.campaigns, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-}) // linkSettings => campaigns
-
 db.tUsers.hasOne(db.tVideos, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
@@ -141,7 +132,7 @@ db.tVideos.belongsTo(db.tHashtags, {
     onUpdate: 'CASCADE'
 }) // tVideos => tHashtags
 
-db.tVideos.hasOne(db.linkSettings, {
+db.tVideos.hasMany(db.linkSettings, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 }) // tVideos => linkSettings

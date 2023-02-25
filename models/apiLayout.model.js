@@ -41,15 +41,6 @@ module.exports = (sequelize, DataTypes) => {
                 deferrable: Deferrable.INITIALLY_IMMEDIATE
             }
         },
-        linkSettingId: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'linkSettings',
-                key: 'id',
-                deferrable: Deferrable.INITIALLY_IMMEDIATE
-            }
-        },
     }
 
     const modelOpts = {

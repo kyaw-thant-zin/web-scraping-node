@@ -69,6 +69,7 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
 
     const storeCamapignOutputs = (campaigns) => {
         const filteredCampaignOutputs = []
+        console.log(campaigns)
         campaigns.forEach((co) => {
             const dumpCo = {}
             let account = '-'

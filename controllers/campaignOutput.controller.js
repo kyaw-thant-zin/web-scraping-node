@@ -46,6 +46,7 @@ const index = asyncHnadler( async (req, res) => {
             ['id', 'ASC'],
         ],
     })
+    
     res.send(campaignOutputs)
 
 })

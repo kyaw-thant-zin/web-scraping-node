@@ -114,19 +114,7 @@
   }, [inputCodeStore._updatedLayoutContent])
 
   const copyCodes = (apiCode) => {
-
-    const apiURL = `https://test.com?token=${apiCode}`
-    copyToClipboard(apiURL)
-    .then(() => {
-      $q.notify({
-        caption: 'Copied!',
-        type: 'positive',
-        timeout: 1000
-      })
-    })
-    .catch(() => {
-      console.log('unable to copy')
-    })
+    inputCodeStore.copyHTML(apiCode)
   }
 
   const checkVisibility = (row) => {

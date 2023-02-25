@@ -70,6 +70,9 @@ app.use('/api/v2/inputCode', require('./routes/inputCode.routes')) // inputCode
 // LINK SETTING ROUTES
 app.use('/api/v2/linkSetting', require('./routes/linkSetting.routes')) // linkSetting
 
+// CDN ROUTES
+app.use('/v1/api/', require('./routes/cdn.routes')) // linkSetting
+
 /**
  * Server Activation
  */

@@ -29,15 +29,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: true
         },
-        campaignId: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'campaigns',
-                key: 'id',
-                deferrable: Deferrable.INITIALLY_IMMEDIATE
-            }
-        },
         tVideoId: {
             type: DataTypes.INTEGER,
             allowNull: true,
