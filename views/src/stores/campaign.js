@@ -72,23 +72,25 @@ export const useCampaignStore = defineStore('campaign', () => {
 
     const storeCampaigns = (campaigns) => {
         const filteredCampaign = []
-        campaigns.forEach((campaign) => {
-            const dumpCampaign = {}
-
-            const date = dayjs(campaign.createTimestamp)
-            const formattedDate = date.format('DD/MM/YYYY')
-
-            dumpCampaign.id = campaign.id
-            dumpCampaign.campaignName = campaign.campaignName
-            dumpCampaign.createdAt = formattedDate
-            dumpCampaign.collectionType = campaign.collectionType.type
-            dumpCampaign.account = campaign.account
-            dumpCampaign.tags = campaign.hashtag
-            dumpCampaign.linkType = campaign.linkType.type
-            dumpCampaign.publicPrivate = !campaign.visibility
-            dumpCampaign.action = true
-            filteredCampaign.push(dumpCampaign)
-        })
+        if(campaigns.length > 0) {
+            campaigns.forEach((campaign) => {
+                const dumpCampaign = {}
+    
+                const date = dayjs(campaign.createTimestamp)
+                const formattedDate = date.format('DD/MM/YYYY')
+    
+                dumpCampaign.id = campaign.id
+                dumpCampaign.campaignName = campaign.campaignName
+                dumpCampaign.createdAt = formattedDate
+                dumpCampaign.collectionType = campaign.collectionType.type
+                dumpCampaign.account = campaign.account
+                dumpCampaign.tags = campaign.hashtag
+                dumpCampaign.linkType = campaign.linkType.type
+                dumpCampaign.publicPrivate = !campaign.visibility
+                dumpCampaign.action = true
+                filteredCampaign.push(dumpCampaign)
+            })
+        }
         _campaigns.value = filteredCampaign
     }
 

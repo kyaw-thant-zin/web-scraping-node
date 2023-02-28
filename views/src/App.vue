@@ -30,7 +30,7 @@ const routeName = computed(() => {
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
             <Transition name="fade">
-              <div class="fit row min-height-fit q-pb-xl">
+              <div class="fit row min-height-fit">
                 <Suspense>
                     <!-- main content -->
                     <component :is="Component"></component>

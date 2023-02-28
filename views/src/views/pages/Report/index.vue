@@ -17,7 +17,7 @@
       content ? `${content} | ${WebsiteName}` : WebsiteName
     }}</template>
   </metainfo>
-  <div class="full-width column">
+  <div class="full-width column q-mb-xl">
     <div class="q-pa-sm row items-start q-gutter-md">
       <q-breadcrumbs>
           <q-breadcrumbs-el :label="$t('nav.dashboard')" icon="mdi-home-variant-outline" to="/" />

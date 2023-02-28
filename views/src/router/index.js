@@ -81,26 +81,30 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: Dashboard,
+      meta: { requiresAuth: true },
     },
     {
       path: '/campaigns',
       name: 'campaigns',
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
       children: [
         {
           path: '',
           name: 'campaign.index',
           component: CampaignIndex,
+          meta: { requiresAuth: true },
         },
         {
           path: 'create',
           name: 'campaign.create',
           component: CampaignCreate,
+          meta: { requiresAuth: true },
         },
         {
           path: ':id/edit',
           name: 'campaign.edit',
           component: CampaignEdit,
+          meta: { requiresAuth: true },
         }
       ]
     },
@@ -121,16 +125,19 @@ const router = createRouter({
       path: '/report',
       name: 'report',
       component: Report,
+      meta: { requiresAuth: true },
     },
     {
       path: '/link-setting',
       name: 'linkSetting',
       component: LinkSetting,
+      meta: { requiresAuth: true },
     },
     {
       path: '/input-code',
       name: 'inputCode',
       component: InputCode,
+      meta: { requiresAuth: true },
     },
     {
       path: '/user',
@@ -154,12 +161,13 @@ const router = createRouter({
 });
 
 router.beforeEach( async (to, from, next) => {
-  // if (to.meta.requiresAuth && !await isLoggedIn()) {
-  //   next({ path: '/sign-in' })
-  // } else {
-  //   next()
-  // }
+  if (to.meta.requiresAuth && !await isLoggedIn()) {
+    console.log('next auth')
+    next({ path: '/sign-in' })
+    return
+  }
   next()
+  return
 })
 
 export default router;

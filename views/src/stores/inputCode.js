@@ -25,21 +25,22 @@ export const useInputCodeStore = defineStore('inputCode', () => {
     const storeInputCodes = (inputCodes) => {
 
         const filteredInputCodes = []
-        inputCodes.forEach((ic) => {
-            const dumpIC = {}
-            dumpIC.id = ic.id
-            dumpIC.campaignName = ic.campaign.campaignName
-            dumpIC.layoutType = ic.layoutType
-            dumpIC.layoutContent = `${ic.showAccount}, ${ic.showTitle}, ${ic.showHashtag}`
-            dumpIC.showAccount = ic.showAccount
-            dumpIC.showTitle = ic.showTitle
-            dumpIC.showHashtag = ic.showHashtag
-            dumpIC.apiCode = ic.apiToken
-            dumpIC.showText = true
-            dumpIC.visibility = ic.campaign.visibility
-            filteredInputCodes.push(dumpIC)
-        })
-
+        if(inputCodes.length > 0) {
+            inputCodes.forEach((ic) => {
+                const dumpIC = {}
+                dumpIC.id = ic.id
+                dumpIC.campaignName = ic.campaign.campaignName
+                dumpIC.layoutType = ic.layoutType
+                dumpIC.layoutContent = `${ic.showAccount}, ${ic.showTitle}, ${ic.showHashtag}`
+                dumpIC.showAccount = ic.showAccount
+                dumpIC.showTitle = ic.showTitle
+                dumpIC.showHashtag = ic.showHashtag
+                dumpIC.apiCode = ic.apiToken
+                dumpIC.showText = true
+                dumpIC.visibility = ic.campaign.visibility
+                filteredInputCodes.push(dumpIC)
+            })
+        }
         _inputCodes.value = filteredInputCodes
     }
 

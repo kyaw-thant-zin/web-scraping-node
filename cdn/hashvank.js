@@ -21,19 +21,21 @@ const getJSCode = (videos, inputCode, callBack) => {
                     
                     const lsArray = []
                     linkSettings.forEach((ls) => {
-                        const layout = `
-                                    <li class="hashvank-vd-wr-info-list-item">
-                                        <a href="${ls.pageURL}" target="_blank" rel="noopener">
-                                            <figure>
-                                                <img src="${ls.imageURL}" alt="${ls.title}" />
-                                            </figure>
-                                            <div class="hashvank-vd-wr-info-list-item-txt">
-                                                <h3>${ls.title}</h3>
-                                                <p>${ls.hashtag}</p>
-                                            </div>
-                                        </a>
-                                    </li>
-                                `
+                        let layoutStart = `
+                            <li class="hashvank-vd-wr-info-list-item">
+                                <a href="${ls.pageURL}" target="_blank" rel="noopener">
+                                    <figure>
+                                        <img src="${ls.imageURL}" alt="${ls.title}" />
+                                    </figure>
+                                    <div class="hashvank-vd-wr-info-list-item-txt">`
+                        if(inputCode.title) {
+                            layoutStart += `<h3>${ls.title}</h3>`
+                        } 
+                        if(inputCode.hashtag) {
+                            layoutStart += `<p>${ls.hashtag}</p>`
+                        }
+                        const layoutEnd = `</div></a></li>`
+                        let layout = layoutStart + layoutEnd
                         lsArray.push(layout)
                     })
 
@@ -48,7 +50,7 @@ const getJSCode = (videos, inputCode, callBack) => {
                         </div>
                     `)
                 }
-            });
+            })
             
         }
 

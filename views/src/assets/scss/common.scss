@@ -30,6 +30,85 @@ body {
   min-height: inherit;
 }
 
+.bg-main {
+  background-color: #7764E4;
+}
+
+.bg-cm {
+  color: #172B4D;
+  background-color: #F53C56;
+}
+
+.bg-co {
+  color: #172B4D;
+  background-color: #11CDEF;
+}
+
+.bg-ls {
+  color: #172B4D;
+  background-color: #FEB969;
+}
+
+.bg-api {
+  color: #000;
+  background-color: #D5D6D6;
+}
+
+.custom-badge {
+  right: -12px;
+  background-color: #C10015;
+}
+
+.custom-chip {
+  display: inline-block;
+  position: relative;
+  font-size: 12px;
+  margin: 0px;
+  color: #172B4D;
+  text-align: center;
+  padding: 4px 24px;
+}
+
+.lock-card {
+  opacity: 0.7;
+}
+
+.bg-glossy {
+  background-image: linear-gradient(to bottom,rgba(255,255,255,.3),rgba(255,255,255,0) 50%,rgba(0,0,0,.12) 51%,rgba(0,0,0,.04))!important;
+}
+
+.br-rounded {
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+
+.color-cm {
+  color: #F53C56;
+}
+
+.color-co {
+  color: #11CDEF;
+}
+
+.color-ls {
+  color: #FEB969;
+}
+
+.color-ic {
+  color: #FB6340;
+}
+
+.apexcharts-legend {
+  min-width: 150px;
+}
+
+.o-none {
+  overflow: hidden;
+}
+
 .campaignOutput-t-video {
   width: 120px;
   height: 160px;

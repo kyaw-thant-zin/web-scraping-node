@@ -89,6 +89,6 @@ app.listen(port, async () => {
     console.log(`Listening to requests on http://localhost:${port}`)
 
     // check and update video URL
-    Schedule.updateTVideoURL()
+    // Schedule.updateTVideoURL()
 
 })

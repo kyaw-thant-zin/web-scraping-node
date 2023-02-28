@@ -24,16 +24,18 @@ export const useLinkSettingStore = defineStore('linkSetting', () => {
 
     const storelinkSettings = (linkSettings) => {
         const filteredLinkSettings = []
-        linkSettings.forEach((ls) => {
-            const dumpLs = {
-                id: ls.id,
-                hashtag: ls.hashtag,
-                imgURL: ls.imageURL,
-                title: ls.title,
-                pageURL: ls.pageURL
-            }
-            filteredLinkSettings.push(dumpLs)
-        })
+        if(linkSettings.length > 0) {
+            linkSettings.forEach((ls) => {
+                const dumpLs = {
+                    id: ls.id,
+                    hashtag: ls.hashtag,
+                    imgURL: ls.imageURL,
+                    title: ls.title,
+                    pageURL: ls.pageURL
+                }
+                filteredLinkSettings.push(dumpLs)
+            })
+        }
         _linkSettings.value = filteredLinkSettings
     }
 

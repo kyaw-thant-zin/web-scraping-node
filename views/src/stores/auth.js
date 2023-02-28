@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const handleCheckAuth = async (uuid) => {
         const response = await API.checkAuth(uuid)
-        if(response !== false) {
+        if(!response?.error) {
             storeError(false)
             storeUser(response)
             storeUUID(response.uuid)

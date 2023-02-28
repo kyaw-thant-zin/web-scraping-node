@@ -3,7 +3,7 @@ module.exports = {
     USER: process.env.DB_USER || 'root',
     PASS: process.env.DB_PASS || '',
     NAME: process.env.DB_NAME || 'hashvank-v2',
-    TIMEZONE: process.env.DB_TIMEZONE || 'ETC/GMT+06:30',
+    TIMEZONE: 'ETC/GMT+06:30',
     dialect: process.env.DB_TYPE || 'mariadb',
 
     pool: {

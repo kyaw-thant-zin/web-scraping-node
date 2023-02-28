@@ -32,7 +32,7 @@ module.exports.passportConfig = () => {
 
             const filteredUser = {}
             for(const key in user.dataValues) {
-                if(key === 'uuid' || key === 'userName' || key === 'roleId' || key === 'firstName' || key === 'lastName' ) {
+                if(key === 'id' || key === 'uuid' || key === 'userName' || key === 'roleId' || key === 'firstName' || key === 'lastName' ) {
                     if(key === 'uuid') {
                         filteredUser[key] = CryptoJS.AES.encrypt(user.dataValues[key], secretKey).toString()
                     } else {
@@ -40,7 +40,6 @@ module.exports.passportConfig = () => {
                     }
                 }
             }
-
             return done(null, filteredUser)
         }
       )

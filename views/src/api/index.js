@@ -3,12 +3,14 @@ import { apiURL } from '@/api/constants.js';
 
 const headers = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': 'http://localhost:8080/',
+    'Access-Control-Allow-Origin': 'https://hashvank.com/',
+    // 'Access-Control-Allow-Origin': 'http://localhost:8000',
     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'
 }
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080/',
+    baseURL: 'https://hashvank.com/',
+    // baseURL: 'http://localhost:8000/',
 });
 
 export const API = {

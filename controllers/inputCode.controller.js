@@ -15,7 +15,7 @@ const InputCode = db.apiLayouts
 // @access Private
 const index = asyncHnadler( async (req, res) => {
 
-    const userId = 12
+    const userId = req.user?.id
 
     if(!userId) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -43,7 +43,7 @@ const index = asyncHnadler( async (req, res) => {
 const updateLayoutType = asyncHnadler( async (req, res) => {
 
     const { id, layoutType } = req.body
-    const userId = 12
+    const userId = req.user?.id
 
     if(id === undefined || layoutType === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -81,7 +81,7 @@ const updateLayoutType = asyncHnadler( async (req, res) => {
 const updatelayoutContent = asyncHnadler( async (req, res) => {
 
     const { id, val, type } = req.body
-    const userId = 12
+    const userId = req.user?.id
 
     if(id === undefined || val === undefined || type === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })

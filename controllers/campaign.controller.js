@@ -7,6 +7,7 @@ const Scraper = require('../scraper/index')
 const { appConfig } = require('../config/appConfig')
 const { tConfig } = require('../config/tiktokConfig')
 const asyncHnadler = require('express-async-handler')
+const Schedule = require("../event/index")
 
 // Create main Model
 const Campaign = db.campaigns
@@ -23,6 +24,7 @@ const ApiLayout = db.apiLayouts
 const validateUnique = asyncHnadler( async (req, res) => {
 
     const { campaignName } = req.query
+    const userId = req.user?.id
 
     if(!campaignName) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -32,7 +34,7 @@ const validateUnique = asyncHnadler( async (req, res) => {
     let foundCampaignName = await Campaign.findOne({
         where: {
             campaignName: campaignName,
-            userId: 12
+            userId: userId
         }
     })
 
@@ -50,7 +52,7 @@ const validateUnique = asyncHnadler( async (req, res) => {
 // @access Private
 const index = asyncHnadler( async (req, res) => {
 
-    const userId = 12
+    const userId = req.user?.id
 
     if(!userId) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -192,6 +194,7 @@ const bulkCreateTVideos = (userItems, t, state, scrapingMethod) => {
 const store = asyncHnadler( async (req, res) => {
 
     const { campaignName, collectionType, account, hashtag, linkType } = req.body
+    const userId = req.user?.id
 
     if(!campaignName || !collectionType || !linkType) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -217,7 +220,7 @@ const store = asyncHnadler( async (req, res) => {
         collectionTypeId: collectionType.value,
         linkTypeId: linkType.value,
         visibility: appConfig.key.visibility,
-        userId: 12
+        userId: userId
     }
 
     const campaign = await Campaign.create(campaignData).then(campaigns => {
@@ -277,6 +280,7 @@ const store = asyncHnadler( async (req, res) => {
         
                                         if(apiLayout) {
                                             console.log('apiLayout Created.....')
+                                            Schedule.updateTVideoURL(campaign.campaignName)
                                             res.json(true)
                                         } else {
                                             res.json(false)
@@ -356,6 +360,7 @@ const store = asyncHnadler( async (req, res) => {
         
                                         if(apiLayout) {
                                             console.log('apiLayout Created.....')
+                                            Schedule.updateTVideoURL(campaign.campaignName)
                                             res.json(true)
                                         } else {
                                             res.json(false)
@@ -388,7 +393,7 @@ const store = asyncHnadler( async (req, res) => {
 const updateVisibility = asyncHnadler( async (req, res) => {
 
     const { id, visibility } = req.body
-    const userId = 12
+    const userId = req.user?.id
 
     if(id === undefined || visibility === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -414,7 +419,7 @@ const updateVisibility = asyncHnadler( async (req, res) => {
 // @access Private
 const show = asyncHnadler( async (req, res) => {
 
-    const userId = 12
+    const userId = req.user?.id
     const { id } = req.params
 
     if(!userId && id === undefined) {
@@ -445,7 +450,7 @@ const show = asyncHnadler( async (req, res) => {
 // @access Private
 const destroy = asyncHnadler( async (req, res) => {
 
-    const userId = 12
+    const userId = req.user?.id
     const { id } = req.body
 
     if(!userId && id === undefined) {

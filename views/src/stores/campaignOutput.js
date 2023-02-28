@@ -45,13 +45,14 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
             label: 'All Campaigns',
             value: '0'
         }]
-        campaigns.forEach((campaign) => {
-            const dumpCampaign = {}
-            dumpCampaign.value = campaign.id
-            dumpCampaign.label = campaign.campaignName
-            filteredCampaign.push(dumpCampaign)
-        })
-
+        if(campaigns.length > 0) {
+            campaigns.forEach((campaign) => {
+                const dumpCampaign = {}
+                dumpCampaign.value = campaign.id
+                dumpCampaign.label = campaign.campaignName
+                filteredCampaign.push(dumpCampaign)
+            })
+        }
         _campaigns.value = filteredCampaign
     }
 
@@ -69,61 +70,62 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
 
     const storeCamapignOutputs = (campaigns) => {
         const filteredCampaignOutputs = []
-        console.log(campaigns)
-        campaigns.forEach((co) => {
-            const dumpCo = {}
-            let account = '-'
-            let hashtag = '-'
-            let visibility = false
-            let priority = false
-            let video = {}
-            if(co.tHashtag == null) {
-                video = co.tUser.tVideo
-                account = co.account
-                const desc = co.tUser.tVideo.desc
-                const hashtagPattern = /#[\p{L}0-9_]+/ug
-                const tags = desc.match(hashtagPattern).toString()
-                hashtag = tags
-                visibility = co.tUser.tVideo.visibility
-                priority = co.tUser.tVideo.priority
-            } else {
-                video = co.tHashtag.tVideo
-                hashtag = co.hashtag
-                account = '@'+co.tHashtag.tVideo.authorUniqueId
-                visibility = co.tHashtag.tVideo.visibility
-                priority = co.tHashtag.tVideo.priority
-            }
-
-
-            let secTags = ''
-            if(video.secVideoURL != '') {
-                const hashtags = video.desc.match(/#[\p{L}0-9_]+/ug)
-                if(hashtags.length > 0) {
-                    secTags = hashtags.join(',')
-                } 
-            } else {
-                secTags = hashtag
-            }
-
-
-            const date = dayjs(video.createTime)
-            const formattedDate = date.format('DD/MM/YYYY')
-
-            dumpCo.id = co.id
-            dumpCo.tVideoId = video.id
-            dumpCo.publicPrivate = !visibility
-            dumpCo.campaignName = co.campaignName
-            dumpCo.tiktok = video.secVideoURL != '' ? video.secVideoURL : video.videoURL
-            dumpCo.postDate = formattedDate
-            dumpCo.account = account
-            dumpCo.hashtag = secTags
-            dumpCo.views = video.playCount
-            dumpCo.link = video.webVideoURL
-            dumpCo.priority = priority
-            dumpCo.url = video.webVideoURL
-            dumpCo.showText = true
-            filteredCampaignOutputs.push(dumpCo)
-        })
+        if(campaigns.length > 0) {
+            campaigns.forEach((co) => {
+                const dumpCo = {}
+                let account = '-'
+                let hashtag = '-'
+                let visibility = false
+                let priority = false
+                let video = {}
+                if(co.tHashtag == null) {
+                    video = co.tUser.tVideo
+                    account = co.account
+                    const desc = co.tUser.tVideo.desc
+                    const hashtagPattern = /#[\p{L}0-9_]+/ug
+                    const tags = desc.match(hashtagPattern).toString()
+                    hashtag = tags
+                    visibility = co.tUser.tVideo.visibility
+                    priority = co.tUser.tVideo.priority
+                } else {
+                    video = co.tHashtag.tVideo
+                    hashtag = co.hashtag
+                    account = '@'+co.tHashtag.tVideo.authorUniqueId
+                    visibility = co.tHashtag.tVideo.visibility
+                    priority = co.tHashtag.tVideo.priority
+                }
+    
+    
+                let secTags = ''
+                if(video.secVideoURL != '') {
+                    const hashtags = video.desc.match(/#[\p{L}0-9_]+/ug)
+                    if(hashtags.length > 0) {
+                        secTags = hashtags.join(',')
+                    } 
+                } else {
+                    secTags = hashtag
+                }
+    
+    
+                const date = dayjs(video.createTime)
+                const formattedDate = date.format('DD/MM/YYYY')
+    
+                dumpCo.id = co.id
+                dumpCo.tVideoId = video.id
+                dumpCo.publicPrivate = !visibility
+                dumpCo.campaignName = co.campaignName
+                dumpCo.tiktok = video.secVideoURL != '' ? video.secVideoURL : video.videoURL
+                dumpCo.postDate = formattedDate
+                dumpCo.account = account
+                dumpCo.hashtag = secTags
+                dumpCo.views = video.playCount
+                dumpCo.link = video.webVideoURL
+                dumpCo.priority = priority
+                dumpCo.url = video.webVideoURL
+                dumpCo.showText = true
+                filteredCampaignOutputs.push(dumpCo)
+            })
+        }
         _campaignOutputs.value = filteredCampaignOutputs
     }
 

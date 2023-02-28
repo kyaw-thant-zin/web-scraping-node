@@ -18,7 +18,7 @@ const TVideo = db.tVideos
 // @access Private
 const index = asyncHnadler( async (req, res) => {
 
-    const userId = 12
+    const userId = req.user.id
 
     if(!userId) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -57,7 +57,7 @@ const index = asyncHnadler( async (req, res) => {
 const updateVisibility = asyncHnadler( async (req, res) => {
 
     const { tVideoId, visibility } = req.body
-    const userId = 12
+    const userId = req.user.id
 
     if(tVideoId === undefined || visibility === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -91,7 +91,7 @@ const updateVisibility = asyncHnadler( async (req, res) => {
 const updatePriority = asyncHnadler( async (req, res) => {
 
     const { tVideoId, priority } = req.body
-    const userId = 12
+    const userId = req.user.id
 
     if(tVideoId === undefined || priority === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })
@@ -152,7 +152,7 @@ const getNewVideoAndUpdate = async (tVideoId, link) => {
 const updateLink = asyncHnadler( async (req, res) => {
 
     const { tVideoId, link } = req.body
-    const userId = 12
+    const userId = req.user.id
 
     if(tVideoId === undefined || link === undefined) {
         res.status(400).send({ error: { required: 'Please add all fields' } })

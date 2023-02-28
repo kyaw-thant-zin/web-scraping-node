@@ -123,7 +123,7 @@
         <q-breadcrumbs-el :label="$t('nav.campaign')" />
     </q-breadcrumbs>
   </div>
-  <div class="full-width row wrap q-mb-xl">
+  <div class="full-width row wrap  q-mb-xl">
     <div class="q-px-md row">
       <q-toolbar>
         <q-toolbar-title class="page-ttl">

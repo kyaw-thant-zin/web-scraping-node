@@ -6,6 +6,7 @@ import { Quasar, Loading, Notify, Dialog } from 'quasar'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { createMetaManager } from 'vue-meta'
+import VueApexCharts from "vue3-apexcharts"
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
@@ -49,6 +50,7 @@ createApp(App)
   .use(pinia)
   .use(router)
   .use(createMetaManager())
+  .use(VueApexCharts)
   .use(Quasar, {
     plugins: {
       Loading,

@@ -145,10 +145,12 @@ const skipUnnecessaryRequests = async (scrapingMethod, page) => {
                         if(request.url().includes("api/post/item_list")) {
                             apiListURL = request.url()
                             apiListHeaders = request.headers()
+                            console.log(apiListURL)
                         }
                         if(request.url().includes("api/user/detail")) {
                             apiUserURL = request.url()
                             apiUserHeaders = request.headers()
+                            console.log(apiUserURL)
                         }
                         request.continue()
                     } else if(removeResourceTypes.includes(request.resourceType())) {
