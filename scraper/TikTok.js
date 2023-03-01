@@ -106,7 +106,10 @@ const openNewPage = async (scrapingMethod) => {
         try {
             if(global.browser.chromium != null) {
                 page = await global.browser.chromium.newPage({
-                    storageState: global.browser.authFile,
+                    // ...global.browser.devices.DesktopChrome,
+                    // geolocation: { longitude: 48.858455, latitude: 2.294474 },
+                    // permissions: ['geolocation'],
+                    // storageState: global.browser.authFile,
                 })
             } else {
                 console.log('---------- else -----------')
@@ -144,7 +147,7 @@ const skipUnnecessaryRequests = async (scrapingMethod, page) => {
                 
             } else if(scrapingMethod === 'hashtag') {
                 page.on('response', async (response) => {
-                    if(response.url().includes("api/search/item/full")) {
+                    if(response.url().includes("api/search/general/full")) {
                         // console.log('<<', response.status(), response.url())
                         try {
                             const responseBodyBuffer = await response.body();
@@ -255,47 +258,86 @@ const getVideoByURL = async (urlObj) => {
 // ------------------------- ***** URL ***** ----------------------------//
 
 // beautify data
-const beautify = async (videoList) => {
+const beautify = async (videoList, scrapingMethod) => {
     return new Promise(async (resovle, reject) => {
         try {
             console.log('----- beautify ------')
+
             if(videoList && videoList.length > 0) {
                 const videoListKey = [ 'author', 'id', 'stats', 'createTime', 'desc', 'video']
                 const videoKey = ['id', 'format', 'duration', 'originCover', 'playAddr', 'videoQuality']
                 let bVideoList = []
-                for(const video of videoList) {
-                    const dumpVideo = {}
-                    for(const key in video) {
-                        if(videoListKey.includes(key)) {
-                            if(key == 'video') {
-                                const videoObj = video[key]
-                                const dumpVideoChild = {}
-                                for(const childKey in videoObj) {
-                                    if(videoKey.includes(childKey)) {
-                                        if(childKey == 'playAddr') {
-                                            const webVideoURL = `https://www.tiktok.com/${video.author.uniqueId}/video/${video.id}`
-                                            console.log(webVideoURL)
-                                            const webUrl = new URL(webVideoURL)
-                                            // const playAddr = await getVideoPlayAbleURL(video.id, video.author.uniqueId)
-                                            const playAddr = await getVideoByURL(webUrl)
-                                            dumpVideoChild['originalPlayAddr'] = videoObj[childKey]
-                                            if(playAddr) {
-                                                dumpVideoChild[childKey] = playAddr.data.secVideoURL
+                if(scrapingMethod === 'hashtag') {
+                    for(const vd of videoList) {
+                        const video = vd.item
+                        const dumpVideo = {}
+                        for(const key in video) {
+                            if(videoListKey.includes(key)) {
+                                if(key == 'video') {
+                                    const videoObj = video[key]
+                                    const dumpVideoChild = {}
+                                    for(const childKey in videoObj) {
+                                        if(videoKey.includes(childKey)) {
+                                            if(childKey == 'playAddr') {
+                                                const webVideoURL = `https://www.tiktok.com/${video.author.uniqueId}/video/${video.id}`
+                                                console.log(webVideoURL)
+                                                const webUrl = new URL(webVideoURL)
+                                                // const playAddr = await getVideoPlayAbleURL(video.id, video.author.uniqueId)
+                                                const playAddr = await getVideoByURL(webUrl)
+                                                dumpVideoChild['originalPlayAddr'] = videoObj[childKey]
+                                                if(playAddr) {
+                                                    dumpVideoChild[childKey] = playAddr.data.secVideoURL
+                                                } else {
+                                                    dumpVideoChild[childKey] = videoObj[childKey]
+                                                }
                                             } else {
                                                 dumpVideoChild[childKey] = videoObj[childKey]
                                             }
-                                        } else {
-                                            dumpVideoChild[childKey] = videoObj[childKey]
                                         }
                                     }
+                                    dumpVideo[key] = dumpVideoChild
+                                } else {
+                                    dumpVideo[key] = video[key]
                                 }
-                                dumpVideo[key] = dumpVideoChild
-                            } else {
-                                dumpVideo[key] = video[key]
                             }
                         }
+                        bVideoList.push(dumpVideo)
                     }
-                    bVideoList.push(dumpVideo)
+                } else if(scrapingMethod === 'account') {
+                    for(const video of videoList) {
+                        const dumpVideo = {}
+                        for(const key in video) {
+                            if(videoListKey.includes(key)) {
+                                if(key == 'video') {
+                                    const videoObj = video[key]
+                                    const dumpVideoChild = {}
+                                    for(const childKey in videoObj) {
+                                        if(videoKey.includes(childKey)) {
+                                            if(childKey == 'playAddr') {
+                                                const webVideoURL = `https://www.tiktok.com/${video.author.uniqueId}/video/${video.id}`
+                                                console.log(webVideoURL)
+                                                const webUrl = new URL(webVideoURL)
+                                                // const playAddr = await getVideoPlayAbleURL(video.id, video.author.uniqueId)
+                                                const playAddr = await getVideoByURL(webUrl)
+                                                dumpVideoChild['originalPlayAddr'] = videoObj[childKey]
+                                                if(playAddr) {
+                                                    dumpVideoChild[childKey] = playAddr.data.secVideoURL
+                                                } else {
+                                                    dumpVideoChild[childKey] = videoObj[childKey]
+                                                }
+                                            } else {
+                                                dumpVideoChild[childKey] = videoObj[childKey]
+                                            }
+                                        }
+                                    }
+                                    dumpVideo[key] = dumpVideoChild
+                                } else {
+                                    dumpVideo[key] = video[key]
+                                }
+                            }
+                        }
+                        bVideoList.push(dumpVideo)
+                    }
                 }
                 console.log('beautify done....')
                 resovle(bVideoList)
@@ -381,10 +423,11 @@ const getVideosByAccount = async (account) => {
                                 console.log('----------------got videos------------')
                                 if(videos?.itemList) {
                                     const newList = videos.itemList.slice(0, 11)
-                                    const videoLists = await beautify(newList)
+                                    const videoLists = await beautify(newList, 'account')
                                     if(videoLists) {
                                         user.items = videoLists
-                                        console.log('--------------resovle user-----------')
+                                        await page.close()
+                                        console.log('---------Page closed--------')
                                         resovle(user)
                                     }
                                 } else {
@@ -441,8 +484,8 @@ const getVideosByHashtag = async (hashtag) => {
                     })
                     console.log('----------page ready-----------')
                     
-                    if(hashtagList && hashtagList?.item_list) {
-                        const videos = await beautify(hashtagList.item_list)
+                    if(hashtagList && hashtagList?.data) {
+                        const videos = await beautify(hashtagList.data, 'hashtag')
                         if(videos) {
                             console.log('-----------Got Video----------')
                             hashtagResults.items = videos

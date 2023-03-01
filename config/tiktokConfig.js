@@ -19,13 +19,13 @@ const tAppURLs = {
         },
         "getSearchURL": (account) => {
             account = account.replace('@', '')
-            return `https://www.tiktok.com/search/user?q=${account}`
+            return `https://www.tiktok.com/search?q=${account}`
         }
     },
     "hashtag": {
         "getSearchURL": (hashtag) => {
             hashtag = hashtag.replace('#', '')
-            return `https://www.tiktok.com/search/video?q=${hashtag}`
+            return `https://www.tiktok.com/search?q=${hashtag}`
         }
     },
     "video": {

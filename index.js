@@ -89,7 +89,7 @@ const browser = {
     userDir: './profiles',
     authFile: './.auth/auth.json',
     devices: {
-        'DesktopChrome': devices['Desktop Chrome']
+        'DesktopChrome': devices['Desktop Chrome HiDPI']
     },
     loginURL: 'https://www.tiktok.com/login/phone-or-email/email'
 }
@@ -102,12 +102,22 @@ app.listen(port, async () => {
     // Schedule.updateTVideoURL()
 
     browser.chromium = await chromium.launchPersistentContext('./profiles', { 
-        headless: true,
+        slowMo: 20,
+        headless: false,
+        ...browser.devices.DesktopChrome,
+        locale: 'ja-Jp',
+        timezoneId: 'Asia/Tokyo',
+        geolocation: { longitude: 139.6786764, latitude: 35.6203313 },
+        permissions: ['geolocation'],
+        storageState: browser.authFile,
     })
     console.log('Browser is running......')
 
     page = await browser.chromium.newPage({
-        storageState: browser.authFile,
+        // ...browser.devices.DesktopChrome,
+        // geolocation: { longitude: 48.858455, latitude: 2.294474 },
+        // permissions: ['geolocation'],
+        // storageState: browser.authFile,
     })
 
     const loginURL = 'https://www.tiktok.com/login/phone-or-email/email'
