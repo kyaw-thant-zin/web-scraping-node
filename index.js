@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const { passportConfig } = require("./config/passportConfig")
 const Schedule = require("./event/index")
+const { chromium, firefox, webkit, devices } = require('playwright')
 
 
 /**
@@ -84,11 +85,55 @@ app.get('*', (req, res) => {
 })
 
 
+const browser = {
+    userDir: './profiles',
+    authFile: './.auth/auth.json',
+    devices: {
+        'DesktopChrome': devices['Desktop Chrome']
+    },
+    loginURL: 'https://www.tiktok.com/login/phone-or-email/email'
+}
+
 app.listen(port, async () => {
 
     console.log(`Listening to requests on http://localhost:${port}`)
 
     // check and update video URL
     // Schedule.updateTVideoURL()
+
+    browser.chromium = await chromium.launchPersistentContext('./profiles', { 
+        headless: true,
+    })
+    console.log('Browser is running......')
+
+    page = await browser.chromium.newPage({
+        storageState: browser.authFile,
+    })
+
+    const loginURL = 'https://www.tiktok.com/login/phone-or-email/email'
+    await page.goto( loginURL, {
+        waitUntil: 'networkidle0'
+    })
+
+    await page.waitForTimeout(5000)
+
+    console.log('------------Get current URL------------')
+    const currentUrl = await page.url();
+    console.log(`Current URL: ${currentUrl}`);
+
+    console.log('------------Check login page or not------------')
+    if(currentUrl == loginURL) {
+        await page.fill('input[name="username"]', 'icdl.webmaster.0001@gmail.com')
+        await page.fill('input[type="password"]', 'bf_mMWPh66')
+        await page.getByRole('button', { name: 'Log in' }).click()
+        await page.waitForTimeout(3000)
+        await page.context().storageState({ path: browser.authFile })
+        console.log('------------login successful-------------')
+    } else {
+        console.log('------------Already logged in------------')
+    }
+
+    console.log('-------------Browser ready----------')
+    global.browser = browser
 
 })

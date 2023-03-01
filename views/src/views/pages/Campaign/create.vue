@@ -105,15 +105,22 @@
   }, [campaignStore._loading, campaignStore._collectionTypes, campaignStore._linkTypes])
 
   watchEffect(() => {
-    if(campaignStore._created) {
+    if(campaignStore._created && !campaignStore._created?.error) {
       $q.notify({
         caption: 'Congratulations, campaign has been successfully created.',
-        message: 'SUCCESS',
+        message: 'SUCCESS!',
         type: 'positive',
         timeout: 1000
       })
       resetForm()
       campaignStore.router.replace({ name: 'campaign.index' })
+    } else if(campaignStore._created?.error) {
+      $q.notify({
+        caption: campaignStore._created.error,
+        message: 'FAILED!',
+        type: 'negative',
+        timeout: 1000
+      })
     }
   }, [campaignStore._created])
 

@@ -29,7 +29,7 @@ const campaignVideos = async (req, res) => {
 
         const inputCode = await InputCode.findOne({
             where: {
-                apiToken: token
+                apiToken: decodeURIComponent(token)
             },
         })
 
@@ -56,6 +56,7 @@ const campaignVideos = async (req, res) => {
             if(campaign) {
                 let videos
                 const inputCode = campaign.apiLayout
+                console.log(inputCode)
                 if(campaign.tHashtag != null) {
                     videos = await TVideo.findAll({
                         where: {
@@ -90,6 +91,7 @@ const campaignVideos = async (req, res) => {
 
                 let jsCode
                 if(videos) {
+                    console.log('got videos')
                     if(callBack) {
                         jsCode = await getJSCode(videos, inputCode, callBack)
                     } else {

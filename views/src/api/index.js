@@ -1,16 +1,14 @@
 import axios from 'axios'
-import { apiURL } from '@/api/constants.js';
+import { apiURL, baseURL } from '@/api/constants.js';
 
 const headers = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': 'https://hashvank.com/',
-    // 'Access-Control-Allow-Origin': 'http://localhost:8000',
+    'Access-Control-Allow-Origin': baseURL,
     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'
 }
 
 const instance = axios.create({
-    baseURL: 'https://hashvank.com/',
-    // baseURL: 'http://localhost:8000/',
+    baseURL: baseURL,
 });
 
 export const API = {

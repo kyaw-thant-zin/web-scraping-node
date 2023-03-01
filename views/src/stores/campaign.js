@@ -145,7 +145,13 @@ export const useCampaignStore = defineStore('campaign', () => {
     const handleCampaignCreate = async (formData) => {
         storeLoading(true)
         const response = await API.campaign.store(formData)
-        storeCreated(response)
+        if(response) {
+            storeCreated(response)
+        } else {
+            storeCreated({
+                error: 'Too many attempts, please try another hashtag or username or please try again later.'
+            })
+        }
         storeLoading(false)
         setTimeout(() => {
             storeCreated(false)

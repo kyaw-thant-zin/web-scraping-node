@@ -1,0 +1,4 @@
+2023/03/01-19:30:10.139 8503 Reusing MANIFEST /Users/kyawthantzin/Documents/ICDL MM/nodejs/web-scraping-node/profiles/Profile 2/Service Worker/Database/MANIFEST-000001
+2023/03/01-19:30:10.139 8503 Recovering log #3
+2023/03/01-19:30:10.140 8503 (ignoring error) /Users/kyawthantzin/Documents/ICDL MM/nodejs/web-scraping-node/profiles/Profile 2/Service Worker/Database/000003.log: dropping 30 bytes; Corruption: missing start of fragmented record(2)
+2023/03/01-19:30:10.140 8503 Reusing old log /Users/kyawthantzin/Documents/ICDL MM/nodejs/web-scraping-node/profiles/Profile 2/Service Worker/Database/000003.log 

@@ -42,6 +42,7 @@
     "needle": "^3.2.0",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "playwright": "^1.31.1",
     "puppeteer": "^19.5.2",
     "puppeteer-autoscroll-down": "^1.1.1",
     "puppeteer-extra": "^3.3.4",

@@ -91,6 +91,7 @@ const getExpiresDate = (videoURL) => {
 const bulkCreateTUser = (userInfo, campaignId, state) => {
 
     let row = {}
+    console.log(userInfo)
 
     if(state === tConfig.key.create) {
         row.uuid = uuid.v4()
@@ -233,6 +234,8 @@ const store = asyncHnadler( async (req, res) => {
             console.log('---------------- Hashtag ------------------')
             const responseHastag = await Scraper.tiktok.getVideosByHashtag(campaign.hashtag)
             if(responseHastag) {
+                console.log('----- hashtag items ------')
+                console.log(responseHastag)
                 if(responseHastag?.items) {
                     console.log('----- got hashtag items ------')
                     console.log('tHashtag Creating.....')
@@ -280,7 +283,7 @@ const store = asyncHnadler( async (req, res) => {
         
                                         if(apiLayout) {
                                             console.log('apiLayout Created.....')
-                                            Schedule.updateTVideoURL(campaign.campaignName)
+                                            // Schedule.updateTVideoURL(campaign.campaignName)
                                             res.json(true)
                                         } else {
                                             res.json(false)
@@ -309,6 +312,7 @@ const store = asyncHnadler( async (req, res) => {
         } else {
             console.log('---------------- Account ------------------')
             const response = await Scraper.tiktok.getVideosByAccount(campaign.account)
+            console.log('Response - '+response)
             // got the resposne and user info
             if(response && response?.userInfo) {
                 console.log('----- got user info ------')
@@ -360,7 +364,7 @@ const store = asyncHnadler( async (req, res) => {
         
                                         if(apiLayout) {
                                             console.log('apiLayout Created.....')
-                                            Schedule.updateTVideoURL(campaign.campaignName)
+                                            // Schedule.updateTVideoURL(campaign.campaignName)
                                             res.json(true)
                                         } else {
                                             res.json(false)

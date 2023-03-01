@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import { API } from '@/api/index.js'
 import { useLocalStorage } from '@vueuse/core'
 import { copyToClipboard } from 'quasar'
+import { baseURL } from '@/api/constants.js'
 
 export const useInputCodeStore = defineStore('inputCode', () => {
 
@@ -105,7 +106,7 @@ export const useInputCodeStore = defineStore('inputCode', () => {
     const copyHTML = (apiCode) => {
 
         const layout = `<div id="hashvank"></div>
-        <script type="text/javascript" async src="http://localhost:8080/v1/api/campaign/videos?token=${apiCode}"></script>`
+        <script type="text/javascript" async src="${baseURL}/v1/api/campaign/videos?token=${encodeURIComponent(apiCode)}"></script>`
         copyToClipboard(layout)
     }
 

@@ -16,6 +16,10 @@ const tAppURLs = {
         "getProfileURL": (uniqueId) => {
             uniqueId = uniqueId.replace('@', '')
             return `https://www.tiktok.com/@${uniqueId}`
+        },
+        "getSearchURL": (account) => {
+            account = account.replace('@', '')
+            return `https://www.tiktok.com/search/user?q=${account}`
         }
     },
     "hashtag": {

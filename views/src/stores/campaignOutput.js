@@ -82,9 +82,11 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
                     video = co.tUser.tVideo
                     account = co.account
                     const desc = co.tUser.tVideo.desc
-                    const hashtagPattern = /#[\p{L}0-9_]+/ug
-                    const tags = desc.match(hashtagPattern).toString()
-                    hashtag = tags
+                    if(desc != '') {
+                        const hashtagPattern = /#[\p{L}0-9_]+/ug
+                        const tags = desc.match(hashtagPattern).toString()
+                        hashtag = tags
+                    }
                     visibility = co.tUser.tVideo.visibility
                     priority = co.tUser.tVideo.priority
                 } else {
@@ -97,7 +99,7 @@ export const useCampaignOutputStore = defineStore('campaignOutput', () => {
     
     
                 let secTags = ''
-                if(video.secVideoURL != '') {
+                if(video.secVideoURL != '' && video.desc != '') {
                     const hashtags = video.desc.match(/#[\p{L}0-9_]+/ug)
                     if(hashtags.length > 0) {
                         secTags = hashtags.join(',')
