@@ -101,47 +101,52 @@ app.listen(port, async () => {
     // check and update video URL
     // Schedule.updateTVideoURL()
 
-    browser.chromium = await chromium.launchPersistentContext('./profiles', { 
-        slowMo: 20,
+    // browser.chromium = await chromium.launchPersistentContext('./profiles', { 
+    //     slowMo: 20,
+    //     headless: false,
+    //     ...browser.devices.DesktopChrome,
+    //     locale: 'ja-Jp',
+    //     timezoneId: 'Asia/Tokyo',
+    //     geolocation: { longitude: 139.6786764, latitude: 35.6203313 },
+    //     permissions: ['geolocation'],
+    //     storageState: browser.authFile,
+    // })
+    // console.log('Browser is running......')
+
+    // page = await browser.chromium.newPage({
+    //     // ...browser.devices.DesktopChrome,
+    //     // geolocation: { longitude: 48.858455, latitude: 2.294474 },
+    //     // permissions: ['geolocation'],
+    //     // storageState: browser.authFile,
+    // })
+
+    // const loginURL = 'https://www.tiktok.com/login/phone-or-email/email'
+    // await page.goto( loginURL, {
+    //     waitUntil: 'networkidle0'
+    // })
+
+    // await page.waitForTimeout(5000)
+
+    // console.log('------------Get current URL------------')
+    // const currentUrl = await page.url();
+    // console.log(`Current URL: ${currentUrl}`);
+
+    // console.log('------------Check login page or not------------')
+    // if(currentUrl == loginURL) {
+    //     await page.fill('input[name="username"]', 'icdl.webmaster.0001@gmail.com')
+    //     await page.fill('input[type="password"]', 'bf_mMWPh66')
+    //     await page.getByRole('button', { name: 'Log in' }).click()
+    //     await page.waitForTimeout(3000)
+    //     await page.context().storageState({ path: browser.authFile })
+    //     console.log('------------login successful-------------')
+    // } else {
+    //     console.log('------------Already logged in------------')
+    // }
+
+    browser.chromium = await chromium.launch({ 
         headless: false,
-        ...browser.devices.DesktopChrome,
-        locale: 'ja-Jp',
-        timezoneId: 'Asia/Tokyo',
-        geolocation: { longitude: 139.6786764, latitude: 35.6203313 },
-        permissions: ['geolocation'],
-        storageState: browser.authFile,
     })
     console.log('Browser is running......')
-
-    page = await browser.chromium.newPage({
-        // ...browser.devices.DesktopChrome,
-        // geolocation: { longitude: 48.858455, latitude: 2.294474 },
-        // permissions: ['geolocation'],
-        // storageState: browser.authFile,
-    })
-
-    const loginURL = 'https://www.tiktok.com/login/phone-or-email/email'
-    await page.goto( loginURL, {
-        waitUntil: 'networkidle0'
-    })
-
-    await page.waitForTimeout(5000)
-
-    console.log('------------Get current URL------------')
-    const currentUrl = await page.url();
-    console.log(`Current URL: ${currentUrl}`);
-
-    console.log('------------Check login page or not------------')
-    if(currentUrl == loginURL) {
-        await page.fill('input[name="username"]', 'icdl.webmaster.0001@gmail.com')
-        await page.fill('input[type="password"]', 'bf_mMWPh66')
-        await page.getByRole('button', { name: 'Log in' }).click()
-        await page.waitForTimeout(3000)
-        await page.context().storageState({ path: browser.authFile })
-        console.log('------------login successful-------------')
-    } else {
-        console.log('------------Already logged in------------')
-    }
 
     console.log('-------------Browser ready----------')
     global.browser = browser

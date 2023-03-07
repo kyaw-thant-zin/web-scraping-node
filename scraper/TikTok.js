@@ -31,6 +31,20 @@ let hashtagList = ''
  *  Scraper Configuration
  */
 
+// all reset
+const resetAll = async (page) => {
+    await page.close()
+    // ACCOUNT
+    accountInfo = ''
+    accountVideos = ''
+    accountReqListHeader = ''
+    accountReqListURL = ''
+
+    // HASHTAG
+    accountURL = ''
+    hashtagList = ''
+}
+
 // decrpyt header and set cursor
 const setCursor = (xttparams) => {
     const decipher = crypto.createDecipheriv(tConfig.algorithm, tConfig.secretKey, tConfig.secretKey)
@@ -151,6 +165,7 @@ const skipUnnecessaryRequests = async (page) => {
                     try {
                         console.log('----------------take video list------------')
                         const responseBodyBufferUserVideos = await response.body();
+                        console.log(responseBodyBufferUserVideos)
                         const videos = JSON.parse(responseBodyBufferUserVideos.toString())
                         console.log('----------------got video list------------')
                         if(videos?.itemList) {
@@ -163,7 +178,7 @@ const skipUnnecessaryRequests = async (page) => {
                 }
 
                 // hashtag response
-                if(response.url().includes('api/search/item/full')) {
+                if(response.url().includes('api/search/general/full')) {
                     console.log('------------API fetch------------')
                     console.log('>>', response.url())
                     try {
@@ -171,8 +186,8 @@ const skipUnnecessaryRequests = async (page) => {
                         const responseBodyBufferUser = await response.body();
                         const tags = JSON.parse(responseBodyBufferUser.toString())
                         console.log('----------------got hashtag list------------')
-                        if(tags?.item_list) {
-                            hashtagList = tags.item_list
+                        if(tags?.data) {
+                            hashtagList = tags.data
                         }
         
                     } catch (error) {
@@ -372,21 +387,6 @@ const beautify = async (videoList, scrapingMethod) => {
     })
 }
 
-const allDone = async (page) => {
-    return new Promise(async (resovle, reject) => {
-        await page.close()
-        console.log("Page closed!")
-        await mainBrowser.close()
-        console.log("Browser closed!")
-
-        if (chromeTmpDataDir !== null) {
-            fs.removeSync(chromeTmpDataDir);
-        }
-
-        resovle(true)
-    })
-}
-
 // ------------------------- ***** account ***** ----------------------------//
 const getVideosByAccount = async (account) => {
 
@@ -403,65 +403,143 @@ const getVideosByAccount = async (account) => {
                     const appURL = tAppURLs.user.getProfileURL(acc)
                     console.log(appURL)
                     await page.goto(appURL, {
-                        waitUntil: chromiumPage.waitUntil.networkidle0,
+                        waitUntil: 'networkidle0',
                     })
+                    const imgPath1 = './scraper/err_img/'+account+'1.jpg'
                     await page.screenshot({
-                        path: './scraper/err_img/'+account+'.jpg'
+                        path: imgPath1
                     })
+                    await page.waitForTimeout(5000)
                     console.log('-----account page ready-----')
-                    console.log('-----Page scroll-----')
-                    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-                    await page.waitForTimeout(2000)
-                    console.log('-----Page scroll done-----')
+                    const link = await page.$('a[href="/"]')
+                        if(link) {
+                            console.log('------account link found----')
+                            await link.click()
+                            await page.waitForTimeout(2000)
+                            console.log('---------Go back--------')
+                            await page.goBack({
+                                waitUntil: 'networkidle'
+                            })
+                            await page.waitForTimeout(2000)
 
-                    if(accountReqListURL && accountReqListHeader) {
-
-                        console.log('------------API URL found------------')
-                        const xttparams = accountReqListHeader['x-tt-params']
-                        const decrpytedXttParams = setCursor(xttparams)
-                        const newXttParams = getXTTPARAMS(decrpytedXttParams)
-                        accountReqListHeader['x-tt-params'] = newXttParams
-                        console.log('------------Decrypt Header & Encrypt Header------------')
-                        await page.setExtraHTTPHeaders(accountReqListHeader)
-                        console.log('------------Fetch Video List------------')
-                        await page.goto( accountReqListURL, {
-                            waitUntil: 'networkidle0'
-                        })
-                        console.log('------------Video list page ready------------')
-                        await page.waitForTimeout(2000)
-
-                        if(accountVideos && accountInfo) {
-                            user.userInfo = accountInfo
-                            const newList = accountVideos.slice(0, 11)
-                            const videoLists = await beautify(newList, 'account')
-                            if(videoLists) {
-                                user.items = videoLists
-                                await page.close()
-                                console.log('---------Page closed--------')
-                                resovle(user)
+                            if(accountVideos && accountInfo) {
+                                user.userInfo = accountInfo
+                                const newList = accountVideos.slice(0, 11)
+                                const videoLists = await beautify(newList, 'account')
+                                if(videoLists) {
+                                    user.items = videoLists
+                                    resetAll(page)
+                                    console.log('---------Page closed--------')
+                                    resovle(user)
+                                } else {
+                                    console.log('---------No video found--------')
+                                    resetAll(page)
+                                    console.log('---------Page closed--------')
+                                    resovle(false)
+                                }
                             } else {
                                 console.log('---------No video found--------')
-                                await page.close()
+                                resetAll(page)
                                 console.log('---------Page closed--------')
                                 resovle(false)
                             }
                         } else {
-                            console.log('---------No video found--------')
-                            await page.close()
+                            console.log('---------No API found--------')
+                            resetAll(page)
                             console.log('---------Page closed--------')
                             resovle(false)
                         }
+                    // console.log('-----Page scroll-----')
+                    // await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+                    // await page.waitForTimeout(2000)
+                    // const imgPath2 = './scraper/err_img/'+account+'2.jpg'
+                    // await page.screenshot({
+                    //     path: imgPath2
+                    // })
+                    // console.log('-----Page scroll done-----')
+                    // if(accountReqListURL && accountReqListHeader) {
 
-                    } else {
-                        console.log('---------No API found--------')
-                        await page.close()
-                        console.log('---------Page closed--------')
-                        resovle(false)
-                    }
+                    //     console.log('------------API URL found------------')
+                    //     const xttparams = accountReqListHeader['x-tt-params']
+                    //     const decrpytedXttParams = setCursor(xttparams)
+                    //     const newXttParams = getXTTPARAMS(decrpytedXttParams)
+                    //     accountReqListHeader['x-tt-params'] = newXttParams
+                    //     console.log('------------Decrypt Header & Encrypt Header------------')
+                    //     await page.setExtraHTTPHeaders(accountReqListHeader)
+                    //     console.log('------------Fetch Video List------------')
+                    //     await page.goto( accountReqListURL, {
+                    //         waitUntil: 'networkidle0'
+                    //     })
+                    //     console.log('------------Video list page ready------------')
+                    //     await page.waitForTimeout(2000)
+                    //     const imgPath2 = './scraper/err_img/'+account+'3.jpg'
+                    //     await page.screenshot({
+                    //         path: imgPath2
+                    //     })
+
+                    //     if(accountVideos && accountInfo) {
+                    //         user.userInfo = accountInfo
+                    //         const newList = accountVideos.slice(0, 11)
+                    //         const videoLists = await beautify(newList, 'account')
+                    //         if(videoLists) {
+                    //             user.items = videoLists
+                    //             resetAll(page)
+                    //             console.log('---------Page closed--------')
+                    //             resovle(user)
+                    //         } else {
+                    //             console.log('---------No video found--------')
+                    //             resetAll(page)
+                    //             console.log('---------Page closed--------')
+                    //             resovle(false)
+                    //         }
+                    //     } else {
+                    //         const link = await page.$('a[href="/"]')
+                    //         if(link) {
+                    //             console.log('------account link found----')
+                    //             await link.click()
+                    //             await page.waitForTimeout(2000)
+                    //             console.log('---------Go back--------')
+                    //             await page.goBack({
+                    //                 waitUntil: 'networkidle'
+                    //             })
+                    //             await page.waitForTimeout(2000)
+
+                    //             if(accountVideos && accountInfo) {
+                    //                 user.userInfo = accountInfo
+                    //                 const newList = accountVideos.slice(0, 11)
+                    //                 const videoLists = await beautify(newList, 'account')
+                    //                 if(videoLists) {
+                    //                     user.items = videoLists
+                    //                     resetAll(page)
+                    //                     console.log('---------Page closed--------')
+                    //                     resovle(user)
+                    //                 } else {
+                    //                     console.log('---------No video found--------')
+                    //                     resetAll(page)
+                    //                     console.log('---------Page closed--------')
+                    //                     resovle(false)
+                    //                 }
+                    //             } else {
+                    //                 console.log('---------No video found--------')
+                    //                 resetAll(page)
+                    //                 console.log('---------Page closed--------')
+                    //                 resovle(false)
+                    //             }
+                    //         } else {
+                    //             console.log('---------No API found--------')
+                    //             resetAll(page)
+                    //             console.log('---------Page closed--------')
+                    //             resovle(false)
+                    //         }
+                    //     }
+
+                    // } else {
+                        
+                    // }
                     
                 } else {
                     resovle(false)
-                    await page.close()
+                    resetAll(page)
                     console.log('---------Page closed--------')
                 }
                 
@@ -504,17 +582,18 @@ const getVideosByHashtag = async (hashtag) => {
                 const page = await openNewPage('hashtag')
                 if(page) {
                     await page.goto(profileURL, {
-                        waitUntil: chromiumPage.waitUntil.networkidle0,
+                        waitUntil: 'networkidle',
                     })
+                    const imgPath1 = './scraper/err_img/'+tag+'.jpg'
                     await page.screenshot({
-                        path: './scraper/err_img/'+tag+'.jpg'
+                        path: imgPath1
                     })
                     console.log('----------go to profile first-----------')
                     if(accountURL != '') {
                         console.log('------------API URL found------------')
                         const newURL = new URL(accountURL)
                         const searchParams = newURL.searchParams
-                        newURL.pathname = '/api/search/item/full/'
+                        newURL.pathname = '/api/search/general/full/'
                         newURL.origin = 'https://www.tiktok.com'
                         newURL.host = 'www.tiktok.com'
                         newURL.hostname = 'www.tiktok.com'
@@ -534,33 +613,40 @@ const getVideosByHashtag = async (hashtag) => {
                         await page.waitForTimeout(2000)
                         console.log('------------API Page Ready------------')
                         if(hashtagList) {
-                            const videos = await beautify(hashtagList, 'hashtag')
+                            const dumpList = []
+                            for (const item of hashtagList) {
+                                dumpList.push(item.item)
+                            }
+                            const videos = await beautify(dumpList, 'hashtag')
                             if(videos) {
                                 console.log('-----------Got Video----------')
                                 hashtagResults.items = videos
-                                await page.close()
+                                resetAll(page)
                                 console.log('---------Page closed--------')
+
+                                fs.unlink(imgPath1)
+
                                 resovle(hashtagResults)
                             } else {
                                 console.log("not getting video list")
+                                resetAll(page)
                                 resovle(false)
-                                await page.close()
                                 console.log('---------Page closed--------')
                             }
                         } else {
                             console.log('------------Cannot find Hashtag------------')
-                            await page.close()
+                            resetAll(page)
                             resovle(false)
                         }
 
                     } else {
                         console.log('------------Cannot find API URL------------')
-                        await page.close()
+                        resetAll(page)
                         resovle(false)
                     }
                     
                 } else {
-                    await page.close()
+                    resetAll(page)
                     resovle(false)
                 }
             }
